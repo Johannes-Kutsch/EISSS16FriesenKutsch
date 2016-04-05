@@ -5,3 +5,9 @@ Zu bestimmten Zeiten bietet das Dauerticket die Möglichkeit eine zusätzliche P
 ####Ziel
 Das Ziel des Projektes ist es, eine Plattform zu schaffen, welche es ermöglicht Kontakt zwischen einander unbekannten Benutzern herzustellen, deren Route ganz oder teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits vorhandenen Dauertickets ermöglicht.
 
+###Applikation
+####Beschreibung
+Platzhalter
+####Installation
+Platzhalter
+
