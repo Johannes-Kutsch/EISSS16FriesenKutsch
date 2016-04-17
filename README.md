@@ -18,5 +18,11 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 ####Beschreibung
 Platzhalter
 ####Installation
-Platzhalter
+1. [VirtualBox herunterladen](http://www.oracle.com/technetwork/server-storage/virtualbox/downloads/index.html) und anschließend installieren.
+2. [Vagrant herunterladen](https://www.vagrantup.com/downloads.html) und anschließend installieren.
+3. Den Git Ordner "DTSharing" herunterladen und entpacken.
+4. Terminal öffnen (bei Windows als Admin) und in den Ordner DTSharing navigieren.
+5. "vagrant up" in die Konsole eingeben und zurücklehnen.
+6. "vagrant ssh" in die Konsole eingeben
+7. folgt
 
