@@ -4,6 +4,9 @@ node_modules/
 # Vagrant
 .vagrant/
 
+#OSX
+.idea/
+
 # Built application files
 *.apk
 *.ap_
