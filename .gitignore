@@ -1,4 +1,7 @@
-### Vagrant ###
+# Node
+node_modules/
+
+# Vagrant
 .vagrant/
 
 # Built application files
