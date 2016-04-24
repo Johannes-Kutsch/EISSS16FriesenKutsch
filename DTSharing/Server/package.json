@@ -1,0 +1,15 @@
+{
+  "name": "DTSharing",
+  "version": "0.0.1",
+  "description": "Dauerticket Sharing Applikation",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "~1.15.0",
+    "express": "~4.13.4",
+    "mongoose": "^4.4.12"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "Thomas Friesen, Johannes Kutsch",
+  "license": "BSD-2-Clause"
+}
