@@ -2,7 +2,7 @@ var express 	= require('express'),
 	app			= express(),
 	bodyParser 	= require('body-parser'),
 	mongoose	= require('mongoose');
-	//meetupsController = require('./controllers/meetups-controller');
+	controller = require('./controllers/db.post-controller');
 
 mongoose.connect('mongodb://localhost:27017/dtsharing');
 
