@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.post('/test', function (req, res) {
-	console.log(req.body);
+app.post('/:type/newEntry', function (req, res) {
+	console.log(req.params.type);
 	var test = {
 		"success": 1,
 		"data": "Daten hier"
@@ -21,6 +21,10 @@ app.post('/test', function (req, res) {
 				'Content-Type': 'application/json'
 			});
   	res.end(JSON.stringify(test));
+});
+
+app.get('getAll', function (req, res) {
+
 });
 
 //app.use('/js', express.static(__dirname + '/client/js'));
