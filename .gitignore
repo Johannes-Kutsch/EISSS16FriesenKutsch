@@ -4,8 +4,11 @@ node_modules/
 # Vagrant
 .vagrant/
 
-#OSX
+#IDE
 .idea/
+
+#MongoDB
+mongo/
 
 # Built application files
 *.apk
