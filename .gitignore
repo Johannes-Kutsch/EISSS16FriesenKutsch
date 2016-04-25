@@ -8,7 +8,7 @@ node_modules/
 .idea/
 
 #MongoDB
-mongo/
+mongo/db/
 
 # Built application files
 *.apk
