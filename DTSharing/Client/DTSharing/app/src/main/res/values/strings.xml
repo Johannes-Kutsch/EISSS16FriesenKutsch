@@ -5,12 +5,14 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="start">Start</string>
-    <string name="ziel">Ziel</string>
-    <string name="ticket_prompt">Welches Ticket besitzt du?</string>
+    <string name="start">Von</string>
+    <string name="destination">Nach</string>
+    <string name="ticket_prompt">Ich besitze&#8230;</string>
     <string name="tvCurrentRadius">Radius: %1$d km</string>
+    <string name="matchingDesc">Nachfolgend aufgeführt findest du alle Suchergebnisse die deinen Kriterien entsprechen. Sollte nichts für dich dabei sein kannst du dich über den Button rechts selbst eintragen</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_matching">MatchingActivity</string>
 
 </resources>

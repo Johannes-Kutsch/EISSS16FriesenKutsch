@@ -5,7 +5,7 @@
         <item
             android:checked="true"
             android:id="@+id/nav_main"
-            android:icon="@drawable/ic_directions_transit_black_24dp"
+            android:icon="@drawable/ic_train_lightgrey_24dp"
             android:title="Home" />
         <item
             android:id="@+id/nav_login"
@@ -20,9 +20,6 @@
             <item
                 android:id="@+id/nav_database"
                 android:title="Database" />
-            <item
-                android:id="@+id/nav_send"
-                android:title="Send" />
         </menu>
     </item>
 

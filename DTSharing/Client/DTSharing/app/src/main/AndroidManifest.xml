@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.dtsharing.dtsharing">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -10,6 +10,11 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAxeRrnA7z27Z2wgqALaynT8zu7W6_upvg"/>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -19,6 +24,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MatchingActivity"
+            android:label="@string/title_activity_matching"
+            android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
     </application>
 
