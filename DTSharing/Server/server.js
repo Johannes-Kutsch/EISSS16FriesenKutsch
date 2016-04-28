@@ -2,7 +2,7 @@ var express 	= require('express'),
 	app			= express(),
 	bodyParser 	= require('body-parser'),
 	mongoose	= require('mongoose');
-	controller = require('./controllers/db.post-controller');
+	db_postController = require('./js/controllers/db_postController');
 
 mongoose.connect('mongodb://localhost:27017/dtsharing');
 
@@ -11,21 +11,25 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.post('/:type/newEntry', function (req, res) {
-	console.log(req.params.type);
-	var test = {
-		"success": 1,
-		"data": "Daten hier"
+app.get('/:type/get/all', db_postController.getAllByType);
+
+app.post('/:type/post/entry', db_postController.createEntry);
+app.post('/:type/get/matches', db_postController.getMatchesByType);
+
+app.get('/vrs/:from/:to', function (req, res) {
+	var from = req.params.from,
+		to = req.params.to;
+
+		
+});
+
+/*app.get('/getAll/:type', function (req, res) {
+	if(req.params.type == "offers"){
+		db_postController.getOffers;
+	}else if(req.params.type == "searches"){
+		db_postController.getSearches;
 	}
-	res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
-  	res.end(JSON.stringify(test));
-});
-
-app.get('getAll', function (req, res) {
-
-});
+});*/
 
 //app.use('/js', express.static(__dirname + '/client/js'));
 //app.use('/assets/js', express.static(__dirname + '/client/assets/js'));
