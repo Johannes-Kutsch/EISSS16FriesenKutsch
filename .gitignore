@@ -4,11 +4,11 @@ node_modules/
 # Vagrant
 .vagrant/
 
-#IDE
+# IDE
 .idea/
 
-#MongoDB
-DTSharing/Server/mongo
+# MongoDB
+DTSharing/Server/mongo/db/*
 
 # Built application files
 *.apk
