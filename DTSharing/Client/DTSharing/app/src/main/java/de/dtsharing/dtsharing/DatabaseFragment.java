@@ -34,7 +34,9 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener {
     private ListView myList;
     private RadioButton rbOffer, rbSearch;
     RelativeLayout v;
-    private String url, urlBase = "http://192.168.0.15:3000/";
+    private String url;
+    String urlBase = "http://10.0.2.2:3000/";
+    //String urlBase = "http://192.168.0.15:3000/";
     //Allgemeine urlBase: http://10.0.2.2:3000/
 
 

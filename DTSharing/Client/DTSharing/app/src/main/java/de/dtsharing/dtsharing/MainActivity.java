@@ -110,6 +110,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new DatabaseFragment();
                 title = "Database";
                 break;
+            case R.id.nav_location:
+                fragment = new LocationFragment();
+                title = "Location";
+                break;
 
         }
 

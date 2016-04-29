@@ -1,6 +1,7 @@
-var Offer = require('../models/offer');
-var Search = require('../models/search');
-var Station = require('../models/station');
+var Offer = require('../models/offer'),
+	Search = require('../models/search'),
+	Station = require('../models/station'),
+	geolib = require('geolib');
 
 module.exports.createEntry = function (req, res) {
 	console.log(req.body);
@@ -78,11 +79,31 @@ module.exports.getMatchesByType = function (req, res) {
 }
 
 module.exports.getStations = function (req, res) {
-	Station.find({/*'stop_name': {'$regex': 'Deutz'}*/}, 'stop_name -_id', function (err, results) {
+	Station.find({/*'stop_name': {'$regex': 'Gummersbach', '$options': 'i'}*/}, 'stop_name -_id', function (err, results) {
 	        	/*var newResults = [];
 	        	results.forEach(function(results){
 	        		newResults.push(results.stop_name);
 	        	});*/
 	        	res.json(results);
 	    	});
+}
+
+module.exports.getStationsNearby = function (req, res) {
+	var user_lat = req.params.lat,
+		user_lon = req.params.lon;
+
+	Station.find({}, 'stop_name stop_lat stop_lon -_id', function (err, results) {
+		var newResults = [];
+		var obj = {};
+		results.forEach(function(result){
+			var inRange = geolib.isPointInCircle(
+				{latitude: result.stop_lat, longitude: result.stop_lon},
+				{latitude: user_lat, longitude: user_lon},
+				2000
+				);
+			if(inRange)
+				newResults.push({'stop_name': result.stop_name});
+		});
+		res.json(newResults);
+	});
 }

@@ -34,8 +34,9 @@ public class MatchingActivity extends AppCompatActivity {
     private ListView myList;
     Button bSubmit;
 
-    private String start, destination, ticket, date, time, getType, postType, url,
-                    urlBase = "http://192.168.0.15:3000/";
+    private String start, destination, ticket, date, time, getType, postType, url;
+    String urlBase = "http://10.0.2.2:3000/";
+    //String urlBase = "http://192.168.0.15:3000/";
                     //Allgemeine urlBase: http://10.0.2.2:3000/
     //<--       OnCreate Start         -->
     @Override

@@ -3,8 +3,11 @@ package de.dtsharing.dtsharing;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -48,7 +51,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     ArrayList<String> stations = new ArrayList<>();
 
     private String spTicket_selected = "kein Ticket";
-    private String url, urlBase = "http://192.168.0.15:3000/";
+    private String url;
+    String urlBase = "http://10.0.2.2:3000/";
+    //String urlBase = "http://192.168.0.15:3000/";
 
     /*Aktuelles Datum + Uhrzeit erhalten*/
     final Calendar c = Calendar.getInstance();
@@ -93,7 +98,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         getStations();
 
-
         /*Ticket Dialog item selected listener*/
         spinnerListener();
 
@@ -128,10 +132,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-                        System.out.println("###FÜLLE ARRAY AUF###");
-                        System.out.println(stations);
-                        /*stations.add(response);*/
+                        System.out.println("### GET STATIONS METHOD ###");
                         adapterAutoComplete.addAll(stations);
                         adapterAutoComplete.notifyDataSetChanged();
                     }
@@ -145,7 +146,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     }
                 }
         );
-        Volley.newRequestQueue(getActivity().getApplicationContext()).add(jsonRequest);
+        Volley.newRequestQueue(getActivity()).add(jsonRequest);
     }
     //<--           getStations End         -->
 

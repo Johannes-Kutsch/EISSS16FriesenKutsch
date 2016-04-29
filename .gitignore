@@ -8,7 +8,7 @@ node_modules/
 .idea/
 
 #MongoDB
-DTSharing/Server/mongo/db/*
+journal/
 
 # Built application files
 *.apk
