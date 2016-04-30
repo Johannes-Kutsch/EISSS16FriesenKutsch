@@ -47,8 +47,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private Spinner spTicket;
     AutoCompleteTextView etStart, etDestination;
 
+    int getStationsCounter = 0;
+
     ArrayAdapter adapterAutoComplete;
-    ArrayList<String> stations = new ArrayList<>();
 
     private String spTicket_selected = "kein Ticket";
     private String url;
@@ -90,8 +91,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", mDay, (mMonth+1), mYear));
         etTime.setText(String.format(Locale.US, "%02d:%02d", mHour, mMinute));
 
-        /*Erzeuge Adapter für Autocomplete mit gefüllt mit dem stations Array*/
-        adapterAutoComplete = new ArrayAdapter(getActivity().getBaseContext(),android.R.layout.simple_list_item_1, stations);
+        /*Erzeuge Adapter für Autocomplete*/
+        adapterAutoComplete = new ArrayAdapter(getActivity().getBaseContext(),android.R.layout.simple_list_item_1);
         /*Koppel AutoCompleteTextViews mit dem Adapter*/
         etStart.setAdapter(adapterAutoComplete);
         etStart.setThreshold(1);
@@ -118,35 +119,38 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void getStations(){
         url = urlBase+"get/stations";
 
-        JsonArrayRequest jsonRequest = new JsonArrayRequest(
-                Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        adapterAutoComplete.clear();
 
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            /*Fülle das Array mit den Station Namen*/
-                            for(int i=0;i<response.length();i++){
-                                JSONObject json_data = response.getJSONObject(i);
-                                stations.add(json_data.getString("stop_name"));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+        if(getStationsCounter == 0) {
+            final JsonArrayRequest jsonRequest = new JsonArrayRequest(
+                    Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+
+                @Override
+                public void onResponse(JSONArray response) {
+                    try {
+                        /*Fülle den Adapter mit den Station Namen*/
+                        for (int i = 0; i < response.length(); i++) {
+                            adapterAutoComplete.add(response.getJSONObject(i).getString("stop_name"));
                         }
-                        /*Füge das Array dem Adapter hinzu und benachrichtige diesen anschließend*/
-                        System.out.println("### GET STATIONS METHOD ###");
-                        adapterAutoComplete.addAll(stations);
+                        /*Benachrichtige den Adapter dass neue Daten vorliegen*/
                         adapterAutoComplete.notifyDataSetChanged();
-                    }
-                },
-                new Response.ErrorListener() {
+                        getStationsCounter = 1;
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
-        );
-        Volley.newRequestQueue(getActivity()).add(jsonRequest);
+            },
+                    new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    }
+            );
+            Volley.newRequestQueue(getActivity().getBaseContext()).add(jsonRequest);
+        }
     }
     //<--           getStations End         -->
 
