@@ -38,3 +38,5 @@ Der Rapid Prototype wurde in Android Studio entwickelt, für den Server wurde No
  * ```node gtfs2mongo.js``` ausführen (Achtung! - Dauert recht lange)
 7. Um den NodeJS Server zu starten ```node server.js```ausführen.
 
+####Screenshots
+![alt text](https://github.com/netrox91/EISSS16FriesenKutsch/blob/master/MS1/Rapid%20Prototype%20Screenshots/All.png "Screenshot")
