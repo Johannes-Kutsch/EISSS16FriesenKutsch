@@ -16,12 +16,13 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 
 ###Rapid Prototype
 ####Beschreibung
-Der Rapid Prototype wurde in Android Studio entwickelt und es wurden wichtige Funktionalitäten umgesetzt.
-* Einpflegen der GTFS Fahrplandaten in die MongoDB
-* Eintragen der Ticket Anbietenden und Suchenden in die Datenbank
-* Autocomplete mit den Verfügbaren Haltestellen im Eingabeformular
-* Matching zwischen Anbietend und Suchend anhand der eingetragenen Daten (PoC 11.1)
-* Einmaliges abrufen der GPS Informationen Latitude und Longitude (PoC 11.4)
+Der Rapid Prototype wurde in Android Studio entwickelt, für den Server wurde NodeJS gewählt und als Datenbank findet MongoDB verwendung. Es wurden im Prototypen für das Projekt wichtige Funktionalitäten umgesetzt.
+* Einpflegen der GTFS Fahrplandaten in die MongoDB (Diese werden monatlich von der VRS aktualisiert)
+* Eintragen der Ticket-Anbietenden und -Suchenden nach Typ in die Datenbank (Search, Offer)
+* Abrufen der eingetragenen Daten nach Typ (Search, Offer)
+* Autocomplete mit den Verfügbaren Haltestellen im Eingabeformular (Haltestellen über die GTFS Daten in der MongoDB bezogen und somit kompatible mit direktem API Zugriff)
+* Matching zwischen Ticket-Anbietend und -Suchend anhand der eingetragenen Daten (PoC 11.1)
+* Abrufen der GPS Informationen Latitude und Longitude on demand (PoC 11.4)
 * Ausgabe von Haltestellen, welche sich in einem Umkreis von 2km befinden (Radius kann variiert werden) (PoC 11.5)
 
 ####Installation
