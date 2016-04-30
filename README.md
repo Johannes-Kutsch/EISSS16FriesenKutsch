@@ -20,11 +20,13 @@ Platzhalter
 ####Installation
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
 2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
-3. Den Git Ordner ``` DTSharing ``` herunterladen und entpacken.
-4. Terminal öffnen und in den Ordner "DTSharing/Server" wechseln.
+3. Den Git Ordner ```DTSharing``` herunterladen und entpacken.
+4. Terminal öffnen und in den Ordner ```DTSharing/Server``` wechseln.
 5. Ein 2. Terminal in dem Ordner öffnen, da MongoDB und NodeJS ausgeführt werden müssen.
-6. Um die MongoDB zu starten ``` mongod --dbpath mongo/db ``` ausführen.
- * Um die MongoDB mit den GTFS Daten zu füllen ein neues Terminal Fenster in dem Ordner öffnen.
- * ```node gtfs2mongo.js ```ausführen (Achtung! - Dauert recht lange)
-7. Um den NodeJS Server zu starten ``` node server.js ```ausführen.
+6. Um die MongoDB zu starten ```mongod --dbpath mongo/db``` ausführen.
+ * Um die MongoDB mit den GTFS Daten zu füllen:
+ * In den Ordner gtfs_data wechseln und die ``` google_transit_DB.zip ``` entpacken (Die .txt Dateien müssen ohne Unterordner in ``` DTSharing/gtfs_data/* ``` liegen
+ * Ein 3. Terminal öffnen und ```node gtfs2mongo.js``` im Ordner ```DTSharing/Server/*``` ausführen.
+ * ```node gtfs2mongo.js```ausführen (Achtung! - Dauert recht lange)
+7. Um den NodeJS Server zu starten ```node server.js```ausführen.
 
