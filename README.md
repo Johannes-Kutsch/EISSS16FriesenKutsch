@@ -17,7 +17,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 ###Rapid Prototype
 ####Beschreibung
 Der Rapid Prototype wurde in Android Studio entwickelt, für den Server wurde NodeJS gewählt und als Datenbank findet MongoDB verwendung. Es wurden im Prototypen für das Projekt wichtige Funktionalitäten umgesetzt.
-* Einpflegen der GTFS Fahrplandaten in die MongoDB (Diese werden monatlich von der VRS aktualisiert)
+* Einpflegen der GTFS Fahrplandaten* in die MongoDB. *(werden monatlich von der VRS aktualisiert)
 * Eintragen der Ticket-Anbietenden und -Suchenden nach Typ in die Datenbank (Search, Offer)
 * Abrufen der eingetragenen Daten nach Typ (Search, Offer)
 * Autocomplete mit den Verfügbaren Haltestellen im Eingabeformular (Haltestellen über die GTFS Daten in der MongoDB bezogen und somit kompatible mit direktem API Zugriff)
