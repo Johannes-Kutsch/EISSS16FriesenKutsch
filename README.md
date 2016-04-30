@@ -18,9 +18,12 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 ####Beschreibung
 Platzhalter
 ####Installation
-1. ...
-2. ...
-3. Den Git Ordner "DTSharing" herunterladen und entpacken.
-4. Terminal öffnen und in den Ordner DTSharing wechseln.
-5. ...
+1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
+2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
+3. Den Git Ordner ``` DTSharing ``` herunterladen und entpacken.
+4. Terminal öffnen und in den Ordner "DTSharing/Server" wechseln.
+5. Einen zweiten Tab in dem Ordner erstellen.
+6. Um die MongoDB zu starten ``` mongod --dbpath mongo/db ``` ausführen.
+7. Um die MongoDB mit den GTFS Daten zu füllen ```node gtfs2mongo.js ```ausführen (Achtung! - Dauert recht lange)
+7. Um den NodeJS Server zu starten ``` node server.js ```ausführen.
 
