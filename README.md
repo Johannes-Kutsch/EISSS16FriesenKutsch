@@ -27,6 +27,6 @@ Platzhalter
  * Um die MongoDB mit den GTFS Daten zu füllen:
  * In den Ordner gtfs_data wechseln und die ``` google_transit_DB.zip ``` entpacken (Die .txt Dateien müssen ohne Unterordner in ``` DTSharing/gtfs_data ``` liegen
  * Ein 3. Terminal öffnen und ```node gtfs2mongo.js``` im Ordner ```DTSharing/Server``` ausführen.
- * ```node gtfs2mongo.js```ausführen (Achtung! - Dauert recht lange)
+ * ```node gtfs2mongo.js``` ausführen (Achtung! - Dauert recht lange)
 7. Um den NodeJS Server zu starten ```node server.js```ausführen.
 
