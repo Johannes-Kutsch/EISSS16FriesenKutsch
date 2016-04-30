@@ -14,9 +14,16 @@ teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits
 vorhandenen Dauertickets ermöglicht. Außerdem soll es durch das System
 vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 
-###Applikation
+###Rapid Prototype
 ####Beschreibung
-Platzhalter
+Der Rapid Prototype wurde in Android Studio entwickelt und es wurden wichtige Funktionalitäten umgesetzt.
+* Einpflegen der GTFS Fahrplandaten in die MongoDB
+* Eintragen der Ticket Anbietenden und Suchenden in die Datenbank
+* Autocomplete mit den Verfügbaren Haltestellen im Eingabeformular
+* Matching zwischen Anbietend und Suchend anhand der eingetragenen Daten (PoC 11.1)
+* Einmaliges abrufen der GPS Informationen Latitude und Longitude (PoC 11.4)
+* Ausgabe von Haltestellen, welche sich in einem Umkreis von 2km befinden (Radius kann variiert werden) (PoC 11.5)
+
 ####Installation
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
 2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
