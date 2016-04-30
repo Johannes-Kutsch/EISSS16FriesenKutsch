@@ -18,6 +18,7 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    //<--           onCreate Start          -->
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,19 +26,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
+        /*Erzeuge Slide Navigation*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
+        /*Synchronisiere Button Status*/
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -45,9 +39,12 @@ public class MainActivity extends AppCompatActivity
 
         displayView(R.id.nav_main);
     }
+    //<--           onCreate End            -->
 
+    //<--           onBackPressed Start            -->
     @Override
     public void onBackPressed() {
+        /*Aktionen die beim Drücken des Zurück Buttons ausgeführt werden*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -55,48 +52,54 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+    //<--           onBackPressed End            -->
 
+    //<--           onCreateOptionsMenu Start           -->
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        /*Füge Layout menu.main (Slide Menu) hinzu*/
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+    //<--           onCreateOptionsMenu End         -->
 
+    //<--           onOptionsItemSelected Start         -->
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        /*Settings Toggle klick*/
         if (id == R.id.action_settings) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+    //<--           onOptionsItemSelected End         -->
 
+    //<--           onNavigationItemSelected Start           -->
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+
+        /*Erhalte itemId des geklickten Objektes und rufe displayView auf*/
         int id = item.getItemId();
         displayView(id);
         return true;
     }
+    //<--           onNavigationItemSelected End           -->
 
+    //<--           displayView Start           -->
     public void displayView(int viewId) {
 
         Fragment fragment = null;
         String title = getString(R.string.app_name);
 
+        /*Switch Case der ItemId und somit der Aktionen nach Klick auf ein Item*/
         switch (viewId) {
             case R.id.nav_main:
                 fragment = new MainFragment();
                 title  = "Main";
-
                 break;
             case R.id.nav_login:
                 fragment = new LoginFragment();
@@ -117,19 +120,22 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        /*Falls das Fragment vorhanden ersetze den ViewContainer mit neuem Fragment*/
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_frame, fragment);
             ft.commit();
         }
 
-        // set the toolbar title
+        /*Ändere den Titel*/
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
 
+        /*Schließe die Slide Navigation*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
     }
+    //<--           displayView End         -->
 }

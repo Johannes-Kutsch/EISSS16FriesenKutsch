@@ -12,26 +12,28 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+/*Rufe alle Daten nach Typ ab*/
 app.get('/:type/get/all', db_Controller.getAllByType);
+
+/*Rufe alle Stationen ab und gib die Namen zurück*/
 app.get('/get/stations', db_Controller.getStations);
+
+/*Ermittle Stationen im Umkreis von 2km um die erhaltene Position*/
 app.get('/get/stations/nearby/:lat/:lon', db_Controller.getStationsNearby);
 
+
+/*Trage erhaltene Reisedaten in die Datenbank ein*/
 app.post('/:type/post/entry', db_Controller.createEntry);
+
+/*Ermittle Matches anhand der erhaltenen Daten und gib diese zurück*/
 app.post('/:type/get/matches', db_Controller.getMatchesByType);
 
-app.get('/vrs/:from/:to', function (req, res) {
-	var from = req.params.from,
-		to = req.params.to;		
-});
-
+/*Reverse Geocoding um einen Ort aus der Latitude und Longitude zu ermitteln
+* Vorerst nur ein Versuch, welcher nicht über die Applikation angesprochen wird */
 app.get('/location/:lat/:lon', function (req, res) {
 	var lat = req.params.lat,
 		lon = req.params.lon;
 	
-	//console.log("Lat: "+lat);
-	//console.log("Lon: "+lon);
-
-	// Setting language to German
 	geocoder.reverseGeocode( lat, lon, function ( err, data ) {
 		var results = data.results,
 			myAddress = {};
@@ -41,22 +43,6 @@ app.get('/location/:lat/:lon', function (req, res) {
   		res.json(myAddress);
 	}, { language: 'de' });
 });
-
-/*app.get('/getAll/:type', function (req, res) {
-	if(req.params.type == "offers"){
-		db_postController.getOffers;
-	}else if(req.params.type == "searches"){
-		db_postController.getSearches;
-	}
-});*/
-
-//app.use('/js', express.static(__dirname + '/client/js'));
-//app.use('/assets/js', express.static(__dirname + '/client/assets/js'));
-//app.use('/css', express.static(__dirname + '/client/assets/css'));
-
-//REST API
-//app.get('/api/meetups', meetupsController.list);
-//app.post('/api/meetups', meetupsController.create);
 
 app.listen(3000, function() {
 	console.log('Listening on port 3000...');

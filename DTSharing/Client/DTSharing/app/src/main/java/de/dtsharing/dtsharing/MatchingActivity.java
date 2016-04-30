@@ -130,7 +130,7 @@ public class MatchingActivity extends AppCompatActivity {
     }
     //<--           OnOptionsItemSelected End         -->
 
-    //POST-GET ANFRAGE START
+    //<--           POST-GET ANFRAGE START          -->
     public void submitData(final String queryType){
         if(queryType.equals("post"))
             url = urlBase+postType+"/post/entry";
@@ -143,9 +143,13 @@ public class MatchingActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         try {
                             if(queryType.equals("post")) {
+                                /*Falls der Typ post ist, erwarte als Antwort ein JSONObject*/
                                 JSONObject jsonObjResponse = new JSONObject(response);
                                 System.out.println(jsonObjResponse.getString("_id"));
                             } else if(queryType.equals("get")) {
+                                /*Falls der Typ get ist, erwaerte als Antwort ein JSONArray
+                                * erzeuge eine ArrayList und füge diese dem Adapter hinzu
+                                * benachrichtige diesen anschließend*/
                                 JSONArray jsonArrayResponse = new JSONArray(response);
                                 ArrayList<Result> newResults = Result.fromJson(jsonArrayResponse);
                                 adapter.addAll(newResults);
@@ -163,6 +167,7 @@ public class MatchingActivity extends AppCompatActivity {
                 }
             })
             {
+            /*Daten welche der Post-Request mitgegeben werden*/
             @Override
             protected Map<String, String> getParams()
             {
@@ -179,6 +184,5 @@ public class MatchingActivity extends AppCompatActivity {
 
             Volley.newRequestQueue(this).add(postRequest);
     }
-
-    //POST-GET ANFRAGE ENDE
+    //<--           POST-GET ANFRAGE ENDE           -->
 }

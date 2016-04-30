@@ -90,12 +90,15 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", mDay, (mMonth+1), mYear));
         etTime.setText(String.format(Locale.US, "%02d:%02d", mHour, mMinute));
 
+        /*Erzeuge Adapter für Autocomplete mit gefüllt mit dem stations Array*/
         adapterAutoComplete = new ArrayAdapter(getActivity().getBaseContext(),android.R.layout.simple_list_item_1, stations);
+        /*Koppel AutoCompleteTextViews mit dem Adapter*/
         etStart.setAdapter(adapterAutoComplete);
         etStart.setThreshold(1);
         etDestination.setAdapter(adapterAutoComplete);
         etDestination.setThreshold(1);
 
+        /*Rufe Stations Daten ab und fülle das Array*/
         getStations();
 
         /*Ticket Dialog item selected listener*/
@@ -120,11 +123,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onResponse(JSONArray response) {
-
-                        /*stations.add(response);
-                        adapterAutoComplete.addAll(stations);
-                        adapterAutoComplete.notifyDataSetChanged();*/
                         try {
+                            /*Fülle das Array mit den Station Namen*/
                             for(int i=0;i<response.length();i++){
                                 JSONObject json_data = response.getJSONObject(i);
                                 stations.add(json_data.getString("stop_name"));
@@ -132,12 +132,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        /*Füge das Array dem Adapter hinzu und benachrichtige diesen anschließend*/
                         System.out.println("### GET STATIONS METHOD ###");
                         adapterAutoComplete.addAll(stations);
                         adapterAutoComplete.notifyDataSetChanged();
                     }
                 },
-
                 new Response.ErrorListener() {
 
                     @Override

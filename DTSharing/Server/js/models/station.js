@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+/*Datenbank Schema der Collection "stops" */
 module.exports = mongoose.model('stops', {
 	stop_id: Number,
     stop_code: String,

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+/*Datenbank Schema der Collection "Offer" */
 module.exports = mongoose.model('Offer', {
 	radius: String,
     start: String,

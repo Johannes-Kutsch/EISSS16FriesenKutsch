@@ -6,31 +6,35 @@
     android:padding="10dp">
 
     <!-- TODO: Update blank fragment layout -->
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Drücke auf den Buttom um deine Position zu ermitteln" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvLocation"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvLocationName"/>
-        <Button
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bestimmte GPS"
-            android:id="@+id/bLocation"
-            android:background="@drawable/button_primary_style"
-            android:textColor="@color/colorWhite"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Drücke auf den Buttom um deine Position zu ermitteln" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvLocation"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvLocationName"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bestimmte GPS"
+                android:id="@+id/bLocation"
+                android:background="@drawable/button_primary_style"
+                android:textColor="@color/colorWhite"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>
