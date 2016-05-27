@@ -1,6 +1,6 @@
 var Offer = require('../models/offer'),
 	Search = require('../models/search'),
-	stops = require('../models/stops'),
+	Stops = require('../models/stops'),
 	stop_times = require('../models/stop_times'),
 	geolib = require('geolib');
 
@@ -105,7 +105,7 @@ module.exports.advancedMatching = function (req, res) {
 						}
 
 					});
-
+					
 					res.json(matches);
 
 				});
@@ -119,77 +119,34 @@ module.exports.advancedMatching = function (req, res) {
 
 /*Rufe alle Stationen aus der Datenbank ab und gib nur den Namen zurück*/
 module.exports.getStations = function (req, res) {
-	stops.find({}, 'stop_name -_id', function (err, results) {
+	Stops.find({}, 'stop_name -_id', function (err, results) {
 	        	res.json(results);
 	    	});
 }
 
 /*Ermittle alle Stationen in einem Radius von 2km um die erhaltenen GPS Informationen und gib
 * nur die Namen zurück */
-module.exports.getStationsNearby = function (req, res) {
+module.exports.stationsNearby = function (req, res) {
 	var user_lat = req.params.lat,
 		user_lon = req.params.lon;
 
-	stops.find({}, 'stop_name stop_lat stop_lon -_id', function (err, results) {
-		var newResults = [];
-		var obj = {};
+	Stops.find({}, 'stop_name stop_lat stop_lon -_id', function (err, results) {
+		var inRangeObj = {};
 		results.forEach(function(result){
 			var inRange = geolib.isPointInCircle(
 				{latitude: result.stop_lat, longitude: result.stop_lon},
 				{latitude: user_lat, longitude: user_lon},
 				2000
 				);
-			if(inRange)
-				newResults.push({'stop_name': result.stop_name});
-		});
-		res.json(newResults);
-	});
-}
+			if(inRange){
+				var name = result.stop_name,
+					lat = result.stop_lat,
+					lon = result.stop_lon;
 
-module.exports.stationsNearby = function (req, res) {
-	var user_lat = req.params.lat,
-		user_lon = req.params.lon,
-		distance = 2000;
-
-	var query = stops.find({'stop_lat stop_lon': {
-  		$near: [
-    		user_lat,
-    		user_lon
-  		],
-  		$maxDistance: distance
-	}
-	});
-
-	query.exec(function (err, stop) {
-	  if (err) {
-	    console.log(err);
-	    throw err;
-	  }
-
-	  if (!stop) {
-	    res.json({});
-	  } else {
-	    console.log('Cant save: Found city:' + stop);
-	    res.json(stop);
-	 }
-
-	});
-}
-
-//Ändern des DB Schemas um die MongoDB geo Funktionalitäten zu nutzen
-module.exports.evolveSchema = function (req, res) {
-	stops.find( { geo : { $exists : false } }, function (err, results) {
-
-		results.forEach(
-			function (doc) {
-				doc.geo = [doc.stop_lon, doc.stop_lat];
-
-				delete doc.stop_lat;
-				delete doc.stop_lon;
-
-				stops.save(doc);
+				inRangeObj[name] = {latitude: lat, longitude: lon};
 			}
-		);
-
+		});
+		var sortedByDistance = geolib.orderByDistance({latitude: user_lat, longitude: user_lon}, inRangeObj);
+		res.json(sortedByDistance);
 	});
 }

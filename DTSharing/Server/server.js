@@ -4,7 +4,8 @@ var express 	= require('express'),
 	mongoose	= require('mongoose'),
 	db_Controller = require('./js/controllers/db_Controller'),
 	geocoder = require('geocoder'),
-	http = require('http');
+	https = require('https'),
+	fs = require('fs');
 
 mongoose.connect('mongodb://localhost:27017/dtsharing');
 
@@ -20,13 +21,9 @@ app.get('/:type/get/all', db_Controller.getAllByType);
 app.get('/get/stations', db_Controller.getStations);
 
 /*Ermittle Stationen im Umkreis von 2km um die erhaltene Position*/
-app.get('/get/stations/nearby/:lat/:lon', db_Controller.getStationsNearby);
 app.get('/stations/nearby/:lat/:lon', db_Controller.stationsNearby);
 
-//app.get('/matches', db_Controller.advancedMatching);
 app.get('/matches/:type/:unique_trip_id/:departure_sequence_id/:target_sequence_id', db_Controller.advancedMatching);
-app.get('/evolveSchema', db_Controller.evolveSchema);
-
 
 /*Trage erhaltene Reisedaten in die Datenbank ein*/
 app.post('/:type/post/entry', db_Controller.createEntry);
@@ -50,53 +47,54 @@ app.get('/location/:lat/:lon', function (req, res) {
 	}, { language: 'de' });
 });
 
+/*Testweise: Zugriff auf die API des VRS.
+* XML-Request an die API. XML-Response als Antwort, welche weiterverarbeitet werden kann*/
 app.get('/test/vrsapi/:stop', function (req, res) {
-	var stop = req.params.stop;
-	var body = '<?xml version="1.0" encoding="ISO-8859-15"?>'+
-				'<Request>'+
-  					'<ObjectInfo>'+
-    					'<ObjectSearch>'+
-        					'<String>'+stop+'</String>'+
-      						'<Classes>'+
-        						'<Stop/>'+
-      						'</Classes>'+
-    					'</ObjectSearch>'+
-    					'<Options>'+
-      						'<Output>'+
-        						'<SRSName>urn:adv:crs:ETRS89_UTM32</SRSName>'+
-        					'</Output>'+
-    					'</Options>'+
-					'</ObjectInfo>'+
-				'</Request>';
+	
+	/*Query auslesen und XML-Body mit zu suchendem String bauen*/
+	var query = req.params.stop,
+		body = '<?xml version="1.0" encoding="ISO-8859-15"?><Request><ObjectInfo><ObjectSearch><String>'+query+'</String><Classes><Stop/></Classes></ObjectSearch><Options><Output><SRSName>urn:adv:crs:ETRS89_UTM32</SRSName></Output></Options></ObjectInfo></Request>';
 
-	var postRequest = {
-    host: "https://apitest.vrsinfo.de",
+	/*HTTP-Request Optionen zuzüglich einbinden des VRS SSL-Zertifikats*/
+	var options = {
+    host: "apitest.vrsinfo.de",
     path: "/vrs/cgi/service/ass",
     port: 4443,
     method: "POST",
+    ca: [fs.readFileSync('ssl/VRS-CA.cer')],
     headers: {
         'Content-Type': 'text/xml',
         'Content-Length': Buffer.byteLength(body)
     }
 	};
 
-	var buffer = "";
+	var vrs_request = https.request( options, function( vrs_response ){
 
-	var req = http.request( postRequest, function( res )    {
-
-	   console.log( res.statusCode );
-	   var buffer = "";
-	   res.on( "data", function( data ) { buffer = buffer + data; } );
-	   res.on( "end", function( data ) { console.log( buffer ); } );
+   		console.log( vrs_response.statusCode );
+		var buffer = "";
+   		
+   		/*Response kommt in Häppchen, deswegen wird sie hier nach und nach zusammengesetzt*/
+   		vrs_response.on( "data", function( data ) {
+	   		buffer = buffer + data; 
+	   	});
+	   	
+	   	/*Response endet, Buffer somit vollständig und kann ausgegeben/weiterverarbeitet werden*/
+	   	vrs_response.on( "end", function( data ) {
+	   		res.writeHead(200, {'Content-Type': 'text/xml'});
+	   		res.write(buffer);
+	   		res.end();
+	   	});
 
 	});
 
-	req.on('error', function(e) {
-	    console.log('problem with request: ' + e.message);
+	/*Fehler bei der Request*/
+	vrs_request.on('error', function(e) {
+	    console.log('Problem mit der Request: ' + e.message);
 	});
 
-	req.write( body );
-	req.end();
+	/*XML-Body an die API abschließend Ende*/
+	vrs_request.write( body );
+	vrs_request.end();
 });
 
 app.listen(3000, function() {
