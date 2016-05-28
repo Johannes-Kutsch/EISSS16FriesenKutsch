@@ -120,7 +120,7 @@ module.exports.advancedMatching = function (req, res) {
 /*Rufe alle Stationen aus der Datenbank ab und gib nur den Namen zurück*/
 module.exports.getStations = function (req, res) {
 	Stops.find({}, 'stop_name -_id', function (err, results) {
-	        	res.json(results);
+	        	res.json(results); 
 	    	});
 }
 

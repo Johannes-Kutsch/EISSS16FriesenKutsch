@@ -49,10 +49,10 @@ app.get('/location/:lat/:lon', function (req, res) {
 
 /*Testweise: Zugriff auf die API des VRS.
 * XML-Request an die API. XML-Response als Antwort, welche weiterverarbeitet werden kann*/
-app.get('/test/vrsapi/:stop', function (req, res) {
+app.get('/test/vrsapi', function (req, res) {
 	
 	/*Query auslesen und XML-Body mit zu suchendem String bauen*/
-	var query = req.params.stop,
+	var query = req.query.stop,
 		body = '<?xml version="1.0" encoding="ISO-8859-15"?><Request><ObjectInfo><ObjectSearch><String>'+query+'</String><Classes><Stop/></Classes></ObjectSearch><Options><Output><SRSName>urn:adv:crs:ETRS89_UTM32</SRSName></Output></Options></ObjectInfo></Request>';
 
 	/*HTTP-Request Optionen zuzüglich einbinden des VRS SSL-Zertifikats*/
