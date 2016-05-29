@@ -7354,9 +7354,8 @@ user_hash : config.intercomUserHash
 }
 }
 };
-if ( $window.optimizely && user.email ) {
+$window.optimizely = $window.optimizely || [];
 $window.optimizely.push(['setUserId', hashString(user.email)]);
-}
 $window.analytics.identify( user.id, traits, context );
 }
 function translateSubscriptionToLifecycleStage( subscription ) {
@@ -11597,7 +11596,7 @@ var emojiContainer = element.find(".emojis");
 var emojiIcon = ".emoji-icon";
 var emojiAttr = "data-emoji";
 var mentionEnabled = appSettings.getSettings().features.mentions;
-var isModal = element.closest(".modal").length > 0 || element.closest(".m-inbox-conversation").length;
+var isModal = element.closest(".modal").length > 0 || element.closest(".m-inbox-conversation").length || element.closest(".m-inbox-board-item").length;
 var emojiPlaceholder = element.closest(".emoji-root").find(".emoji-placeholder");
 var appendTo = ( emojiPlaceholder.length > 0 ) ? emojiPlaceholder : $document.find( "body" );
 scope.$on( "emoji:toggle", handleToggle );
