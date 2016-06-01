@@ -8,9 +8,6 @@
             android:icon="@drawable/ic_train_lightgrey_24dp"
             android:title="Home" />
         <item
-            android:id="@+id/nav_login"
-            android:title="Login" />
-        <item
             android:id="@+id/nav_register"
             android:title="Register" />
     </group>
@@ -23,6 +20,9 @@
             <item
                 android:id="@+id/nav_location"
                 android:title="Location Test" />
+            <item
+                android:id="@+id/nav_crypto"
+                android:title="Cryptography" />
         </menu>
     </item>
 

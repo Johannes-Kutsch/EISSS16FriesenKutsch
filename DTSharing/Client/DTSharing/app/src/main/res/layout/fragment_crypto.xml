@@ -1,0 +1,123 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.dtsharing.dtsharing.MainFragment"
+    android:padding="10dp">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Input"
+                android:textStyle="bold"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"/>
+
+            <EditText
+                android:id="@+id/etInput"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_style"/>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="15dp">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Key 1"
+                    android:id="@+id/rbKey1"
+                    android:layout_weight="1"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Key 2"
+                    android:id="@+id/rbKey2"
+                    android:layout_weight="1" />
+
+            </RadioGroup>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bEncrypt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Verschlüsseln"
+                    android:textColor="@color/colorWhite"
+                    android:background="@drawable/button_primary_style"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/bDecrypt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Entschlüsseln"
+                    android:textColor="@color/colorWhite"
+                    android:background="@drawable/button_primary_style"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Verschlüsselter Text"
+                android:textStyle="bold"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"/>
+
+            <EditText
+                android:id="@+id/etEncrypted"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_style"
+                android:layout_marginBottom="10dp"
+                android:inputType="none"
+                android:focusable="false"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Entschlüsselter Text"
+                android:textStyle="bold"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"/>
+
+            <EditText
+                android:id="@+id/etDecrypted"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_style"
+                android:layout_marginBottom="10dp"
+                android:inputType="none"
+                android:focusable="false" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

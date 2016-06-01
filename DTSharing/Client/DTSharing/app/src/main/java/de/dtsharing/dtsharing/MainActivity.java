@@ -101,10 +101,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = new MainFragment();
                 title  = "Main";
                 break;
-            case R.id.nav_login:
-                fragment = new LoginFragment();
-                title = "Login";
-                break;
             case R.id.nav_register:
                 fragment = new RegisterFragment();
                 title = "Register";
@@ -116,6 +112,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_location:
                 fragment = new LocationFragment();
                 title = "Location";
+                break;
+            case R.id.nav_crypto:
+                fragment = new CryptoFragment();
+                title = "Cryptography";
                 break;
 
         }
