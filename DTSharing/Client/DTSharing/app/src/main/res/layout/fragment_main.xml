@@ -44,9 +44,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/start"
                         android:layout_marginBottom="10dp"
-                        android:padding="10dp"
-                        android:singleLine="true"
-                        android:background="@drawable/edittext_style">
+                        android:singleLine="true">
                     </AutoCompleteTextView>
                 </LinearLayout>
 
@@ -68,9 +66,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/destination"
-                        android:padding="10dp"
-                        android:singleLine="true"
-                        android:background="@drawable/edittext_style">
+                        android:singleLine="true">
                     </AutoCompleteTextView>
                 </LinearLayout>
 
@@ -107,7 +103,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:background="@drawable/edittext_style"
                         android:textAlignment="center"
                         android:focusable="false"
                         android:singleLine="true" />
@@ -133,7 +128,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:background="@drawable/edittext_style"
                         android:layout_weight="0"
                         android:layout_gravity="right"
                         android:textAlignment="center"
@@ -171,8 +165,7 @@
                     android:id="@+id/spTicket"
                     android:spinnerMode="dialog"
                     android:prompt="@string/ticket_prompt"
-                    android:entries="@array/ticket_spinner"
-                    android:background="@drawable/edittext_style"/>
+                    android:entries="@array/ticket_spinner"/>
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
