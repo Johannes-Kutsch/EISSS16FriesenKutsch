@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+
+
+        <TextView
+            android:id="@+id/tvDepartureTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textSize="18sp"
+            android:textColor="#7ED321"
+            android:text="13:23"/>
+
+        <TextView
+            android:id="@+id/tvDepartureName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_toRightOf="@+id/tvDepartureTime"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:text="Gummersbach Bf"/>
+
+
+        <RelativeLayout
+            android:id="@+id/rlDurationContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDepartureTime"
+            android:layout_marginTop="8dp">
+            <FrameLayout
+                android:id="@+id/flClock"
+                android:layout_width="16dp"
+                android:layout_height="16dp">
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_clock_lightgrey_24dp"/>
+            </FrameLayout>
+            <TextView
+                android:id="@+id/tvTransitDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/flClock"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="4dp"
+                android:textColor="#a4a4a4"
+                android:textSize="12sp"
+                android:text="1:13"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDepartureTime"
+            android:layout_toRightOf="@+id/tvDepartureTime"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp">
+            <FrameLayout
+                android:id="@+id/flTransit"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_centerVertical="true">
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_directions_subway_24dp"/>
+            </FrameLayout>
+            <TextView
+                android:id="@+id/tvLineName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/flTransit"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="4dp"
+                android:textColor="#a4a4a4"
+                android:textSize="12sp"
+                android:text="RB11549"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvTargetTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/rlDurationContainer"
+            android:textSize="18sp"
+            android:textColor="#E06666"
+            android:text="15:36" />
+
+        <TextView
+            android:id="@+id/tvTargetName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@+id/tvTargetTime"
+            android:layout_below="@+id/rlDurationContainer"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:text="Köln Hbf"/>
+
+
+        <FrameLayout
+            android:id="@+id/flPerson"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="-9dp"
+            android:layout_marginRight="-24dp"
+            android:layout_toLeftOf="@+id/rlBadge"
+            android:layout_below="@+id/rlDurationContainer">
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_person_24dp"/>
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlBadge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/rlDurationContainer"
+            android:layout_marginTop="-16dp">
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/badge_item_count"
+                    android:layout_centerInParent="true"/>
+
+                <TextView
+                    android:id="@+id/tvBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="1"
+                    android:textAlignment="center"
+                    android:textColor="#FFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+        </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+
+
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:id="@+id/ivAvatar"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@color/colorAccent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlContainer"
+        android:layout_toRightOf="@id/ivAvatar"
+        android:layout_marginLeft="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/tvName"
+            android:textSize="16dp"
+            android:textColor="#000000"
+            android:text="Peter W."/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:id="@+id/tvDate"
+            android:text="16. Mai"
+            android:textSize="12dp"
+            android:textColor="@color/grey"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rlTransitContainer"
+            android:layout_below="@id/tvName">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/tvDeparture"
+                android:text="Gummersbach Bf"
+                android:textSize="12dp"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/tvArrow"
+                android:textColor="@color/colorPrimary"
+                android:text="➔"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:id="@+id/tvTarget"
+                android:text="Köln Hbf"
+                android:textSize="12dp"
+                android:textColor="#000000"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/rlTransitContainer"
+            android:id="@+id/tvMessage"
+            android:text="Bist du gerade an mir vorbei gefahren? :)"
+            android:textSize="12dp"
+            android:textColor="@color/grey"/>
+    </RelativeLayout>
+
+</RelativeLayout>

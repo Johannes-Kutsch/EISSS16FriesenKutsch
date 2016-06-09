@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+
+
+    <ImageView
+        android:layout_width="62dp"
+        android:layout_height="62dp"
+        android:id="@+id/ivAvatar"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@color/colorAccent" />
+
+    <RelativeLayout
+        android:id="@+id/rlContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/ivAvatar"
+        android:layout_marginLeft="8dp">
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="Peter W."/>
+
+        <RelativeLayout
+            android:id="@+id/rlStarsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:id="@+id/ivStar1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_star_full_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ivStar1"
+                android:src="@drawable/ic_star_full_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ivStar2"
+                android:src="@drawable/ic_star_full_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ivStar3"
+                android:src="@drawable/ic_star_full_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ivStar4"
+                android:src="@drawable/ic_star_full_24dp"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvDepartureTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tvUserName"
+            android:textSize="18sp"
+            android:textColor="#7ED321"
+            android:text="13:23"/>
+
+        <TextView
+            android:id="@+id/tvDepartureName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_toRightOf="@+id/tvDepartureTime"
+            android:layout_below="@+id/tvUserName"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:text="Gummersbach Bf"/>
+
+        <TextView
+            android:id="@+id/tvTargetTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tvDepartureTime"
+            android:textSize="18sp"
+            android:textColor="#E06666"
+            android:text="15:36" />
+
+        <TextView
+            android:id="@+id/tvTargetName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@+id/tvTargetTime"
+            android:layout_below="@+id/tvDepartureTime"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:text="Köln Hbf"/>
+
+        <RelativeLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="-8dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tvUserName">
+
+            <TextView
+                android:id="@+id/bMatching"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/badge_item_count"
+                android:text="+"
+                android:textAlignment="center"
+                android:textColor="#fff"
+                android:textSize="18sp"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

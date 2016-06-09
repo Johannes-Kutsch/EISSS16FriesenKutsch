@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:cardView="http://schemas.android.com/apk/res-auto"
-    tools:context="de.dtsharing.dtsharing.Chats"
+    tools:context="de.dtsharing.dtsharing.TripsActivity"
     android:padding="8dp">
 
     <android.support.v7.widget.CardView
@@ -13,7 +13,7 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/lvChats">
+            android:id="@+id/lvTrips">
 
         </ListView>
     </android.support.v7.widget.CardView>
