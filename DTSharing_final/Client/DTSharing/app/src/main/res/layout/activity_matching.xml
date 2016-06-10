@@ -31,7 +31,7 @@
                     android:layout_height="wrap_content"
                     android:text="Verbindungen"
                     android:textColor="#ffffff"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:id="@+id/toolbar_title" />
 
             </android.support.v7.widget.Toolbar>

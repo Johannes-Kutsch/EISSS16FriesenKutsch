@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Base64;
@@ -24,7 +25,7 @@ public class MatchingAdapter extends BaseAdapter{
 
     public class ViewHolder {
         public TextView userName, departureTime, departureName, targetTime, targetName;
-        public TextView matchingButton;
+        public Button matchingButton;
         public ImageView picture, star1, star2, star3, star4, star5;
 
     }
@@ -55,14 +56,14 @@ public class MatchingAdapter extends BaseAdapter{
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.matching_row, null);
+                    R.layout.matching_row, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.userName = (TextView) convertView.findViewById(R.id.tvUserName);
             viewHolder.departureTime = (TextView) convertView.findViewById(R.id.tvDepartureTime);
             viewHolder.departureName = (TextView) convertView.findViewById(R.id.tvDepartureName);
             viewHolder.targetTime = (TextView) convertView.findViewById(R.id.tvTargetTime);
             viewHolder.targetName = (TextView) convertView.findViewById(R.id.tvTargetName);
-            viewHolder.matchingButton = (TextView) convertView.findViewById(R.id.bMatching);
+            viewHolder.matchingButton = (Button) convertView.findViewById(R.id.bMatching);
             viewHolder.picture = (ImageView) convertView.findViewById(R.id.ivAvatar);
             viewHolder.star1 = (ImageView) convertView.findViewById(R.id.ivStar1);
             viewHolder.star2 = (ImageView) convertView.findViewById(R.id.ivStar2);
@@ -83,40 +84,83 @@ public class MatchingAdapter extends BaseAdapter{
         viewHolder.targetTime.setText(matchesEntry.getTargetTime());
         viewHolder.targetName.setText(matchesEntry.getTargetName());
 
-        setRating(matchesEntry.getRating(), viewHolder);
+        setRating(matchesEntry.getAverageRating(), viewHolder);
 
-        RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), decodeBase64(matchesEntry.getPicture()));
+        RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(matchesEntry.getPicture()));
         roundDrawable.setCircular(true);
         viewHolder.picture.setImageDrawable(roundDrawable);
+
+        viewHolder.matchingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Match kontaktieren", Snackbar.LENGTH_SHORT)
+                        .setAction("Action", null).show();
+            }
+        });
 
         return convertView;
     }
 
 
-    private void setRating(double rating, ViewHolder viewHolder){
+    private void setRating(final double rating, ViewHolder viewHolder){
 
+        /*Default = starBorder => Somit muss dieser Stern nicht zugewiesen werden*/
         int starFull = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_full_24dp", null, null);
         int starHalf = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_half_24dp", null, null);
-        int starBorder = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_border_24dp", null, null);
 
-        if(rating < 0.5){
-            viewHolder.star1.setImageResource(starBorder);
-            viewHolder.star2.setImageResource(starBorder);
-            viewHolder.star3.setImageResource(starBorder);
-            viewHolder.star4.setImageResource(starBorder);
-            viewHolder.star5.setImageResource(starBorder);
-        }else if(rating >= 0.5 && rating < 1){
-            viewHolder.star1.setImageResource(starHalf);
-            viewHolder.star2.setImageResource(starBorder);
-            viewHolder.star3.setImageResource(starBorder);
-            viewHolder.star4.setImageResource(starBorder);
-            viewHolder.star5.setImageResource(starBorder);
+        int wholeRating = (int) rating;
+        double fractionalRating = rating - wholeRating;
+
+        switch (wholeRating){
+            case 5:
+                viewHolder.star5.setImageResource(starFull);
+            case 4:
+                viewHolder.star4.setImageResource(starFull);
+            case 3:
+                viewHolder.star3.setImageResource(starFull);
+            case 2:
+                viewHolder.star2.setImageResource(starFull);
+            case 1:
+                viewHolder.star1.setImageResource(starFull);
         }
-    }
 
-    public static Bitmap decodeBase64(String input)
-    {
-        byte[] decodedBytes = Base64.decode(input, 0);
-        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+        if(fractionalRating > 0.25 && fractionalRating < 0.75){
+            switch (wholeRating+1){
+                case 1:
+                    viewHolder.star1.setImageResource(starHalf);
+                    break;
+                case 2:
+                    viewHolder.star2.setImageResource(starHalf);
+                    break;
+                case 3:
+                    viewHolder.star3.setImageResource(starHalf);
+                    break;
+                case 4:
+                    viewHolder.star4.setImageResource(starHalf);
+                    break;
+                case 5:
+                    viewHolder.star5.setImageResource(starHalf);
+                    break;
+            }
+        }else if(fractionalRating >= 0.75){
+            switch (wholeRating+1){
+                case 1:
+                    viewHolder.star1.setImageResource(starFull);
+                    break;
+                case 2:
+                    viewHolder.star2.setImageResource(starFull);
+                    break;
+                case 3:
+                    viewHolder.star3.setImageResource(starFull);
+                    break;
+                case 4:
+                    viewHolder.star4.setImageResource(starFull);
+                    break;
+                case 5:
+                    viewHolder.star5.setImageResource(starFull);
+                    break;
+            }
+        }
     }
 }

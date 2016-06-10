@@ -15,8 +15,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TripsActivity"></activity>
-        <activity android:name=".MatchingActivity"></activity>
+        <activity android:name=".TripsActivity"/>
+        <activity android:name=".MatchingActivity"/>
+        <activity android:name=".UserprofileActivity"/>
     </application>
 
 </manifest>

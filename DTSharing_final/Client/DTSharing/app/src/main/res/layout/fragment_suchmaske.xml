@@ -130,7 +130,6 @@
                         android:id="@+id/etTime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0"
                         android:layout_gravity="right"
                         android:textAlignment="center"
                         android:inputType="none"
@@ -183,7 +182,7 @@
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
             android:text="SUCHEN"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textColor="#ffffff"
             android:background="@drawable/button_primary_style"/>
 
@@ -196,16 +195,18 @@
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="#000000"
-            android:textSize="14dp"/>
+            android:textSize="14sp"/>
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             cardView:cardCornerRadius="2dp">
             <de.dtsharing.dtsharing.NonScrollListView
+                android:id="@+id/lvHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/lvHistory">
+                android:divider="@drawable/list_divider_default"
+                android:dividerHeight="1dp">
 
             </de.dtsharing.dtsharing.NonScrollListView>
         </android.support.v7.widget.CardView>

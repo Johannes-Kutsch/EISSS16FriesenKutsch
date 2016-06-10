@@ -1,6 +1,7 @@
 package de.dtsharing.dtsharing;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,14 +34,18 @@ public class TripsActivity extends AppCompatActivity {
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
+
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        /*Zurück Button in der Titelleiste*/
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            /*Deaktiviere Titel da Custom Titel*/
+            actionBar.setDisplayShowTitleEnabled(false);
+            /*Zurück Button in der Titelleiste*/
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         /*Sichere die Empfangenen Daten in Variablen*/
         Intent tripsIntent = getIntent();
@@ -56,25 +61,23 @@ public class TripsActivity extends AppCompatActivity {
         lvTrips = (ListView) findViewById(R.id.lvTrips);
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        Runnable tripsRunnable = new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
                 /*Erzeuge und verbinde Adapter mit der History ListView*/
-                mAdapter = new TripsAdapter(getApplication().getBaseContext(), trips);
+                mAdapter = new TripsAdapter(getApplicationContext(), trips);
                 lvTrips.setAdapter(mAdapter);
             }
-        };
-        Thread mythread = new Thread(tripsRunnable);
-        mythread.start();
+        });
 
         /*Fülle Array mit Beispieldaten*/
-        prepareVerlaufData();
+        prepareTripsData();
 
         lvTrips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 /*Erzeuge die Matching Activity und füge Daten hinzu*/
-                Intent matchingIntent = new Intent(getApplication().getBaseContext(), MatchingActivity.class);
+                Intent matchingIntent = new Intent(getApplicationContext(), MatchingActivity.class);
                 matchingIntent.putExtra("hasTicket", hasTicket);
                 /*Starte Matching Activity*/
                 startActivity(matchingIntent);
@@ -83,7 +86,7 @@ public class TripsActivity extends AppCompatActivity {
     }
 
     //<--           prepareVerlaufData Start          -->
-    private void prepareVerlaufData(){
+    private void prepareTripsData(){
         trips.clear();
         trips.add(new TripsEntry("13:23", "Gummersbach Bf", "14:36", "Köln Hbf", "1:13", "RB11549", "2"));
         trips.add(new TripsEntry("13:53", "Gummersbach Bf", "15:06", "Köln Hbf", "1:13", "RB11549", "0"));
@@ -93,7 +96,7 @@ public class TripsActivity extends AppCompatActivity {
         trips.add(new TripsEntry("16:53", "Gummersbach Bf", "18:06", "Köln Hbf", "1:13", "RB11549", "0"));
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        Runnable tripsRunnable = new Runnable() {
+        new Handler().post(new Runnable() {
 
             @Override
             public void run() {
@@ -101,9 +104,7 @@ public class TripsActivity extends AppCompatActivity {
                 mAdapter.notifyDataSetChanged();
             }
 
-        };
-        Thread mythread = new Thread(tripsRunnable);
-        mythread.start();
+        });
     }
     //<--           prepareVerlaufData End            -->
 

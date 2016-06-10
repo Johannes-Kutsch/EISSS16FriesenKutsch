@@ -2,6 +2,7 @@ package de.dtsharing.dtsharing;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,14 +31,17 @@ public class MatchingActivity extends AppCompatActivity {
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
+
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        /*Zurück Button in der Titelleiste*/
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            /*Deaktiviere Titel da Custom Titel*/
+            actionBar.setDisplayShowTitleEnabled(false);
+            /*Zurück Button in der Titelleiste*/
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         /*Sichere die Empfangenen Daten in Variablen*/
         Intent tripsIntent = getIntent();
@@ -45,47 +49,48 @@ public class MatchingActivity extends AppCompatActivity {
             hasTicket = tripsIntent.getBooleanExtra("hasTicket", false);
         }
 
-        if(hasTicket)
-            mTitle.setText("Mitfahrgelegenheit Suchende");
-        else
-            mTitle.setText("Mitfahrgelegenheiten");
+        if (mTitle != null) {
+            mTitle.setText(hasTicket ? "Mitfahrgelegenheit Suchende" : "Mitfahrgelegenheiten");
+        }
 
         /*Erfassen der Views mit denen interagiert werden soll*/
         lvMatches = (ListView) findViewById(R.id.lvMatches);
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        Runnable matchesRunnable = new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
                 /*Erzeuge und verbinde Adapter mit der History ListView*/
-                mAdapter = new MatchingAdapter(getApplication().getBaseContext(), matches);
+                mAdapter = new MatchingAdapter(getApplicationContext(), matches);
                 lvMatches.setAdapter(mAdapter);
             }
-        };
-        Thread mythread = new Thread(matchesRunnable);
-        mythread.start();
+        });
 
         /*Fülle Array mit Beispieldaten*/
-        prepareVerlaufData();
+        prepareMatchingData();
 
         lvMatches.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Snackbar.make(view, matches.get(position).getDepartureTime(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                /*Erzeuge die Userprofile Activity und füge Daten hinzu*/
+                Intent userprofileIntent = new Intent(getApplicationContext(), UserprofileActivity.class);
+                userprofileIntent.putExtra("profilePicture", getString(R.string.unknownPerson));
+                userprofileIntent.putExtra("userName", matches.get(position).getUserName());
+                /*Starte Matching Activity*/
+                startActivity(userprofileIntent);
             }
         });
     }
 
     //<--           prepareVerlaufData Start          -->
-    private void prepareVerlaufData(){
+    private void prepareMatchingData(){
         matches.clear();
         String bild = getString(R.string.unknownPerson);
-        matches.add(new MatchingEntry("Peter W.", 0.3, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild));
-        matches.add(new MatchingEntry("Holger J.", 0.7, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild));
+        matches.add(new MatchingEntry("Peter W.", 3.77, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild));
+        matches.add(new MatchingEntry("Holger J.", 2.6, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild));
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        Runnable matchesRunnable = new Runnable() {
+        new Handler().post(new Runnable() {
 
             @Override
             public void run() {
@@ -93,9 +98,7 @@ public class MatchingActivity extends AppCompatActivity {
                 mAdapter.notifyDataSetChanged();
             }
 
-        };
-        Thread mythread = new Thread(matchesRunnable);
-        mythread.start();
+        });
     }
     //<--           prepareVerlaufData End            -->
 

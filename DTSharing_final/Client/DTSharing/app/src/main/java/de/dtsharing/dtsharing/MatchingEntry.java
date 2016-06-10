@@ -21,7 +21,7 @@ public class MatchingEntry {
         return userName;
     }
 
-    public double getRating(){
+    public double getAverageRating(){
         return rating;
     }
 

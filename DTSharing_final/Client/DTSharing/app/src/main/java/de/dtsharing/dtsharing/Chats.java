@@ -46,11 +46,11 @@ public class Chats extends Fragment {
 
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        v.post(new Runnable() {
+        new android.os.Handler().post(new Runnable() {
             @Override
             public void run() {
-                /*Erzeuge und verbinde Adapter mit der History ListView*/
-                mAdapter = new ChatsAdapter(getActivity().getBaseContext(), chats);
+                /*Erzeuge und verbinde Adapter mit der Chats ListView*/
+                mAdapter = new ChatsAdapter(getContext(), chats);
                 lvChats.setAdapter(mAdapter);
             }
         });
@@ -72,7 +72,7 @@ public class Chats extends Fragment {
         chats.add(new ChatsEntry("Tee T.", "5. Mai", "Paderborn Hbf", "Bad Driburg Bahnhof", "Okay das reicht...", bild));
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        v.post(new Runnable() {
+        new android.os.Handler().post(new Runnable() {
 
             @Override
             public void run() {

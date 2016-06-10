@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/ivAvatar"
+        android:layout_alignParentLeft="true"
+        android:src="@color/colorAccent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlContainer"
+        android:layout_toRightOf="@id/ivAvatar"
+        android:layout_marginLeft="8dp">
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Angela M."
+            android:textColor="#000"/>
+
+        <RelativeLayout
+            android:id="@+id/rlStarsContainer"
+            android:layout_below="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="-2dp">
+
+            <ImageView
+                android:id="@+id/ivStar1"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star_border_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar2"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_toRightOf="@+id/ivStar1"
+                android:src="@drawable/ic_star_border_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar3"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_toRightOf="@+id/ivStar2"
+                android:src="@drawable/ic_star_border_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar4"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_toRightOf="@+id/ivStar3"
+                android:src="@drawable/ic_star_border_24dp"/>
+            <ImageView
+                android:id="@+id/ivStar5"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_toRightOf="@+id/ivStar4"
+                android:src="@drawable/ic_star_border_24dp"/>
+
+            <TextView
+                android:id="@+id/tvRatingDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/ivStar5"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="-2dp"
+                android:textColor="@color/grey"
+                android:text="10.06.2016"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvRatingDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rlStarsContainer"
+            android:layout_marginTop="4dp"
+            android:textColor="#000"
+            android:text="Die Fahrt war der Hammer! Bin ja auch etwas verrückt aber der Peter übertrifft alles! Immer wieder gerne!"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,250 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:cardView="http://schemas.android.com/apk/res-auto"
+    tools:context="de.dtsharing.dtsharing.UserprofileActivity"
+    android:padding="8dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvGeneral"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        cardView:cardCornerRadius="2dp">
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Alter"
+                    android:layout_column="1"
+                    android:textStyle="bold"
+                    android:textColor="@color/grey" />
+
+                <TextView
+                    android:id="@+id/tvAge"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="48 Jahre"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    android:textColor="#000" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Hobbys"
+                    android:layout_column="1"
+                    android:textStyle="bold"
+                    android:textColor="@color/grey" />
+
+                <TextView
+                    android:id="@+id/tvHobby"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Brüllen, Schrauben sortieren, Kämmen"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    android:textColor="#000" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Sonstiges"
+                    android:layout_column="1"
+                    android:paddingRight="16dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/grey" />
+
+                <TextView
+                    android:id="@+id/tvOthers"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Hallo! Ich bin ein kleiner Fuchsteufel und mir fällt nicht mehr ein so endet der Text abrupt!"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    android:textColor="#000" />
+
+            </TableRow>
+
+        </TableLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvStatistics"
+        android:layout_below="@id/cvGeneral"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        cardView:cardCornerRadius="2dp">
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="8dp">
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tvCountOfferer"
+                    android:layout_column="0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textColor="@color/colorPrimary"
+                    android:text="12" />
+
+                <TextView
+                    android:id="@+id/tvCountPassenger"
+                    android:layout_column="2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textColor="@color/colorPrimary"
+                    android:text="0" />
+
+            </TableRow>
+
+            <TableRow>
+                <Space
+                    android:layout_column="1"
+                    android:layout_width="40dp"/>
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:layout_column="0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="angeboten"
+                    android:textColor="#000" />
+
+                <TextView
+                    android:layout_column="2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="mitgefahren"
+                    android:textColor="#000" />
+
+            </TableRow>
+
+        </TableLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvRatings"
+        android:layout_below="@id/cvStatistics"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        cardView:cardCornerRadius="2dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <RelativeLayout
+                android:id="@+id/rlStarsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true">
+
+                <ImageView
+                    android:id="@+id/ivStar1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_star_border_24dp"/>
+                <ImageView
+                    android:id="@+id/ivStar2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/ivStar1"
+                    android:src="@drawable/ic_star_border_24dp"/>
+                <ImageView
+                    android:id="@+id/ivStar3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/ivStar2"
+                    android:src="@drawable/ic_star_border_24dp"/>
+                <ImageView
+                    android:id="@+id/ivStar4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/ivStar3"
+                    android:src="@drawable/ic_star_border_24dp"/>
+                <ImageView
+                    android:id="@+id/ivStar5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/ivStar4"
+                    android:src="@drawable/ic_star_border_24dp"/>
+
+                <TextView
+                    android:id="@+id/tvAverageRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_toRightOf="@id/ivStar5"
+                    android:layout_centerVertical="true"
+                    android:text="4,77"/>
+
+                <TextView
+                    android:id="@+id/tvCountRatings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_toRightOf="@id/tvAverageRating"
+                    android:layout_centerVertical="true"
+                    android:text="(3)"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/divider"
+                android:layout_marginTop="8dp"
+                android:layout_below="@+id/rlStarsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/greyLight"/>
+
+            <ListView
+                android:id="@+id/lvRatings"
+                android:layout_below="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/list_divider_ratings"
+                android:dividerHeight="1dp">
+
+            </ListView>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

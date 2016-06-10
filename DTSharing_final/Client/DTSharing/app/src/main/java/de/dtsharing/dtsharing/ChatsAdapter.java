@@ -58,7 +58,7 @@ public class ChatsAdapter extends BaseAdapter{
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.chats_row, null);
+                    R.layout.chats_row, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.name = (TextView) convertView.findViewById(R.id.tvName);
             viewHolder.date = (TextView) convertView.findViewById(R.id.tvDate);

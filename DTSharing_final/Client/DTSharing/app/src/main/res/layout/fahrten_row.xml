@@ -28,6 +28,15 @@
             android:textColor="#000000"
             android:text="Gummersbach Bf"/>
 
+        <Button
+            android:id="@+id/bDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_delete_24dp"/>
+
 
         <RelativeLayout
             android:id="@+id/rlDurationContainer"
@@ -113,45 +122,45 @@
             android:text="Köln Hbf"/>
 
 
-    <FrameLayout
-        android:id="@+id/flPerson"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginRight="-16dp"
-        android:layout_toLeftOf="@+id/rlBadge"
-        android:layout_below="@+id/rlDurationContainer">
-        <ImageView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_person_24dp"/>
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/flPerson"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="-16dp"
+            android:layout_toLeftOf="@+id/rlBadge"
+            android:layout_below="@+id/rlDurationContainer">
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_person_24dp"/>
+        </FrameLayout>
 
-    <RelativeLayout
-        android:id="@+id/rlBadge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/rlDurationContainer"
-        android:layout_marginTop="-6dp">
-
-        <TextView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:background="@drawable/badge_item_count"
-            android:layout_centerInParent="true" />
-
-        <TextView
-            android:id="@+id/tvBadge"
+        <RelativeLayout
+            android:id="@+id/rlBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="1"
-            android:textAlignment="center"
-            android:textColor="#FFF"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
-    </RelativeLayout>
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/rlDurationContainer"
+            android:layout_marginTop="-6dp">
+
+                <TextView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:background="@drawable/badge_item_count"
+                    android:layout_centerInParent="true"/>
+
+                <TextView
+                    android:id="@+id/tvBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="1"
+                    android:textAlignment="center"
+                    android:textColor="#FFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+        </RelativeLayout>
 
 </RelativeLayout>

@@ -11,9 +11,11 @@
         android:layout_height="wrap_content"
         cardView:cardCornerRadius="2dp">
         <ListView
+            android:id="@+id/lvMatches"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/lvMatches">
+            android:divider="@drawable/list_divider_chats"
+            android:dividerHeight="1dp">
 
         </ListView>
     </android.support.v7.widget.CardView>

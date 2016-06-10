@@ -1,38 +1,34 @@
 package de.dtsharing.dtsharing;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class TripsAdapter extends BaseAdapter{
+public class FahrtenAdapter extends BaseAdapter{
 
-    private ArrayList<TripsEntry> trips;
+    private ArrayList<FahrtenEntry> fahrten;
     private Context context_1;
 
     public class ViewHolder {
-        public TextView departureTime;
-        public TextView departureName;
-        public TextView targetTime;
-        public TextView targetName;
-        public TextView transitDuration;
-        public TextView lineName;
-        public TextView badgeCount;
-
+        public TextView departureTime, departureName, targetTime, targetName, transitDuration, lineName, badgeCount;
+        public Button delete;
     }
 
-    public TripsAdapter(Context context, ArrayList<TripsEntry> trips) {
+    public FahrtenAdapter(Context context, ArrayList<FahrtenEntry> fahrten) {
         this.context_1 = context;
-        this.trips = trips;
+        this.fahrten = fahrten;
     }
 
     @Override
     public int getCount() {
-        return trips.size();
+        return fahrten.size();
     }
 
     @Override
@@ -51,7 +47,7 @@ public class TripsAdapter extends BaseAdapter{
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.trips_row, parent, false);
+                    R.layout.fahrten_row, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.departureTime = (TextView) convertView.findViewById(R.id.tvDepartureTime);
             viewHolder.departureName = (TextView) convertView.findViewById(R.id.tvDepartureName);
@@ -60,6 +56,7 @@ public class TripsAdapter extends BaseAdapter{
             viewHolder.transitDuration = (TextView) convertView.findViewById(R.id.tvTransitDuration);
             viewHolder.lineName = (TextView) convertView.findViewById(R.id.tvLineName);
             viewHolder.badgeCount = (TextView) convertView.findViewById(R.id.tvBadge);
+            viewHolder.delete = (Button) convertView.findViewById(R.id.bDelete);
 
 
             convertView.setTag(viewHolder);
@@ -67,15 +64,23 @@ public class TripsAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        TripsEntry tripsEntry = trips.get(position);
+        FahrtenEntry fahrtenEntry = fahrten.get(position);
 
-        viewHolder.departureTime.setText(tripsEntry.getDepartureTime());
-        viewHolder.departureName.setText(tripsEntry.getDepartureName());
-        viewHolder.targetTime.setText(tripsEntry.getTargetTime());
-        viewHolder.targetName.setText(tripsEntry.getTargetName());
-        viewHolder.transitDuration.setText(tripsEntry.getTransitDuration());
-        viewHolder.lineName.setText(tripsEntry.getLineName());
-        viewHolder.badgeCount.setText(tripsEntry.getBadgeCount());
+        viewHolder.departureTime.setText(fahrtenEntry.getDepartureTime());
+        viewHolder.departureName.setText(fahrtenEntry.getDepartureName());
+        viewHolder.targetTime.setText(fahrtenEntry.getTargetTime());
+        viewHolder.targetName.setText(fahrtenEntry.getTargetName());
+        viewHolder.transitDuration.setText(fahrtenEntry.getTransitDuration());
+        viewHolder.lineName.setText(fahrtenEntry.getLineName());
+        viewHolder.badgeCount.setText(fahrtenEntry.getBadgeCount());
+
+        viewHolder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Fahrt löschen", Snackbar.LENGTH_SHORT)
+                        .setAction("Action", null).show();
+            }
+        });
 
         return convertView;
     }

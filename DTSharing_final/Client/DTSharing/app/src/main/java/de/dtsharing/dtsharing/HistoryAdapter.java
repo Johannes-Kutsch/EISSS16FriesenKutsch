@@ -50,7 +50,7 @@ public class HistoryAdapter extends BaseAdapter{
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.history_row, null);
+                    R.layout.history_row, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.departure = (TextView) convertView
                     .findViewById(R.id.tvDeparture);

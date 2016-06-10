@@ -9,12 +9,13 @@
 
 
     <ImageView
-        android:layout_width="62dp"
-        android:layout_height="62dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:id="@+id/ivAvatar"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:src="@color/colorAccent" />
+        android:layout_marginTop="6dp"
+        android:src="@color/colorAccent"
+        android:scaleType="fitXY"/>
 
     <RelativeLayout
         android:id="@+id/rlContainer"
@@ -41,31 +42,31 @@
                 android:id="@+id/ivStar1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_star_full_24dp"/>
+                android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/ivStar1"
-                android:src="@drawable/ic_star_full_24dp"/>
+                android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/ivStar2"
-                android:src="@drawable/ic_star_full_24dp"/>
+                android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/ivStar3"
-                android:src="@drawable/ic_star_full_24dp"/>
+                android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/ivStar4"
-                android:src="@drawable/ic_star_full_24dp"/>
+                android:src="@drawable/ic_star_border_24dp"/>
 
         </RelativeLayout>
 
@@ -116,20 +117,18 @@
         <RelativeLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginRight="-8dp"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/tvUserName">
+            android:layout_below="@+id/tvUserName"
+            android:layout_marginTop="-1dp">
 
-            <TextView
+            <Button
                 android:id="@+id/bMatching"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_centerInParent="true"
-                android:background="@drawable/badge_item_count"
-                android:text="+"
-                android:textAlignment="center"
-                android:textColor="#fff"
-                android:textSize="18sp"/>
+                android:background="@drawable/ic_add_circle_24dp"/>
 
         </RelativeLayout>
 
