@@ -2,46 +2,71 @@ package de.dtsharing.dtsharing;
 
 public class TripsEntry {
 
-    private String departureTime, departureName, targetTime, targetName, transitDuration, lineName;
-    private String badgeCount;
+    private String tripID, uniqueTripID, departureTime, departureName, departureDate, arrivalTime, targetName, travelDuration, routeName;
+    private int departureSequence, targetSequence, numberMatches;
 
     public TripsEntry(){}
 
-    public TripsEntry(String departureTime, String departureName, String targetTime, String targetName, String transitDuration, String lineName, String badgeCount) {
+    public TripsEntry(String tripID, String uniqueTripID, int departureSequence, String departureTime, String departureDate, String departureName, int targetSequence, String arrivalTime, String targetName, String travelDuration, String routeName, int numberMatches) {
+        this.tripID = tripID;
+        this.uniqueTripID = uniqueTripID;
+        this.departureSequence = departureSequence;
         this.departureTime = departureTime;
+        this.departureDate = departureDate;
         this.departureName = departureName;
-        this.targetTime = targetTime;
+        this.targetSequence = targetSequence;
+        this.arrivalTime = arrivalTime;
         this.targetName = targetName;
-        this.transitDuration = transitDuration;
-        this.lineName = lineName;
-        this.badgeCount = badgeCount;
+        this.travelDuration = travelDuration;
+        this.routeName = routeName;
+        this.numberMatches = numberMatches;
+    }
+
+    public String getTripID(){
+        return tripID;
+    }
+
+    public String getUniqueTripID(){
+        return uniqueTripID;
+    }
+
+    public int getDepartureSequence(){
+        return departureSequence;
     }
 
     public String getDepartureTime(){
         return departureTime;
     }
 
+    public String getDepartureDate(){
+        return departureDate;
+    }
+
     public String getDepartureName(){
         return departureName;
     }
 
-    public String getTargetTime(){
-        return targetTime;
+    public int getTargetSequence(){
+        return targetSequence;
+    }
+
+    public String getArrivalTime(){
+        return arrivalTime;
     }
 
     public String getTargetName(){
         return targetName;
     }
 
-    public String getTransitDuration(){
-        return transitDuration;
+    public String getTravelDuration(){
+        return travelDuration;
     }
 
-    public String getLineName(){
-        return lineName;
+    public String getRouteName(){
+        return routeName;
     }
 
-    public String getBadgeCount(){
-        return badgeCount;
+    public int getNumberMatches(){
+        return numberMatches;
     }
 }
