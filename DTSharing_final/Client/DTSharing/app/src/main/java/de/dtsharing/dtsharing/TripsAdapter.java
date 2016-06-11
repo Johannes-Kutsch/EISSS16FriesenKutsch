@@ -50,8 +50,8 @@ public class TripsAdapter extends BaseAdapter{
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.trips_row, parent, false);
+            convertView = LayoutInflater.from(context_1).inflate(R.layout.trips_row, parent, false);
+
             viewHolder = new ViewHolder();
             viewHolder.departureTime = (TextView) convertView.findViewById(R.id.tvDepartureTime);
             viewHolder.departureName = (TextView) convertView.findViewById(R.id.tvDepartureName);
@@ -60,7 +60,6 @@ public class TripsAdapter extends BaseAdapter{
             viewHolder.transitDuration = (TextView) convertView.findViewById(R.id.tvTransitDuration);
             viewHolder.lineName = (TextView) convertView.findViewById(R.id.tvLineName);
             viewHolder.badgeCount = (TextView) convertView.findViewById(R.id.tvBadge);
-
 
             convertView.setTag(viewHolder);
         } else {

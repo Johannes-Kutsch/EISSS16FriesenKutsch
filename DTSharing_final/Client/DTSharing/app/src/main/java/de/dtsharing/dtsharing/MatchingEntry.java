@@ -4,10 +4,11 @@ public class MatchingEntry {
 
     private String userName, departureTime, departureName, targetTime, targetName, picture;
     private double rating;
+    private boolean hasTicket;
 
     public MatchingEntry(){}
 
-    public MatchingEntry(String userName, double rating, String departureTime, String departureName, String targetTime, String targetName, String picture) {
+    public MatchingEntry(String userName, double rating, String departureTime, String departureName, String targetTime, String targetName, String picture, boolean hasTicket) {
         this.userName = userName;
         this.rating = rating;
         this.departureTime = departureTime;
@@ -15,6 +16,7 @@ public class MatchingEntry {
         this.targetTime = targetTime;
         this.targetName = targetName;
         this.picture = picture;
+        this.hasTicket = hasTicket;
     }
 
     public String getUserName(){
@@ -43,5 +45,9 @@ public class MatchingEntry {
 
     public String getPicture(){
         return picture;
+    }
+
+    public boolean hasTicket(){
+        return hasTicket;
     }
 }

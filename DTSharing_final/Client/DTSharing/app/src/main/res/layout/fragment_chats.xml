@@ -12,7 +12,7 @@
         cardView:cardCornerRadius="2dp">
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/lvChats"
             android:divider="@drawable/list_divider_chats"
             android:dividerHeight="1dp">

@@ -41,14 +41,12 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
         viewPager.setCurrentItem(1, false);
-        viewPager.setPageTransformer(true, new DefaultTransformer());
 
         // Set Tabs inside Toolbar
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         if (tabs != null) {
             tabs.setupWithViewPager(viewPager);
         }
-
     }
 
     @Override

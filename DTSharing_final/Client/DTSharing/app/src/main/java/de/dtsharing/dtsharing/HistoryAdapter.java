@@ -49,13 +49,11 @@ public class HistoryAdapter extends BaseAdapter{
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.history_row, parent, false);
+            convertView = LayoutInflater.from(context_1).inflate(R.layout.history_row, parent, false);
+
             viewHolder = new ViewHolder();
-            viewHolder.departure = (TextView) convertView
-                    .findViewById(R.id.tvDeparture);
-            viewHolder.target = (TextView) convertView
-                    .findViewById(R.id.tvTarget);
+            viewHolder.departure = (TextView) convertView.findViewById(R.id.tvDeparture);
+            viewHolder.target = (TextView) convertView.findViewById(R.id.tvTarget);
 
             convertView.setTag(viewHolder);
         } else {

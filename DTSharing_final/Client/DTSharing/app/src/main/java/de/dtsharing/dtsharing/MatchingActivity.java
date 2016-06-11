@@ -3,12 +3,12 @@ package de.dtsharing.dtsharing;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class MatchingActivity extends AppCompatActivity {
 
     private ListView lvMatches;
+    private Button bSubmit;
 
     private ArrayList<MatchingEntry> matches = new ArrayList<>();
     private MatchingAdapter mAdapter;
@@ -55,6 +56,9 @@ public class MatchingActivity extends AppCompatActivity {
 
         /*Erfassen der Views mit denen interagiert werden soll*/
         lvMatches = (ListView) findViewById(R.id.lvMatches);
+        bSubmit = (Button) findViewById(R.id.bSubmit);
+
+        bSubmit.setText(hasTicket ? "ALS ANBIETEND EINTRAGEN" : "ALS SUCHEND EINTRAGEN");
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
         new Handler().post(new Runnable() {
@@ -73,11 +77,11 @@ public class MatchingActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 /*Erzeuge die Userprofile Activity und füge Daten hinzu*/
-                Intent userprofileIntent = new Intent(getApplicationContext(), UserprofileActivity.class);
-                userprofileIntent.putExtra("profilePicture", getString(R.string.unknownPerson));
-                userprofileIntent.putExtra("userName", matches.get(position).getUserName());
+                Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                userProfileIntent.putExtra("profilePicture", getString(R.string.unknownPerson));
+                userProfileIntent.putExtra("userName", matches.get(position).getUserName());
                 /*Starte Matching Activity*/
-                startActivity(userprofileIntent);
+                startActivity(userProfileIntent);
             }
         });
     }
@@ -86,8 +90,8 @@ public class MatchingActivity extends AppCompatActivity {
     private void prepareMatchingData(){
         matches.clear();
         String bild = getString(R.string.unknownPerson);
-        matches.add(new MatchingEntry("Peter W.", 3.77, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild));
-        matches.add(new MatchingEntry("Holger J.", 2.6, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild));
+        matches.add(new MatchingEntry("Peter W.", 3.77, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild, hasTicket));
+        matches.add(new MatchingEntry("Holger J.", 2.6, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild, hasTicket));
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
         new Handler().post(new Runnable() {

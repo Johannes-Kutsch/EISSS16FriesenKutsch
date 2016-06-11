@@ -53,8 +53,7 @@ public class RatingsAdapter extends BaseAdapter{
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.ratings_row, parent, false);
+            convertView = LayoutInflater.from(context_1).inflate(R.layout.ratings_row, parent, false);
 
             viewHolder = new ViewHolder();
             viewHolder.name = (TextView) convertView.findViewById(R.id.tvUserName);

@@ -1,12 +1,14 @@
 package de.dtsharing.dtsharing;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,12 +53,12 @@ public class MatchingAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, final ViewGroup parent) {
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context_1).inflate(
-                    R.layout.matching_row, parent, false);
+            convertView = LayoutInflater.from(context_1).inflate(R.layout.matching_row, parent, false);
+
             viewHolder = new ViewHolder();
             viewHolder.userName = (TextView) convertView.findViewById(R.id.tvUserName);
             viewHolder.departureTime = (TextView) convertView.findViewById(R.id.tvDepartureTime);
@@ -76,7 +78,7 @@ public class MatchingAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        MatchingEntry matchesEntry = matches.get(position);
+        final MatchingEntry matchesEntry = matches.get(position);
 
         viewHolder.userName.setText(matchesEntry.getUserName());
         viewHolder.departureTime.setText(matchesEntry.getDepartureTime());
@@ -92,15 +94,39 @@ public class MatchingAdapter extends BaseAdapter{
 
         viewHolder.matchingButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Match kontaktieren", Snackbar.LENGTH_SHORT)
-                        .setAction("Action", null).show();
+            public void onClick(final View view) {
+
+                String message, positiveButton;
+                if(matchesEntry.hasTicket()) {
+                    message = "Möchtest du wirklich " + matchesEntry.getUserName() + " mitnehmen?";
+                    positiveButton = "Mitnehmen";
+                }else {
+                    message = "Möchtest du wirklich bei " + matchesEntry.getUserName() + " mitfahren?";
+                    positiveButton ="Mitfahren";
+                }
+
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(parent.getContext(), R.style.AppCompatAlertDialogStyle);
+
+                //builder.setTitle("Dialog");
+                builder.setMessage(message);
+                builder.setPositiveButton(positiveButton, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Snackbar.make(parent, "OK", Snackbar.LENGTH_SHORT)
+                                .setAction("Action", null).show();
+                    }
+
+                });
+
+                builder.setNegativeButton("Abbrechen", null);
+                builder.show();
             }
         });
 
         return convertView;
     }
-
 
     private void setRating(final double rating, ViewHolder viewHolder){
 
