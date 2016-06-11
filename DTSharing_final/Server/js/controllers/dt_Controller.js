@@ -61,21 +61,21 @@ module.exports.findTrips = function (req, res) {
     }
     
     function findMatchingTrips(callback) {
-        async.parallel([
-            function(callback){
-                StopTimes.find({stop_id : departureStationID}, function(err, results) {
-                    callback(err, results);
-                });
-            },
-            function(callback){
-                StopTimes.find({stop_id : targetStationID}, function(err, results) {
-                    callback(err, results);
-                });
-            }
-        ],
-        function(err, results){
-            results[0].forEach( function (departureTrip) {
-                results[1].forEach( function (targetTrip) {
+        StopTimes.find({stop_id : {$in: [departureStationID, targetStationID]}}, function(err, results) {
+            var departureTrips = [];
+            var targetTrips = [];
+            results.forEach( function(result) {
+                if(result.stop_id == departureStationID) {
+                    departureTrips.push(result);
+                } else {
+                    targetTrips.push(result);
+                }
+            });
+            console.log(departureTrips.length);
+            console.log(targetTrips.length);
+            console.log("1");
+            departureTrips.forEach( function (departureTrip) {
+                targetTrips.forEach( function (targetTrip) {
                     if(departureTrip.trip_id == targetTrip.trip_id) {
                         if(departureTrip.stop_sequence < targetTrip.stop_sequence) {
                             matchingTrips.push({
@@ -90,6 +90,7 @@ module.exports.findTrips = function (req, res) {
                     }
                 });
             });
+            console.log("2");
             if(matchingTrips.length == 0) {
                 return callback(new Error('Es gibt keine direckte Verbindung zwischen den beiden Bahnhöfen'));
             }

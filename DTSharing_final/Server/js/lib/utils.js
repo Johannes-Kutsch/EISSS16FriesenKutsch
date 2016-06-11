@@ -1,4 +1,4 @@
-//Von aus dem gtfs Modul übernommen
+//Aus dem gtfs Modul übernommen
 
 var _ = require('lodash');
 
@@ -29,6 +29,7 @@ module.exports = {
     return '' + day + "." + month + "." + year;
   },
     
+  //selber geschrieben
   formatDayWithoutDots: function(date) {
     var day = (date.getDate() < 10) ? '' + '0' + date.getDate() : date.getDate(),
       month = ((date.getMonth() + 1) < 10) ? '' + '0' + (date.getMonth() + 1) : (date.getMonth() + 1),
