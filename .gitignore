@@ -10,6 +10,7 @@ node_modules/
 # MongoDB
 DTSharing/Server/mongo/db/*
 DTSharing_final/Server/mongo/db/*
+!DTSharing_final/Server/mongo/db/*.txt
 
 # Built application files
 *.apk
