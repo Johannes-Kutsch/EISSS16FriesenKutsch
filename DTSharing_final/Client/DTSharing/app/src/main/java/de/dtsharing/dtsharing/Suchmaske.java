@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,14 +38,13 @@ public class Suchmaske extends Fragment {
     private Button bSubmit;
     private EditText etDate, etTime, etTicket;
     private AutoCompleteTextView etDeparture, etTarget;
-    private Spinner spTicket;
     private ScrollView svContainer;
 
     private ArrayList<HistoryEntry> transit = new ArrayList<>();
     private HistoryAdapter mAdapter;
 
-    private Boolean spTicket_selected = false;
-    private CharSequence[] ticketArray;
+    private Boolean hasTicket = false;
+    private CharSequence[] ticketDialogArray;
     private int currentTicketIndex;
 
     /*Aktuelles Datum + Uhrzeit erhalten*/
@@ -77,14 +75,13 @@ public class Suchmaske extends Fragment {
         etDate = (EditText) v.findViewById(R.id.etDate);
         etTime = (EditText) v.findViewById(R.id.etTime);
         etTicket = (EditText) v.findViewById(R.id.etTicket);
-        //spTicket = (Spinner) v.findViewById(R.id.spTicket);
         bSubmit = (Button) v.findViewById(R.id.bSubmit);
 
         /*Eintragen der aktuellen Uhrzeit + Datum (mMonth + 1 da die Monate bei 0 beginnen)*/
         etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", mDay, (mMonth+1), mYear));
         etTime.setText(String.format(Locale.US, "%02d:%02d", mHour, mMinute));
 
-        ticketArray = getResources().getStringArray(R.array.ticket_spinner);
+        ticketDialogArray = getResources().getStringArray(R.array.ticket_spinner);
         currentTicketIndex = 0;
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
@@ -107,12 +104,12 @@ public class Suchmaske extends Fragment {
             public void onClick(View view) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
                 builder.setTitle("Ich besitze...");
-                builder.setSingleChoiceItems(ticketArray, currentTicketIndex, new DialogInterface.OnClickListener() {
+                builder.setSingleChoiceItems(ticketDialogArray, currentTicketIndex, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position) {
-                        etTicket.setText(ticketArray[position]);
+                        etTicket.setText(ticketDialogArray[position]);
                         currentTicketIndex = position;
-                        spTicket_selected = position != 0;
+                        hasTicket = position != 0;
                         dialogInterface.dismiss();
                     }
                 });
@@ -138,7 +135,6 @@ public class Suchmaske extends Fragment {
                         targetName = etTarget.getText().toString(),
                         time = etTime.getText().toString(),
                         date = etDate.getText().toString();
-                final Boolean hasTicket = spTicket_selected;
 
                 /*Prüfe ob Start oder Ziel leer sind*/
                 if(departureName.equals("") || targetName.equals("")){
@@ -157,9 +153,6 @@ public class Suchmaske extends Fragment {
                 }
             }
         });
-
-        /*Ticket Dialog item selected listener*/
-        //spinnerListener();
 
         /*History item selected listener*/
         historyOnClickListener();
@@ -188,24 +181,6 @@ public class Suchmaske extends Fragment {
     }
     //<--           prepareVerlaufData End            -->
 
-    //<--           Ticket Dialog Start          -->
-    public void spinnerListener() {
-        /*Erzeuge einen Item Selected Listener*/
-        spTicket.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            /*Ein Eintrag wurde ausgewählt*/
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                /*Ticket vorhanden?*/
-                spTicket_selected = position != 0;
-            }
-            /*Wenn nichts ausgewählt wurde.. Hier unwichtig aber muss überschrieben werden*/
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
-        });
-
-    }
-    //<--           Ticket Dialog End           -->
 
     //<--           Datum Dialog Start          -->
     public void showDateDialog(){
