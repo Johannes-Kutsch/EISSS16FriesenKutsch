@@ -102,7 +102,7 @@ public class Suchmaske extends Fragment {
         etTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog_Alert);
                 builder.setTitle("Ich besitze...");
                 builder.setSingleChoiceItems(ticketDialogArray, currentTicketIndex, new DialogInterface.OnClickListener() {
                     @Override
@@ -199,7 +199,7 @@ public class Suchmaske extends Fragment {
                         /*Trage Wert in das EditText ein (String.format um die )*/
                         etDate.setText(String.format(Locale.US, "%02d.%02d.%04d", dayOfMonth, (monthOfYear+1), year));
                     }
-                },mYear,mMonth,mDay);
+                },mYear, mMonth, mDay);
 
         dpd.setTitle("Datum wählen");
         dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");

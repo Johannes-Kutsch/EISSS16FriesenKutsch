@@ -1,22 +1,29 @@
 package de.dtsharing.dtsharing;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -31,6 +38,7 @@ import java.util.ArrayList;
 public class TripsActivity extends AppCompatActivity {
 
     private ListView lvTrips;
+    private CardView cvContainer;
 
     private ArrayList<TripsEntry> trips = new ArrayList<>();
     private TripsAdapter mAdapter;
@@ -70,6 +78,8 @@ public class TripsActivity extends AppCompatActivity {
 
         /*Erfassen der Views mit denen interagiert werden soll*/
         lvTrips = (ListView) findViewById(R.id.lvTrips);
+        cvContainer = (CardView) findViewById(R.id.cvContainer);
+        cvContainer.setVisibility(View.INVISIBLE);
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
         new Handler().post(new Runnable() {
@@ -78,11 +88,11 @@ public class TripsActivity extends AppCompatActivity {
                 /*Erzeuge und verbinde Adapter mit der History ListView*/
                 mAdapter = new TripsAdapter(getApplicationContext(), trips);
                 lvTrips.setAdapter(mAdapter);
-                getTripsData(departureName, targetName, departureTime, departureDate);
             }
         });
 
         /*Fülle Array mit Beispieldaten*/
+        getTripsData(departureName, targetName, departureTime, departureDate);
         //getTripsData(departureName, targetName, departureTime, departureDate);
         //prepareTripsData();
 
@@ -100,21 +110,24 @@ public class TripsActivity extends AppCompatActivity {
 
     private void getTripsData(final String departureName, final String targetName, final String time, final String date){
 
-        /*String  param1 = "departureStationName="+departureName,
-                param2 = "targetStationName="+targetName,
-                param3 = "departureTime="+departureTime,
-                param4 = "departureDate="+departureDate;
-        String URI = "http://10.0.2.2:3000/trips?"+param1+"&"+param2+"&"+param3+"&"+param4;*/
 
-        String uri = Uri.parse("http://10.0.2.2:3000/trips")
+        final ProgressDialog progressDialog = new ProgressDialog(TripsActivity.this,
+                R.style.AppTheme_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setIndeterminateDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.progress_circle, null));
+        //progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        //progressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Trips werden ermitteln...");
+        progressDialog.show();
+
+        String uri = Uri.parse("http://192.168.0.15:3000/trips")
                 .buildUpon()
                 .appendQueryParameter("departureStationName", departureName)
                 .appendQueryParameter("targetStationName", targetName)
-                .appendQueryParameter("departureTime", departureTime)
+                .appendQueryParameter("departureTime", departureTime+":00")
                 .appendQueryParameter("departureDate", departureDate)
                 .build().toString();
-
-        Log.i("url", uri);
 
         trips.clear();
 
@@ -139,10 +152,12 @@ public class TripsActivity extends AppCompatActivity {
                                 targetSequence = response.getJSONObject(i).getInt("targetSequence"),
                                 numberMatches = response.getJSONObject(i).getInt("numberMatches");
 
-                        trips.add(new TripsEntry(tripID, uniqueTripID, departureSequence, departureTime, departureDate, departureName, targetSequence, arrivalTime, targetName, travelDuration, routeName, numberMatches));
+                        trips.add(new TripsEntry(tripID, uniqueTripID, departureSequence, departureTime.substring(0, 5), departureDate, departureName, targetSequence, arrivalTime.substring(0, 5), targetName, travelDuration, routeName, numberMatches));
                     }
                         /*Benachrichtige den Adapter dass neue Daten vorliegen*/
+                    cvContainer.setVisibility(View.VISIBLE);
                     mAdapter.notifyDataSetChanged();
+                    progressDialog.dismiss();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -154,8 +169,15 @@ public class TripsActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                progressDialog.dismiss();
+                finish();
             }
         });
+
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
     }

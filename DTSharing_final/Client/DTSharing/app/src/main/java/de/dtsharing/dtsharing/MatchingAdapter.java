@@ -106,7 +106,7 @@ public class MatchingAdapter extends BaseAdapter{
                 }
 
                 AlertDialog.Builder builder =
-                        new AlertDialog.Builder(parent.getContext(), R.style.AppCompatAlertDialogStyle);
+                        new AlertDialog.Builder(parent.getContext(), R.style.AppTheme_Dialog_Alert);
 
                 //builder.setTitle("Dialog");
                 builder.setMessage(message);
