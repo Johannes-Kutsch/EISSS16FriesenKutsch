@@ -4,18 +4,22 @@
     android:layout_height="match_parent"
     xmlns:cardView="http://schemas.android.com/apk/res-auto"
     tools:context="de.dtsharing.dtsharing.TripsActivity"
-    android:padding="8dp">
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        cardView:cardCornerRadius="2dp">
+        cardView:cardCornerRadius="2dp"
+        android:layout_marginTop="8dp">
         <ListView
             android:id="@+id/lvTrips"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@drawable/list_divider_default"
-            android:dividerHeight="1dp">
+            android:dividerHeight="1dp"
+            android:scrollbars="none">
 
         </ListView>
     </android.support.v7.widget.CardView>

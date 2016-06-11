@@ -120,7 +120,7 @@ public class MatchingAdapter extends BaseAdapter{
 
                 });
 
-                builder.setNegativeButton("Abbrechen", null);
+                builder.setNegativeButton("Abbruch", null);
                 builder.show();
             }
         });

@@ -1,25 +1,28 @@
 package de.dtsharing.dtsharing;
 
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TimePicker;
+
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,7 +37,7 @@ public class Suchmaske extends Fragment {
     RelativeLayout v;
     private NonScrollListView lvHistory;
     private Button bSubmit;
-    private EditText etDate, etTime;
+    private EditText etDate, etTime, etTicket;
     private AutoCompleteTextView etDeparture, etTarget;
     private Spinner spTicket;
     private ScrollView svContainer;
@@ -43,6 +46,8 @@ public class Suchmaske extends Fragment {
     private HistoryAdapter mAdapter;
 
     private Boolean spTicket_selected = false;
+    private CharSequence[] ticketArray;
+    private int currentTicketIndex;
 
     /*Aktuelles Datum + Uhrzeit erhalten*/
     final Calendar c = Calendar.getInstance();
@@ -71,12 +76,16 @@ public class Suchmaske extends Fragment {
         etTarget = (AutoCompleteTextView) v.findViewById(R.id.etTarget);
         etDate = (EditText) v.findViewById(R.id.etDate);
         etTime = (EditText) v.findViewById(R.id.etTime);
-        spTicket = (Spinner) v.findViewById(R.id.spTicket);
+        etTicket = (EditText) v.findViewById(R.id.etTicket);
+        //spTicket = (Spinner) v.findViewById(R.id.spTicket);
         bSubmit = (Button) v.findViewById(R.id.bSubmit);
 
         /*Eintragen der aktuellen Uhrzeit + Datum (mMonth + 1 da die Monate bei 0 beginnen)*/
         etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", mDay, (mMonth+1), mYear));
         etTime.setText(String.format(Locale.US, "%02d:%02d", mHour, mMinute));
+
+        ticketArray = getResources().getStringArray(R.array.ticket_spinner);
+        currentTicketIndex = 0;
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
         new Handler().post(new Runnable() {
@@ -93,6 +102,23 @@ public class Suchmaske extends Fragment {
         /*Fülle Array mit Beispieldaten*/
         prepareVerlaufData();
 
+        etTicket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
+                builder.setTitle("Ich besitze...");
+                builder.setSingleChoiceItems(ticketArray, currentTicketIndex, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int position) {
+                        etTicket.setText(ticketArray[position]);
+                        currentTicketIndex = position;
+                        spTicket_selected = position != 0;
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.show();
+            }
+        });
         etDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,7 +159,7 @@ public class Suchmaske extends Fragment {
         });
 
         /*Ticket Dialog item selected listener*/
-        spinnerListener();
+        //spinnerListener();
 
         /*History item selected listener*/
         historyOnClickListener();
@@ -184,13 +210,11 @@ public class Suchmaske extends Fragment {
     //<--           Datum Dialog Start          -->
     public void showDateDialog(){
         /*Erzeuge den DatePickerDialog*/
-        DatePickerDialog dpd = new DatePickerDialog(getActivity(),
-                new DatePickerDialog.OnDateSetListener() {
 
-                    /*Datum wurde gewählt und bestätigt*/
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                new DatePickerDialog.OnDateSetListener() {
                     @Override
-                    public void onDateSet(DatePicker view, int year,
-                                          int monthOfYear, int dayOfMonth) {
+                    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
 
                         /*Aktualisiere Datum Variablen, da der Date Picker bei diesen beginnt*/
                         mYear = year;
@@ -200,24 +224,23 @@ public class Suchmaske extends Fragment {
                         /*Trage Wert in das EditText ein (String.format um die )*/
                         etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", dayOfMonth, (monthOfYear+1), year));
                     }
-                }, mYear, mMonth, mDay);
+                },mYear,mMonth,mDay);
 
-        /*Setze Titel und zeige den Dialog*/
         dpd.setTitle("Datum wählen");
-        dpd.show();
+        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+
     }
     //<--           Datum Dialog End            -->
 
     //<--           Time Dialog Start           -->
     public void showTimeDialog(){
         /*Erzeuge den TimePickerDialog*/
-        TimePickerDialog tpd = new TimePickerDialog(getActivity(),
+        TimePickerDialog tpd = TimePickerDialog.newInstance(
                 new TimePickerDialog.OnTimeSetListener() {
 
                     /*Uhrzeit wurde gewählt und bestätigt*/
                     @Override
-                    public void onTimeSet(TimePicker view, int selectedHour, int selectedMinute) {
-
+                    public void onTimeSet(RadialPickerLayout view, int selectedHour, int selectedMinute, int selectedSecond) {
                         /*Aktualisiere Uhrzeit Variablen, da der Time Picker bei diesen beginnt*/
                         mHour = selectedHour;
                         mMinute = selectedMinute;
@@ -225,11 +248,12 @@ public class Suchmaske extends Fragment {
                         /*Übergebe Zeit an getTime und trage den return Wert in das EditText ein*/
                         etTime.setText(String.format(Locale.US, "%02d:%02d", selectedHour, selectedMinute));
                     }
+
                 }, mHour, mMinute, true);/*true => 24h Format*/
 
         /*Setze Titel und zeige den Dialog*/
         tpd.setTitle("Uhrzeit wählen");
-        tpd.show();
+        tpd.show(getActivity().getFragmentManager(), "Timepickerdialog");
     }
     //<--           Time Dialog End         -->
 

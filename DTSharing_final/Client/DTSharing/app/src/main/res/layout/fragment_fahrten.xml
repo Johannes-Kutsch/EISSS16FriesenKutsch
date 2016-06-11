@@ -15,7 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@drawable/list_divider_default"
-            android:dividerHeight="1dp">
+            android:dividerHeight="1dp"
+            android:scrollbars="none">
 
         </ListView>
     </android.support.v7.widget.CardView>
