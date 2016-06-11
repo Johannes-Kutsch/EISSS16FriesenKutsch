@@ -78,7 +78,7 @@ public class Suchmaske extends Fragment {
         bSubmit = (Button) v.findViewById(R.id.bSubmit);
 
         /*Eintragen der aktuellen Uhrzeit + Datum (mMonth + 1 da die Monate bei 0 beginnen)*/
-        etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", mDay, (mMonth+1), mYear));
+        etDate.setText(String.format(Locale.US, "%02d.%02d.%04d", mDay, (mMonth+1), mYear));
         etTime.setText(String.format(Locale.US, "%02d:%02d", mHour, mMinute));
 
         ticketDialogArray = getResources().getStringArray(R.array.ticket_spinner);
@@ -162,7 +162,7 @@ public class Suchmaske extends Fragment {
 
     //<--           prepareVerlaufData Start          -->
     private void prepareVerlaufData(){
-        transit.add(new HistoryEntry("Gummersbach Bf", "Köln Hbf"));
+        transit.add(new HistoryEntry("Köln, Hansaring", "Gummersbach Bf"));
         transit.add(new HistoryEntry("Köln Hbf", "Paderborn Hbf"));
         transit.add(new HistoryEntry("Paderborn Hbf", "Bad Driburg Bahnhof"));
         transit.add(new HistoryEntry("Paderborn Hbf", "Hamm Hbf"));
@@ -197,7 +197,7 @@ public class Suchmaske extends Fragment {
                         mDay = dayOfMonth;
 
                         /*Trage Wert in das EditText ein (String.format um die )*/
-                        etDate.setText(String.format(Locale.US, "%02d-%02d-%04d", dayOfMonth, (monthOfYear+1), year));
+                        etDate.setText(String.format(Locale.US, "%02d.%02d.%04d", dayOfMonth, (monthOfYear+1), year));
                     }
                 },mYear,mMonth,mDay);
 

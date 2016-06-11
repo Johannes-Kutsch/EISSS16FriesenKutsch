@@ -70,11 +70,11 @@ public class TripsAdapter extends BaseAdapter{
 
         viewHolder.departureTime.setText(tripsEntry.getDepartureTime());
         viewHolder.departureName.setText(tripsEntry.getDepartureName());
-        viewHolder.targetTime.setText(tripsEntry.getTargetTime());
+        viewHolder.targetTime.setText(tripsEntry.getArrivalTime());
         viewHolder.targetName.setText(tripsEntry.getTargetName());
-        viewHolder.transitDuration.setText(tripsEntry.getTransitDuration());
-        viewHolder.lineName.setText(tripsEntry.getLineName());
-        viewHolder.badgeCount.setText(tripsEntry.getBadgeCount());
+        viewHolder.transitDuration.setText(tripsEntry.getTravelDuration());
+        viewHolder.lineName.setText(tripsEntry.getRouteName());
+        viewHolder.badgeCount.setText(Integer.toString(tripsEntry.getNumberMatches()));
 
         return convertView;
     }
