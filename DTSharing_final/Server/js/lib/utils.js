@@ -1,4 +1,4 @@
-//Aus dem gtfs Modul übernommen
+//Aus dem gtfs Modul übernommen und abgeändert
 
 var _ = require('lodash');
 
@@ -43,8 +43,8 @@ module.exports = {
       timeParts = [time.getHours(), time.getMinutes(), time.getSeconds()];
     } else {
       timeParts = time.split(':');
-      if (timeParts.length != 3) {
-        return null;
+      if (timeParts.length == 2) {
+        timeparts[2] = 0;
       }
     }
     return parseInt(timeParts[0], 10) * 60 * 60 + parseInt(timeParts[1], 10) * 60 + parseInt(timeParts[2], 10);
