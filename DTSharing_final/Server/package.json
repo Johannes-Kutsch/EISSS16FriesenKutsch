@@ -1,0 +1,21 @@
+{
+  "name": "DTSharing",
+  "version": "0.0.1",
+  "description": "Dauerticket Sharing Applikation",
+  "main": "server.js",
+  "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "body-parser": "~1.15.0",
+    "express": "~4.13.4",
+    "geocoder": "^0.2.2",
+    "geolib": "^2.0.20",
+    "gtfs": "^0.4.6",
+    "gtfs2mongo": "^1.1.7",
+    "lodash": "^4.13.1",
+    "mongoose": "^4.4.12"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "Thomas Friesen, Johannes Kutsch",
+  "license": "BSD-2-Clause"
+}
