@@ -1,0 +1,77 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:cardView="http://schemas.android.com/apk/res-auto"
+    tools:context=".LoginFragment"
+    android:padding="8dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        cardView:cardCornerRadius="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/etMail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/mail"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"
+                android:theme="@style/AppTheme.Base" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:theme="@style/AppTheme.Base"/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <Button
+        android:id="@+id/bSignin"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:text="ANMELDEN"
+        android:textSize="16sp"
+        android:textColor="#fff"
+        android:background="@drawable/button_primary_style"
+        android:layout_below="@id/cvContainer"/>
+
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/bSignin">
+
+        <TextView
+            android:id="@+id/bForgot"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Kennwort vergessen?"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical"/>
+
+        <TextView
+            android:id="@+id/bSignup"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Jetzt registrieren"
+            android:layout_weight="1"
+            android:gravity="right|center_vertical"/>
+
+    </TableRow>
+
+</RelativeLayout>

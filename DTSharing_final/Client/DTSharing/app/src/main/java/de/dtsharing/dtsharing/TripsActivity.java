@@ -1,11 +1,13 @@
 package de.dtsharing.dtsharing;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
@@ -39,6 +41,7 @@ public class TripsActivity extends AppCompatActivity {
 
     private ListView lvTrips;
     private CardView cvContainer;
+    private CoordinatorLayout coordinatorLayout;
 
     private ArrayList<TripsEntry> trips = new ArrayList<>();
     private TripsAdapter mAdapter;
@@ -50,6 +53,8 @@ public class TripsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_trips);
+
+
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -77,6 +82,7 @@ public class TripsActivity extends AppCompatActivity {
         }
 
         /*Erfassen der Views mit denen interagiert werden soll*/
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         lvTrips = (ListView) findViewById(R.id.lvTrips);
         cvContainer = (CardView) findViewById(R.id.cvContainer);
         cvContainer.setVisibility(View.INVISIBLE);
@@ -136,31 +142,38 @@ public class TripsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(JSONArray response) {
-                try {
+                if(response.length() == 0){
+                    Intent message = new Intent();
+                    message.putExtra("message", "Es konnten keine Verbindungen gefunden werden. Bitte überprüfe deine Eingaben.");
+                    setResult(Activity.RESULT_CANCELED, message);
+                    finish();
+                }else {
+                    try {
                         /*Fülle den Adapter mit den Station Namen*/
-                    for (int i = 0; i < response.length(); i++) {
+                        for (int i = 0; i < response.length(); i++) {
 
-                        String  tripID = response.getJSONObject(i).getString("tripID"),
-                                uniqueTripID = response.getJSONObject(i).getString("uniqueTripID"),
-                                departureTime = response.getJSONObject(i).getString("departureTime"),
-                                arrivalTime = response.getJSONObject(i).getString("arrivalTime"),
-                                departureDate = response.getJSONObject(i).getString("departureDate"),
-                                routeName = "Platzhalter",
-                                travelDuration = "1:13";
+                            String tripID = response.getJSONObject(i).getString("tripID"),
+                                    uniqueTripID = response.getJSONObject(i).getString("uniqueTripID"),
+                                    departureTime = response.getJSONObject(i).getString("departureTime"),
+                                    arrivalTime = response.getJSONObject(i).getString("arrivalTime"),
+                                    departureDate = response.getJSONObject(i).getString("departureDate"),
+                                    routeName = "Platzhalter",
+                                    travelDuration = "1:13";
 
-                        int     departureSequence = response.getJSONObject(i).getInt("departureSequence"),
-                                targetSequence = response.getJSONObject(i).getInt("targetSequence"),
-                                numberMatches = response.getJSONObject(i).getInt("numberMatches");
+                            int departureSequence = response.getJSONObject(i).getInt("departureSequence"),
+                                    targetSequence = response.getJSONObject(i).getInt("targetSequence"),
+                                    numberMatches = response.getJSONObject(i).getInt("numberMatches");
 
-                        trips.add(new TripsEntry(tripID, uniqueTripID, departureSequence, departureTime.substring(0, 5), departureDate, departureName, targetSequence, arrivalTime.substring(0, 5), targetName, travelDuration, routeName, numberMatches));
-                    }
+                            trips.add(new TripsEntry(tripID, uniqueTripID, departureSequence, departureTime.substring(0, 5), departureDate, departureName, targetSequence, arrivalTime.substring(0, 5), targetName, travelDuration, routeName, numberMatches));
+                        }
                         /*Benachrichtige den Adapter dass neue Daten vorliegen*/
-                    cvContainer.setVisibility(View.VISIBLE);
-                    mAdapter.notifyDataSetChanged();
-                    progressDialog.dismiss();
+                        cvContainer.setVisibility(View.VISIBLE);
+                        mAdapter.notifyDataSetChanged();
+                        progressDialog.dismiss();
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         },
@@ -170,6 +183,9 @@ public class TripsActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
                 progressDialog.dismiss();
+                Intent message = new Intent();
+                message.putExtra("message", "Verbindung zum Sever nicht möglich!");
+                setResult(Activity.RESULT_CANCELED, message);
                 finish();
             }
         });
@@ -210,6 +226,7 @@ public class TripsActivity extends AppCompatActivity {
             /*Zurück Button geklickt*/
             case android.R.id.home:
                 /*Schließe Aktivität ab und kehre zurück*/
+                setResult(Activity.RESULT_OK);
                 finish();
                 return true;
         }

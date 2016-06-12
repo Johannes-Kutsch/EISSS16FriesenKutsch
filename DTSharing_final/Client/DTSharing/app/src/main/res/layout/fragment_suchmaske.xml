@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
-    tools:context="de.dtsharing.dtsharing.Suchmaske"
+    tools:context=".SuchmaskeFragment"
     android:paddingLeft="8dp"
     android:paddingRight="8dp">
 
@@ -51,7 +51,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/start"
                         android:singleLine="true"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:theme="@style/AppTheme.Base"/>
 
                 </TableRow>
 
@@ -73,7 +74,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/destination"
                         android:singleLine="true"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:theme="@style/AppTheme.Base"/>
 
                 </TableRow>
 
@@ -109,7 +111,8 @@
                     android:focusable="false"
                     android:singleLine="true"
                     android:paddingLeft="16dp"
-                    android:paddingRight="16dp"/>
+                    android:paddingRight="16dp"
+                    android:theme="@style/AppTheme.Base"/>
 
                 <Space android:layout_weight="1"/>
 
@@ -129,7 +132,8 @@
                     android:focusable="false"
                     android:singleLine="true"
                     android:paddingLeft="16dp"
-                    android:paddingRight="16dp"/>
+                    android:paddingRight="16dp"
+                    android:theme="@style/AppTheme.Base"/>
 
             </TableRow>
 
@@ -165,7 +169,8 @@
                     android:singleLine="true"
                     android:focusable="false"
                     android:layout_weight="1"
-                    android:inputType="textNoSuggestions"/>
+                    android:inputType="textNoSuggestions"
+                    android:theme="@style/AppTheme.Base"/>
 
             </TableRow>
 

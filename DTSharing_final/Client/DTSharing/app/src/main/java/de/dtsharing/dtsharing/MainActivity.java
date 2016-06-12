@@ -10,9 +10,6 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
-import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
-import com.ToxicBakery.viewpager.transforms.StackTransformer;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +27,9 @@ public class MainActivity extends AppCompatActivity {
         TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
         setSupportActionBar(toolbar);
-        setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+
+
 
         if(actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
@@ -52,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (viewPager.getCurrentItem() == 1) {
-            /*Wenn die Suchmaske ausgewählt ist und zurück gedrückt wird => finish() Activity*/
+            /*Wenn die SuchmaskeFragment ausgewählt ist und zurück gedrückt wird => finish() Activity*/
             super.onBackPressed();
         } else {
-            /*Sonst geh zurück zur Suchmaske*/
+            /*Sonst geh zurück zur SuchmaskeFragment*/
             viewPager.setCurrentItem(1, true);
         }
     }
@@ -63,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new Chats(), "CHATS");
-        adapter.addFragment(new Suchmaske(), "SUCHMASKE");
-        adapter.addFragment(new Fahrten(), "FAHRTEN");
+        adapter.addFragment(new ChatsFragment(), "CHATS");
+        adapter.addFragment(new SuchmaskeFragment(), "SUCHMASKE");
+        adapter.addFragment(new FahrtenFragment(), "FAHRTEN");
         viewPager.setAdapter(adapter);
     }
 

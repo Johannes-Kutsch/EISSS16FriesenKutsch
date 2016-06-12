@@ -20,7 +20,7 @@ import java.util.logging.Handler;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Chats extends Fragment {
+public class ChatsFragment extends Fragment {
 
     RelativeLayout v;
 
@@ -29,7 +29,7 @@ public class Chats extends Fragment {
     private ArrayList<ChatsEntry> chats = new ArrayList<>();
     private ChatsAdapter mAdapter;
 
-    public Chats() {
+    public ChatsFragment() {
         // Required empty public constructor
     }
 
@@ -49,7 +49,7 @@ public class Chats extends Fragment {
         new android.os.Handler().post(new Runnable() {
             @Override
             public void run() {
-                /*Erzeuge und verbinde Adapter mit der Chats ListView*/
+                /*Erzeuge und verbinde Adapter mit der ChatsFragment ListView*/
                 mAdapter = new ChatsAdapter(getContext(), chats);
                 lvChats.setAdapter(mAdapter);
             }

@@ -1,12 +1,14 @@
 package de.dtsharing.dtsharing;
 
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -31,9 +34,10 @@ import java.util.Locale;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Suchmaske extends Fragment {
+public class SuchmaskeFragment extends Fragment {
 
     RelativeLayout v;
+    Snackbar snackbar;
     private NonScrollListView lvHistory;
     private Button bSubmit;
     private EditText etDate, etTime, etTicket;
@@ -46,6 +50,7 @@ public class Suchmaske extends Fragment {
     private Boolean hasTicket = false;
     private CharSequence[] ticketDialogArray;
     private int currentTicketIndex;
+    public static final int REQUEST_CODE_TRIPS = 1;
 
     /*Aktuelles Datum + Uhrzeit erhalten*/
     final Calendar c = Calendar.getInstance();
@@ -55,7 +60,7 @@ public class Suchmaske extends Fragment {
     int mHour = c.get(Calendar.HOUR_OF_DAY);
     int mMinute = c.get(Calendar.MINUTE);
 
-    public Suchmaske() {
+    public SuchmaskeFragment() {
         // Required empty public constructor
     }
 
@@ -149,7 +154,7 @@ public class Suchmaske extends Fragment {
                     tripsIntent.putExtra("date", date);
                     tripsIntent.putExtra("time", time);
                     /*Starte Matching Activity*/
-                    startActivity(tripsIntent);
+                    startActivityForResult(tripsIntent, REQUEST_CODE_TRIPS);
                 }
             }
         });
@@ -158,6 +163,22 @@ public class Suchmaske extends Fragment {
         historyOnClickListener();
 
         return v;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_CODE_TRIPS && resultCode == Activity.RESULT_CANCELED) {
+            String message = data.getStringExtra("message");
+            snackbar = Snackbar.make(v, message, Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Action", null);
+            View snackBarView = snackbar.getView();
+            snackBarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            snackbar.show();
+        }
+
     }
 
     //<--           prepareVerlaufData Start          -->

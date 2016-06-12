@@ -20,7 +20,7 @@ import java.util.logging.Handler;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Fahrten extends Fragment {
+public class FahrtenFragment extends Fragment {
 
     RelativeLayout v;
 
@@ -29,7 +29,7 @@ public class Fahrten extends Fragment {
     private ArrayList<FahrtenEntry> fahrten = new ArrayList<>();
     private FahrtenAdapter mAdapter;
 
-    public Fahrten() {
+    public FahrtenFragment() {
         // Required empty public constructor
     }
 
@@ -49,7 +49,7 @@ public class Fahrten extends Fragment {
         new android.os.Handler().post(new Runnable() {
             @Override
             public void run() {
-                /*Erzeuge und verbinde Adapter mit der Fahrten ListView*/
+                /*Erzeuge und verbinde Adapter mit der FahrtenFragment ListView*/
                 mAdapter = new FahrtenAdapter(getContext(), fahrten);
                 lvFahrten.setAdapter(mAdapter);
             }
