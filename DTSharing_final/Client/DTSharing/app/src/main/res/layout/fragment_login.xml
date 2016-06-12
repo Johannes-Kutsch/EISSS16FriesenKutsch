@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:cardView="http://schemas.android.com/apk/res-auto"
-    tools:context=".LoginFragment"
+    tools:context="de.dtsharing.dtsharing.LoginActivity"
     android:padding="8dp">
 
     <android.support.v7.widget.CardView
@@ -57,20 +57,20 @@
         android:layout_below="@id/bSignin">
 
         <TextView
-            android:id="@+id/bForgot"
+            android:id="@+id/tvForgotPassword"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:text="Kennwort vergessen?"
             android:layout_weight="1"
-            android:gravity="left|center_vertical"/>
+            android:gravity="start|center_vertical"/>
 
         <TextView
-            android:id="@+id/bSignup"
+            android:id="@+id/tvSignup"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:text="Jetzt registrieren"
             android:layout_weight="1"
-            android:gravity="right|center_vertical"/>
+            android:gravity="end|center_vertical"/>
 
     </TableRow>
 

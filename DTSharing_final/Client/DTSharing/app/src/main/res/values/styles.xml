@@ -9,9 +9,13 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="alertDialogTheme">@style/AppTheme.Dialog.Alert</item>
         <item name="dialogTheme">@style/AppTheme.Dialog</item>
+
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+        <item name="android:buttonStyle">@style/RobotoButtonStyle</item>
     </style>
 
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:fontFamily">Roboto</item>
         <item name="colorControlNormal">@color/grey</item>
         <item name="colorControlActivated">@color/colorAccent</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
@@ -41,5 +45,13 @@
         <item name="android:fullDark">@color/transparent</item>
         <item name="android:topBright">@color/transparent</item>
         <item name="android:topDark">@color/transparent</item>
+    </style>
+
+    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 </resources>

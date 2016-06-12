@@ -106,7 +106,7 @@ public class TripsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 /*Erzeuge die Matching Activity und füge Daten hinzu*/
-                Intent matchingIntent = new Intent(getApplicationContext(), MatchingActivity.class);
+                Intent matchingIntent = new Intent(TripsActivity.this, MatchingActivity.class);
                 matchingIntent.putExtra("hasTicket", hasTicket);
                 /*Starte Matching Activity*/
                 startActivity(matchingIntent);
@@ -235,4 +235,9 @@ public class TripsActivity extends AppCompatActivity {
     }
     //<--           OnOptionsItemSelected End         -->
 
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_OK);
+        finish();
+    }
 }

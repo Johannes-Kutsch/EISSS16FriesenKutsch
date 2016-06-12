@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (viewPager.getCurrentItem() == 1) {
-            /*Wenn die SuchmaskeFragment ausgewählt ist und zurück gedrückt wird => finish() Activity*/
+            /*Wenn das SuchmaskeFragment ausgewählt ist und zurück gedrückt wird => finish() Activity*/
             super.onBackPressed();
         } else {
             /*Sonst geh zurück zur SuchmaskeFragment*/

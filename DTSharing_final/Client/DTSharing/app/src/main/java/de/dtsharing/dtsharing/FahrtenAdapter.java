@@ -1,7 +1,9 @@
 package de.dtsharing.dtsharing;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +44,7 @@ public class FahrtenAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, final ViewGroup parent) {
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
@@ -77,8 +79,23 @@ public class FahrtenAdapter extends BaseAdapter{
         viewHolder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Fahrt löschen", Snackbar.LENGTH_SHORT)
-                        .setAction("Action", null).show();
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(parent.getContext(), R.style.AppTheme_Dialog_Alert);
+
+                //builder.setTitle("Dialog");
+                builder.setMessage("Möchtest du die Fahrt wirklich löschen?");
+                builder.setPositiveButton("Fahrt löschen", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Snackbar.make(parent, "OK", Snackbar.LENGTH_SHORT)
+                                .setAction("Action", null).show();
+                    }
+
+                });
+
+                builder.setNegativeButton("Abbruch", null);
+                builder.show();
             }
         });
 
