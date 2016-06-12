@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var Route = mongoose.model('Route', new mongoose.Schema({
+module.exports = mongoose.model('routes', {
   agency_key: {
     type: String,
     index: true
@@ -18,4 +18,4 @@ var Route = mongoose.model('Route', new mongoose.Schema({
   route_url: String,
   route_color: String,
   route_text_color: String
-}));
+});
