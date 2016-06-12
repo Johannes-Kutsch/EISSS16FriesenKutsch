@@ -9,6 +9,7 @@ module.exports = mongoose.model('stoptimes', {
   },
   trip_id: {
     type: String,
+    ref: 'Trips',
     index: true
   },
   arrival_time: {

@@ -3,6 +3,7 @@ var express 	= require('express'),
 	mongoose	= require('mongoose'),
 	user_Controller = require('./js/controllers/user_Controller'),
     dt_Controller = require('./js/controllers/dt_Controller'),
+    stop_Controller = require('./js/controllers/stop_Controller'),
     bodyParser	= require('body-parser'),
 	https = require('https'),
 	fs = require('fs');
@@ -19,6 +20,9 @@ app.post('/users', user_Controller.register);
 
 /*Ein Benutzerprofil abrufen*/
 app.get('/users/:user_id', user_Controller.findUserProfile);
+
+//Alle Stops Abrufen
+app.get('/stops', stop_Controller.findStops);
 
 
 app.get('/trips', dt_Controller.findTrips);
