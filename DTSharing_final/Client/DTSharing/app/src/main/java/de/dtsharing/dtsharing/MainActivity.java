@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
 
-
-
         if(actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }

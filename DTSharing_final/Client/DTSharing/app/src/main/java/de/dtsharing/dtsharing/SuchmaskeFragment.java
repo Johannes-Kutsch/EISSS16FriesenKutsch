@@ -47,9 +47,9 @@ public class SuchmaskeFragment extends Fragment {
     private ArrayList<HistoryEntry> transit = new ArrayList<>();
     private HistoryAdapter mAdapter;
 
-    private Boolean hasTicket = false;
+    private Boolean hasTicket;
     private CharSequence[] ticketDialogArray;
-    private int currentTicketIndex;
+    private int currentTicketIndex = -1;
     public static final int REQUEST_CODE_TRIPS = 1;
 
     /*Aktuelles Datum + Uhrzeit erhalten*/
@@ -87,7 +87,6 @@ public class SuchmaskeFragment extends Fragment {
         etTime.setText(String.format(Locale.US, "%02d:%02d", mHour, mMinute));
 
         ticketDialogArray = getResources().getStringArray(R.array.ticket_spinner);
-        currentTicketIndex = 0;
 
         /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
         new Handler().post(new Runnable() {
@@ -113,6 +112,7 @@ public class SuchmaskeFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position) {
                         etTicket.setText(ticketDialogArray[position]);
+                        etTicket.setError(null);
                         currentTicketIndex = position;
                         hasTicket = position != 0;
                         dialogInterface.dismiss();
@@ -141,11 +141,25 @@ public class SuchmaskeFragment extends Fragment {
                         time = etTime.getText().toString(),
                         date = etDate.getText().toString();
 
+                boolean valid = true;
+
                 /*Prüfe ob Start oder Ziel leer sind*/
-                if(departureName.equals("") || targetName.equals("")){
-                    Snackbar.make(view, "Fehler!", Snackbar.LENGTH_SHORT)
-                            .setAction("Action", null).show();
-                }else{
+
+                if (departureName.equals("")) {
+                    valid = false;
+                    etDeparture.setError("Darf nicht leer sein!");
+                }
+                if (targetName.equals("")) {
+                    valid = false;
+                    etTarget.setError("Darf nicht leer sein!");
+                }
+
+                if(etTicket.getText().toString().equals("")){
+                    valid = false;
+                    etTicket.setError("Bitte ein Ticket wählen!");
+                }
+
+                if(valid){
                     /*Erzeuge die Matching Activity und füge Daten hinzu*/
                     Intent tripsIntent = new Intent(getContext(), TripsActivity.class);
                     tripsIntent.putExtra("departureName", departureName);
@@ -264,6 +278,9 @@ public class SuchmaskeFragment extends Fragment {
 
                 etDeparture.setText(historyEntry.getDeparture());
                 etTarget.setText(historyEntry.getTarget());
+
+                etDeparture.setError(null);
+                etTarget.setError(null);
 
                 svContainer.smoothScrollTo(0,0);
 

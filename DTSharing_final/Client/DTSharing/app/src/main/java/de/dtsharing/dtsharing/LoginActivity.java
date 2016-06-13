@@ -5,28 +5,33 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
 
+    Adapter adapter;
+    android.support.v7.app.ActionBar actionBar;
+    ViewPager viewPager;
     Toolbar toolbar;
-    Button _signin;
-    TextView _forgotPassword, _signup, toolbar_title;
-    EditText _mail, _password;
+    TextView toolbar_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,102 +40,116 @@ public class LoginActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar_title = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
-        setSupportActionBar(toolbar);
 
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+
         if (actionBar != null) {
             /*Deaktiviere Titel da Custom Titel*/
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        _signup = (TextView) findViewById(R.id.tvSignup);
-        _forgotPassword = (TextView) findViewById(R.id.tvForgotPassword);
-        _signin = (Button) findViewById(R.id.bSignin);
-        _mail = (EditText) findViewById(R.id.etMail);
-        _password = (EditText) findViewById(R.id.etPassword);
+        // Setting ViewPager for each Tabs
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+        viewPager.setCurrentItem(1, false);
 
-
-        _signup.setOnClickListener(new View.OnClickListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View view) {
-                Intent signupIntent = new Intent(getApplicationContext(), SignupActivity.class);
-                startActivity(signupIntent);
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
             }
-        });
-        _forgotPassword.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View view) {
-                Intent forgotPasswordIntent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
-                startActivity(forgotPasswordIntent);
-            }
-        });
-        _signin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                hideSoftKeyboard(LoginActivity.this, view);
-
-                final String mail = _mail.getText().toString(),
-                        password = _password.getText().toString();
-
-                if(verifyInput(mail, password)){
-                    submitData(mail, password);
+            public void onPageSelected(int position) {
+                if(position != 1){
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    actionBar.setHomeButtonEnabled(true);
+                    toolbar_title.setText(adapter.getPageTitle(position).toString());
+                    toolbar_title.setGravity(Gravity.LEFT);
+                }else{
+                    actionBar.setDisplayHomeAsUpEnabled(false);
+                    actionBar.setHomeButtonEnabled(false);
+                    toolbar_title.setText(adapter.getPageTitle(position).toString());
+                    toolbar_title.setGravity(Gravity.CENTER);
                 }
             }
-        });
-    }
 
-    private boolean verifyInput(String mail, String password){
-        boolean valid = true;
-
-        if(!isValidEmail(mail)){
-            valid = false;
-            _mail.setError("Bitte eine korrekte E-Mail Adresse eingeben!");
-        }
-
-        if(!isValidPassword(password)){
-            valid = false;
-            _password.setError("Ungültiges Kennwort");
-        }
-
-        return valid;
-    }
-
-    private void submitData(String mail, String password){
-
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.AppTheme_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setIndeterminateDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.progress_circle, null));
-        //progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        //progressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("Es wird ein Preis für deine Daten ermitteln...");
-        progressDialog.show();
-
-        new Handler().postDelayed(new Runnable() {
             @Override
-            public void run() {
-                progressDialog.dismiss();
-                Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(mainIntent);
-                finish();
+            public void onPageScrollStateChanged(int state) {
+
             }
-        }, 5000);
+        });
 
     }
 
-    public static void hideSoftKeyboard (Activity activity, View view)
-    {
-        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+    @Override
+    public void onBackPressed() {
+        if (viewPager.getCurrentItem() == 1) {
+            /*Wenn das SuchmaskeFragment ausgewählt ist und zurück gedrückt wird => finish() Activity*/
+            super.onBackPressed();
+        } else {
+            /*Sonst geh zurück zur SuchmaskeFragment*/
+            viewPager.setCurrentItem(1, true);
+        }
     }
 
-    public final static boolean isValidEmail(CharSequence target) {
-        return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    public void setCurrentPage(int page){
+        viewPager.setCurrentItem(page, true);
     }
-    public final static boolean isValidPassword(CharSequence target) {
-        return !TextUtils.isEmpty(target) && target.length() >= 6;
+
+    // Add Fragments to Tabs
+    private void setupViewPager(ViewPager viewPager) {
+        adapter = new Adapter(getSupportFragmentManager());
+        adapter.addFragment(new ForgotPasswordFragment(), "Kennwort vergessen");
+        adapter.addFragment(new LoginFragment(), "DTSharing");
+        adapter.addFragment(new SignupFragment(), "Registrieren");
+        viewPager.setAdapter(adapter);
     }
+
+    static class Adapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public Adapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
+
+    //<--           OnOptionsItemSelected Start         -->
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            /*Zurück Button geklickt*/
+            case android.R.id.home:
+                /*Schließe Aktivität ab und kehre zurück*/
+                viewPager.setCurrentItem(1, true);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    //<--           OnOptionsItemSelected End         -->
+
 
 }
