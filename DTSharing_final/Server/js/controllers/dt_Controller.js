@@ -38,7 +38,7 @@ module.exports.findTrips = function (req, res) {
         //ToDo Errorhandling
         formatUniqueTrips();
         var endTime = (new Date()).getTime(); 
-        console.log('Es wurden ' + [endTime - totalStartTime] + ' MS gebraucht um die Verbindungen zu ermitteln!');
+        console.log('Es wurden ' + [endTime - totalStartTime] + ' MS gebraucht um ' + uniqueTrips.length + ' Verbindungen zu ermitteln!');
         console.log('');
         res.json(uniqueTrips);
     });
@@ -175,7 +175,7 @@ module.exports.findTrips = function (req, res) {
             //Waterfall entfernen?!?!?
             function () {return uniqueTrips.length < numberTrips && days < 8},
             function(callback) {
-                console.log('Suche Fahrten für: '+utils.formatDay(departureDate)+ ' ab ' + utils.secondsToTime(currentDepartureTime) + ' Uhr');
+                console.log('Suche Fahrten für: '+utils.formatDay(departureDate)+ ' ab ' + utils.secondsToTime(currentDepartureTime) + ' Uhr...');
                 async.waterfall([
                     async.apply(findTripsAtDay, currentDepartureTime, currentDepartureDate),
                 ], function (err) {
@@ -280,8 +280,6 @@ module.exports.findTrips = function (req, res) {
                         numberMatches : 0,
                     });
                 });
-                
-                console.log(uniqueTrips.length);
                 var endTime = (new Date()).getTime();
                 console.log('Es wurden ' + [endTime - startTime] + ' MS gebraucht um ' + newTrips.length + ' Fahrten für den ' + utils.formatDay(date) +' zu ermitteln'); 
                 callback(err);

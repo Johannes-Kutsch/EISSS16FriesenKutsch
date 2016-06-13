@@ -4,6 +4,7 @@ var express 	= require('express'),
 	user_Controller = require('./js/controllers/user_Controller'),
     dt_Controller = require('./js/controllers/dt_Controller'),
     stop_Controller = require('./js/controllers/stop_Controller'),
+    ratings_Controller = require('./js/controllers/ratings_Controller'),
     bodyParser	= require('body-parser'),
 	https = require('https'),
 	fs = require('fs');
@@ -15,14 +16,25 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+//Platzhalter
+//Alle Stops Abrufen 
+app.get('/stops', stop_Controller.findStops);
+
+//Benutzer
 /*Ein neues Benutzerprofil erstellen*/
 app.post('/users', user_Controller.register);
 
 /*Ein Benutzerprofil abrufen*/
-app.get('/users/:user_id', user_Controller.findUserProfile);
+app.get('/users/:userID', user_Controller.findUser);
 
-//Alle Stops Abrufen
-app.get('/stops', stop_Controller.findStops);
+//Ratings
+app.post('/users/:userID/ratings', ratings_Controller.rate);
+app.get('/users/:userID/ratings/:ratingID', ratings_Controller.findRating);
+
+
+
+
+
 
 
 app.get('/trips', dt_Controller.findTrips);
