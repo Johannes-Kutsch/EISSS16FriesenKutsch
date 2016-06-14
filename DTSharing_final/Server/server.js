@@ -16,29 +16,29 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+
+
 //Platzhalter
 //Alle Stops Abrufen 
 app.get('/stops', stop_Controller.findStops);
 
 //Benutzer
-/*Ein neues Benutzerprofil erstellen*/
 app.post('/users', user_Controller.register);
-
-/*Ein Benutzerprofil abrufen*/
 app.get('/users/:userID', user_Controller.findUser);
 
 //Ratings
 app.post('/users/:userID/ratings', ratings_Controller.rate);
 app.get('/users/:userID/ratings/:ratingID', ratings_Controller.findRating);
 
-
-
-
-
-
-
+//trips ermitteln
 app.get('/trips', dt_Controller.findTrips);
 
+//Not Found
+app.use(function(req, res, next) {
+    res.status(404);
+    res.send({ error: 'URI not found' });
+    //return;
+});
 
 app.listen(3000, function() {
 	console.log('Listening on port 3000...');
