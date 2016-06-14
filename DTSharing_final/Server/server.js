@@ -28,7 +28,7 @@ app.get('/users/:userID', user_Controller.findUser);
 
 //Ratings
 app.post('/users/:userID/ratings', ratings_Controller.rate);
-app.get('/users/:userID/ratings/:ratingID', ratings_Controller.findRating);
+app.get('/users/:userID/ratings', ratings_Controller.findRating);
 
 //trips ermitteln
 app.get('/trips', dt_Controller.findTrips);
@@ -36,7 +36,7 @@ app.get('/trips', dt_Controller.findTrips);
 //Not Found
 app.use(function(req, res, next) {
     res.status(404);
-    res.send({ error: 'URI not found' });
+    res.send({ errorMessage: 'URI not found' });
     //return;
 });
 

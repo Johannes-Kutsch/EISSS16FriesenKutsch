@@ -2,7 +2,8 @@ var mongoose = require('mongoose');
 
 /*Datenbank Schema der Collection "users" */
 module.exports = mongoose.model('users', {
-    picture_id: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+    user_id: String,
+    picture_id: String,
     birth_year: Number,
     first_name: String,
     name: String,
