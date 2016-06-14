@@ -2,7 +2,7 @@ var express 	= require('express'),
 	app			= express(),
 	mongoose	= require('mongoose'),
 	user_Controller = require('./js/controllers/user_Controller'),
-    dt_Controller = require('./js/controllers/dt_Controller'),
+    trip_Controller = require('./js/controllers/trip_Controller'),
     stop_Controller = require('./js/controllers/stop_Controller'),
     ratings_Controller = require('./js/controllers/ratings_Controller'),
     bodyParser	= require('body-parser'),
@@ -31,7 +31,7 @@ app.post('/users/:userID/ratings', ratings_Controller.rate);
 app.get('/users/:userID/ratings', ratings_Controller.findRating);
 
 //trips ermitteln
-app.get('/trips', dt_Controller.findTrips);
+app.get('/trips', trip_Controller.findTrips);
 
 //Not Found
 app.use(function(req, res, next) {
