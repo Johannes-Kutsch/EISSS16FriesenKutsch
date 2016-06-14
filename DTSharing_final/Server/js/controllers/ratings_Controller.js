@@ -43,8 +43,8 @@ module.exports.rate = function (req, res) {
             return;
         }
         var rating = new Ratings({
-            user_id: req.params.userID,
-            author_id: req.body.authorID,
+            user_id: req.params.user_id,
+            author_id: req.body.author_id,
             stars: req.body.stars,
             comment: req.body.comment
         });

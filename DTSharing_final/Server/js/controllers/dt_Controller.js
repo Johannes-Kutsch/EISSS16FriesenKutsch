@@ -17,7 +17,7 @@ module.exports.findTrips = function (req, res) {
     //Abfahrtsdatum vom Format DD.MM.YY in ein Date objekt geschrieben
 	var	departureDate = utils.formatDate(req.query.departureDate);
     //Ticketstatus des Suchenden, wird zur ermittlung der Anzahl der Matches benötigt
-	var	hasSeasonTicker = req.query.hasSeasonTicker;
+	var	hasSeasonTicket = req.query.hasSeasonTicket;
     //ID des Anfragstellers, wird zur ermittlung der Anzahl der Matches benötigt
     var userID = req.query.userID;
     //Die Anzahl an Trips die ermittelt werden sollen
