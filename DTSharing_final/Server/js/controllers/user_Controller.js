@@ -16,7 +16,7 @@ module.exports.register = function (req, res) {
             error: 'birthYear is not a Number'
         });
         return;
-    } else if(req.body.birthYear.toString().length != 4 && number % 1 == 0) {
+    } else if(req.body.birthYear < 1000 || req.body.birthYear > 9999 || req.body.birthYear % 1 != 0) {
         res.status(400);
         res.send({
             errorCode: '0003',
@@ -78,25 +78,25 @@ module.exports.register = function (req, res) {
         return;
     }
     
-    if(req.body.interests != null && typeof req.body.interests != 'string') {
+    if(typeof req.body.interests != 'string') {
         res.status(400);
         res.send({
             errorCode: '0031',
-            error: 'interests has to be null or a string' 
+            error: 'interests has to be a string' 
         });
         return;
     }
+
     
-    if(req.body.more != null && typeof req.body.more != 'string') {
+    if(typeof req.body.more != 'string') {
         res.status(400);
         res.send({
             errorCode: '0041',
-            error: 'more has to be null or a string' 
+            error: 'more has to be a string' 
         });
         return;
     }
     
-    //evtl noch auf vorhandene Email überprüfen
     if(req.body.email == null) {
         res.status(400);
         res.send({
@@ -165,7 +165,7 @@ module.exports.findUser = function (req, res) {
         if(!result) {
             res.status(404);
             res.send({
-                errorCode: '0082',
+                errorCode: '0091',
                 error: 'User not found'
             });
             return;
