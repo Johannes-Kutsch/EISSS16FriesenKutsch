@@ -6,21 +6,21 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0001',
-            error: 'birthYear is missing'
+            errorMessage: 'birthYear is missing'
         });
         return;
     } else if(typeof req.body.birthYear != 'number') {
         res.status(400);
         res.send({
             errorCode: '0002',
-            error: 'birthYear is not a Number'
+            errorMessage: 'birthYear is not a Number'
         });
         return;
     } else if(req.body.birthYear < 1000 || req.body.birthYear > 9999 || req.body.birthYear % 1 != 0) {
         res.status(400);
         res.send({
             errorCode: '0003',
-            error: 'birthYear has to be a whole Number with length 4'
+            errorMessage: 'birthYear has to be a whole Number with length 4'
         });
         return;
     }
@@ -29,14 +29,14 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0011',
-            error: 'firstName is missing' 
+            errorMessage: 'firstName is missing' 
         });
         return;
     } else if(typeof req.body.firstName != 'string') {
         res.status(400);
         res.send({
             errorCode: '0012',
-            error: 'firstName is not a String'
+            errorMessage: 'firstName is not a String'
         });
         return;
     }
@@ -45,12 +45,14 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0013',
-            error: 'name is missing' 
+            errorMessage: 'name is missing' 
         });
         return;
     } else if(typeof req.body.name != 'string') {
         res.status(400);
-        res.send({error: 'name is not a String'});
+        res.send({
+            errorCode: '0014',
+            errorMessage: 'name is not a String'});
         return;
     }
     
@@ -58,14 +60,14 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0021',
-            error: 'gender is missing' 
+            errorMessage: 'gender is missing' 
         });
         return;
     } else if(typeof req.body.name != 'string') {
         res.status(400);
         res.send({
             errorCode: '0022',
-            error: 'gender is not a String'
+            errorMessage: 'gender is not a String'
         });
         return;
     } else if(req.body.gender != 'm' && req.body.gender != 'f') {
@@ -73,7 +75,7 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0023',
-            error: 'gender has to be m or f'
+            errorMessage: 'gender has to be m or f'
         });
         return;
     }
@@ -82,7 +84,7 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0031',
-            error: 'interests has to be a string' 
+            errorMessage: 'interests has to be a string' 
         });
         return;
     }
@@ -92,7 +94,7 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0041',
-            error: 'more has to be a string' 
+            errorMessage: 'more has to be a string' 
         });
         return;
     }
@@ -101,14 +103,14 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0051',
-            error: 'email is missing' 
+            errorMessage: 'email is missing' 
         });
         return;
     } else if(typeof req.body.email != 'string') {
         res.status(400);
         res.send({
             errorCode: '0052',
-            error: 'email is not a String'
+            errorMessage: 'email is not a String'
         });
         return;
     }
@@ -117,14 +119,14 @@ module.exports.register = function (req, res) {
         res.status(400);
         res.send({
             errorCode: '0061',
-            error: 'pass is missing' 
+            errorMessage: 'pass is missing' 
         });
         return;
     } else if(typeof req.body.pass != 'string') {
         res.status(400);
         res.send({
             errorCode: '0071',
-            error: 'pass is not a String'
+            errorMessage: 'pass is not a String'
         });
         return;
     }
@@ -134,7 +136,7 @@ module.exports.register = function (req, res) {
             res.status(409);
             res.send({
                 errorCode: '0081',
-                error: 'A User for that Mail already exists'
+                errorMessage: 'A User for that Mail already exists'
             });
             return;
         } else {
@@ -166,7 +168,7 @@ module.exports.findUser = function (req, res) {
             res.status(404);
             res.send({
                 errorCode: '0091',
-                error: 'User not found'
+                errorMessage: 'User not found'
             });
             return;
         }
