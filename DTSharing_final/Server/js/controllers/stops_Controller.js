@@ -13,6 +13,10 @@ module.exports.findStops = function (req, res) {
                 console.error(err);
                 return;
             }
+            var data = {
+                stops_version: stops_version,
+                stops: results
+            };
             res.json(results);
         });
     } else {
