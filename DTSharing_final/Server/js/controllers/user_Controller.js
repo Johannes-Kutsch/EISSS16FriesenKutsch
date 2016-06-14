@@ -22,7 +22,7 @@ module.exports.register = function (req, res) {
             user_version: 0,
             birth_year: req.body.birth_year,
             first_name: req.body.first_name,
-            name: req.body.name,
+            last_name: req.body.last_name,
             gender: req.body.gender,
             interests: req.body.interests,
             more: req.body.more,
@@ -62,7 +62,7 @@ module.exports.findUser = function (req, res) {
             responseObject.user_version = result.user_version;
             responseObject.birth_year = result.birth_year;
             responseObject.first_name = result.first_name;
-            responseObject.name = result.name;
+            responseObject.last_name = result.last_name;
             responseObject.gender = result.gender;
             responseObject.interests = result.interests;
             responseObject.more = result.more;

@@ -5,7 +5,7 @@ module.exports = mongoose.model('users', {
     user_version: Number,
     birth_year: Number,
     first_name: String,
-    name: String,
+    last_name: String,
     gender: String,
     interests: String,
     more: String,
