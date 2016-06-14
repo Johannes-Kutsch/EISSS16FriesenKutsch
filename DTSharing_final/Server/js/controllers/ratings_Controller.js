@@ -31,34 +31,49 @@ module.exports.rate = function (req, res) {
     ],
     function(err, results){
         if(err) {
+            res.status(444);
+            res.send({
+                errorMessage: 'Database Error'
+            });
             console.error(err);
+            return;
         }
         if(error) {
             res.send({errorMessage: error});
             return;
         }
-        var userObjectID = new mongoose.mongo.ObjectID(req.params.userID);
-        var authorObjectID = new mongoose.mongo.ObjectID(req.body.authorID);
         var rating = new Ratings({
-            user_id: userObjectID,
-            author_id: authorObjectID,
+            user_id: req.params.userID,
+            author_id: req.body.authorID,
             stars: req.body.stars,
             comment: req.body.comment
         });
         rating.save(function (err, result) {
-            console.error(err);
+            if(err) {
+                res.status(444);
+                res.send({
+                    errorMessage: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
             res.json(result);
         });
     });
 }
 
 module.exports.findRating = function (req, res) {
-    Users.find({user_id : new ObjectId(req.params.userID)}, '-__v', function (err, results) {
+    Ratings.find({user_id : req.params.userID}, '-__v', function (err, results) {
         if(err) {
+            res.status(444);
+            res.send({
+                errorMessage: 'Database Error'
+            });
             console.error(err);
+            return;
         }
         console.log(results);
-        if(!results.length > 0) {
+        if(results.length == 0) {
             res.status(404);
             res.send({
                 errorMessage: 'No Ratings for this User'

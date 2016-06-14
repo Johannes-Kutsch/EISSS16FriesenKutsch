@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 
 /*Datenbank Schema der Collection "ratings" */
 module.exports = mongoose.model('ratings', {
-    user_id: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
-    author_id: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
+    user_id: String,
+    author_id: String,
     stars: Number,
     comment: String
 });

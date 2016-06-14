@@ -4,9 +4,14 @@ var Users = require('../models/users'),
 module.exports.register = function (req, res) {
     Users.findOne({email : req.body.email}, function(err, result) {
         if(err) {
+            res.status(444);
+            res.send({
+                errorMessage: 'Database Error'
+            });
             console.error(err);
+            return;
         }
-        if(result) {
+        if(!result) {
             res.status(409);
             res.send({
                 errorMessage: 'A User for that Mail already exists'
@@ -35,12 +40,18 @@ module.exports.register = function (req, res) {
 module.exports.findUser = function (req, res) {
     //ToDo Errorhandling wenn kein User gefunden
     Users.findById(req.params.userID, '-__v', function (err, result) {
-        if(err) {
+         if(err) {
+            res.status(444);
+            res.send({
+                errorMessage: 'Database Error'
+            });
             console.error(err);
+            return;
         }
         if(!result) {
             res.status(404);
             res.send({
+                success: 0,
                 errorMessage: 'User not found'
             });
             return;
