@@ -106,7 +106,10 @@ module.exports.register = function (req, res) {
         return;
     } else if(typeof req.body.email != 'string') {
         res.status(400);
-        res.send({error: 'email is not a String'});
+        res.send({
+            errorCode: '0052',
+            error: 'email is not a String'
+        });
         return;
     }
     
@@ -131,7 +134,7 @@ module.exports.register = function (req, res) {
             res.status(409);
             res.send({
                 errorCode: '0081',
-                error: 'User for that Mail already exists'
+                error: 'A User for that Mail already exists'
             });
             return;
         } else {
@@ -159,6 +162,14 @@ module.exports.register = function (req, res) {
 module.exports.findUser = function (req, res) {
     //ToDo Errorhandling wenn kein User gefunden
     Users.findById(req.params.userID, '-__v', function (err, result) {
+        if(!result) {
+            res.status(404);
+            res.send({
+                errorCode: '0082',
+                error: 'User not found'
+            });
+            return;
+        }
         res.json(result);
     });
 }
