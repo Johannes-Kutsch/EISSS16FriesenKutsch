@@ -1,9 +1,9 @@
 var express 	= require('express'),
 	app			= express(),
 	mongoose	= require('mongoose'),
-	user_Controller = require('./js/controllers/user_Controller'),
-    trip_Controller = require('./js/controllers/trip_Controller'),
-    stop_Controller = require('./js/controllers/stop_Controller'),
+	user_Controller = require('./js/controllers/users_Controller'),
+    trip_Controller = require('./js/controllers/trips_Controller'),
+    stop_Controller = require('./js/controllers/stops_Controller'),
     ratings_Controller = require('./js/controllers/ratings_Controller'),
     bodyParser	= require('body-parser'),
 	https = require('https'),
@@ -20,18 +20,18 @@ app.use(bodyParser.urlencoded({
 
 //Platzhalter
 //Alle Stops Abrufen 
-app.get('/stops', stop_Controller.findStops);
+app.get('/stops', stops_Controller.findStops);
 
 //Benutzer
-app.post('/users', user_Controller.register);
-app.get('/users/:userID', user_Controller.findUser);
+app.post('/users', users_Controller.register);
+app.get('/users/:userID', users_Controller.findUser);
 
 //Ratings
 app.post('/users/:userID/ratings', ratings_Controller.rate);
 app.get('/users/:userID/ratings', ratings_Controller.findRating);
 
 //trips ermitteln
-app.get('/trips', trip_Controller.findTrips);
+app.get('/trips', trips_Controller.findTrips);
 
 //Not Found
 app.use(function(req, res, next) {

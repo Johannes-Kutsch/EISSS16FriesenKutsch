@@ -40,8 +40,6 @@ module.exports.register = function (req, res) {
 }
 
 module.exports.findUser = function (req, res) {
-    //erst überprüfen dann Daten ermitteln!
-    console.log(true || false);
     Users.findById(req.params.userID, '-__v', function (err, result) {
          if(err) {
             res.status(444);
