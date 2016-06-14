@@ -5,7 +5,7 @@ module.exports.findStops = function (req, res) {
     var stops_version = 1;
     
     //var user = new User(req.body);
-    if(result.stops_version != req.query.stops_version || req.query.user_version !== undefined) {
+    if(req.query.user_version !== undefined || result.stops_version != req.query.stops_version) {
         Stops.find({}, 'stop_id stop_name stop_lat stop_lon -_id', function (err, results) {
             if(err) {
                 res.status(444);

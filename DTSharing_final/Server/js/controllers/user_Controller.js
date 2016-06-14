@@ -59,7 +59,7 @@ module.exports.findUser = function (req, res) {
             return;
         }
         var responseObject = {};
-        if(result.user_version != req.query.user_version || req.query.user_version !== undefined) {
+        if(req.query.user_version !== undefined || result.user_version != req.query.user_version) {
             responseObject.user_version = result.user_version;
             responseObject.birth_year = result.birth_year;
             responseObject.first_name = result.first_name;
@@ -68,7 +68,7 @@ module.exports.findUser = function (req, res) {
             responseObject.interests = result.interests;
             responseObject.more = result.more;
         }
-        if(result.picture_version != req.query.picture_version ||req.query.picture_version !== undefined) {
+        if(req.query.picture_version !== undefined ||result.picture_version != req.query.picture_version) {
             responseObject.picture = result.picture;
             responseObject.picture_version = result.picture_version;
         }
