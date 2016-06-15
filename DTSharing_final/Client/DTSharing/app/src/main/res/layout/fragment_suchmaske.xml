@@ -47,14 +47,15 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
                         <AutoCompleteTextView
                             android:id="@+id/etDeparture"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/start"
                             android:singleLine="true"
-                            android:layout_weight="1"
+                            android:inputType="textAutoComplete"
                             android:theme="@style/AppTheme.Base"/>
                     </android.support.design.widget.TextInputLayout>
 
@@ -74,14 +75,15 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
                         <AutoCompleteTextView
                             android:id="@+id/etTarget"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/destination"
                             android:singleLine="true"
-                            android:layout_weight="1"
+                            android:inputType="textAutoComplete"
                             android:theme="@style/AppTheme.Base"/>
                     </android.support.design.widget.TextInputLayout>
 
@@ -105,51 +107,45 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:drawableStart="@drawable/ic_date_lightgrey_24dp"
                     android:layout_marginEnd="16dp"
                     android:gravity="center_vertical" />
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/etDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="11.06.2016"
+                        android:hint="Datum"
                         android:textAlignment="center"
                         android:focusable="false"
                         android:singleLine="true"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:theme="@style/AppTheme.Base"/>
-                </android.support.design.widget.TextInputLayout>
 
                 <Space android:layout_weight="1"/>
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:drawableStart="@drawable/ic_clock_lightgrey_24dp"
                     android:layout_marginEnd="16dp"
                     android:gravity="center_vertical" />
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/etTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00:00"
+                        android:hint="Uhrzeit"
                         android:textAlignment="center"
                         android:focusable="false"
                         android:singleLine="true"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:theme="@style/AppTheme.Base"/>
-                </android.support.design.widget.TextInputLayout>
 
             </TableRow>
 
@@ -179,15 +175,14 @@
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <EditText
+                    <android.support.design.widget.TextInputEditText
                         android:id="@+id/etTicket"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Welches Ticket besitzt du?"
                         android:drawableEnd="@drawable/ic_arrow_drop_down_24dp"
                         android:singleLine="true"
                         android:focusable="false"
-                        android:layout_weight="1"
                         android:inputType="textNoSuggestions"
                         android:theme="@style/AppTheme.Base"/>
                 </android.support.design.widget.TextInputLayout>

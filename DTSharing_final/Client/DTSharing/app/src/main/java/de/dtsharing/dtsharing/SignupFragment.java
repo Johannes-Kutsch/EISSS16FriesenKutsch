@@ -2,6 +2,7 @@ package de.dtsharing.dtsharing;
 
 import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ScrollingView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,8 +20,10 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -41,7 +44,7 @@ import java.util.Map;
 
 public class SignupFragment extends Fragment {
 
-    RelativeLayout v;
+    ScrollView v;
 
     EditText _mail, _password1, _password2, _firstName, _lastName;
     AutoCompleteTextView _birthYear;
@@ -57,7 +60,7 @@ public class SignupFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         /*Lade fragment_database Layout*/
-        v = (RelativeLayout) inflater.inflate(R.layout.fragment_signup, container, false);
+        v = (ScrollView) inflater.inflate(R.layout.fragment_signup, container, false);
 
         _mail = (EditText) v.findViewById(R.id.etMail);
         _password1 = (EditText) v.findViewById(R.id.etPassword);
@@ -101,7 +104,7 @@ public class SignupFragment extends Fragment {
                     data.put("birthYear", _birthYear.getText().toString());
                     data.put("gender", _gender.getCheckedRadioButtonId() == R.id.rbMale ? "Männlich" : "Weiblich");
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); //sollte nicht eintreten
                 }
                 if(data.length() > 0)
                     if(verifyInput(data)){
@@ -183,7 +186,7 @@ public class SignupFragment extends Fragment {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //sollte nicht eintreten
         }
 
         return valid;
@@ -199,6 +202,7 @@ public class SignupFragment extends Fragment {
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObjResponse = new JSONObject(response);
+                            System.out.println(response);
                             System.out.println(jsonObjResponse);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -208,7 +212,17 @@ public class SignupFragment extends Fragment {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+
                 error.printStackTrace();
+
+                int  statusCode = error.networkResponse.statusCode;
+                NetworkResponse response = error.networkResponse;
+
+                switch (statusCode) {
+                    case 409:
+                        System.out.println("errorcode 400!!");
+                }
+
             }
         })
         {
@@ -225,11 +239,14 @@ public class SignupFragment extends Fragment {
                     params.put("gender", data.getString("gender"));
                     params.put("email", data.getString("mail"));
                     params.put("pass", data.getString("password"));
+                    params.put("interests", "");
+                    params.put("more", "");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 return params;
             }
+
         };
 
         Volley.newRequestQueue(getActivity()).add(postRequest);

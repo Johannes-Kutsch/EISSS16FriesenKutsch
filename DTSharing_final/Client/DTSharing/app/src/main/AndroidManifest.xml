@@ -22,8 +22,6 @@
         <activity android:name=".MatchingActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".SignupFragment" />
-        <activity android:name=".ForgotPasswordFragment" />
     </application>
 
 </manifest>

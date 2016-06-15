@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,6 +46,7 @@ public class SuchmaskeFragment extends Fragment {
     private ScrollView svContainer;
 
     private ArrayList<HistoryEntry> transit = new ArrayList<>();
+    private ArrayAdapter autocompleteAdapter;
     private HistoryAdapter mAdapter;
 
     private Boolean hasTicket;

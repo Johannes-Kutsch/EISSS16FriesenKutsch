@@ -77,7 +77,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tvUserName"
             android:textSize="18sp"
-            android:textColor="#7ED321"
+            android:textColor="@color/positive"
             android:text="13:23"/>
 
         <TextView
