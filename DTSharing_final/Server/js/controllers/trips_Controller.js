@@ -1,11 +1,11 @@
 var async = require('async'),
     utils = require('../lib/utils'),
-    StopTimes = require('../models/stopTimes'),
+    StopTimes = require('../models/stop_times'),
     Stops = require('../models/stops'),
     Trips = require('../models/trips'),
     Routes = require('../models/routes'),
     Calendars = require('../models/calendars'),
-    CalendarDates = require('../models/calendarDates');
+    CalendarDates = require('../models/calendar_dates');
 
 module.exports.findTrips = function (req, res) {
     //Name der Abfahrtshaltestelle

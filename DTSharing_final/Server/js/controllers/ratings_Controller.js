@@ -1,14 +1,13 @@
 var Ratings = require('../models/ratings'),
     Users = require('../models/users'),
     async = require('async'),
-    ObjectId = require('mongoose').Types.ObjectId; 
     mongoose = require('mongoose');
     
 module.exports.rate = function (req, res) {
     var error;
     async.parallel([
         function(callback) {
-            Users.findById(req.params.userID, '-__v', function (err, result) {
+            Users.findById(req.params.user_id, function (err, result) {
                 if(!result) {
                     if(!error) {
                         res.status(404);
@@ -18,7 +17,7 @@ module.exports.rate = function (req, res) {
                 callback(err);
             });
         }, function(callback) {
-            Users.findById(req.body.authorID, '-__v', function (err, result) {
+            Users.findById(req.body.author_id, function (err, result) {
                 if(!result) {
                     if(!error) {
                         res.status(404);
@@ -63,7 +62,7 @@ module.exports.rate = function (req, res) {
 }
 
 module.exports.findRating = function (req, res) {
-    Ratings.find({user_id : req.params.userID}, '-__v', function (err, results) {
+    Ratings.find({user_id : req.params.user_id}, '-__v', function (err, results) {
         if(err) {
             res.status(444);
             res.send({
