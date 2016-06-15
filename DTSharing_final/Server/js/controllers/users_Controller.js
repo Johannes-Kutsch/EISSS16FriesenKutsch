@@ -28,7 +28,7 @@ module.exports.register = function (req, res) {
             more: req.body.more,
             email: req.body.email,
             pass: req.body.pass,
-            picture: req.body.picture,
+            picture: null,
             picture_version: 0
             });
             user.save(function (err, result) {
