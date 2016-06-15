@@ -1,6 +1,8 @@
 package de.dtsharing.dtsharing;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +14,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 public class MatchingActivity extends AppCompatActivity {
@@ -22,6 +33,8 @@ public class MatchingActivity extends AppCompatActivity {
     private ArrayList<MatchingEntry> matches = new ArrayList<>();
     private MatchingAdapter mAdapter;
 
+    String uniqueTripId;
+    int departureSequenceId, targetSequenceId;
     boolean hasTicket;
 
 
@@ -48,6 +61,9 @@ public class MatchingActivity extends AppCompatActivity {
         Intent tripsIntent = getIntent();
         if (tripsIntent != null) {
             hasTicket = tripsIntent.getBooleanExtra("hasTicket", false);
+            uniqueTripId = tripsIntent.getStringExtra("uniqueTripId");
+            departureSequenceId = tripsIntent.getIntExtra("departureSequenceId", 0);
+            targetSequenceId = tripsIntent.getIntExtra("targetSequenceId", 0);
         }
 
         if (mTitle != null) {
@@ -60,18 +76,13 @@ public class MatchingActivity extends AppCompatActivity {
 
         bSubmit.setText(hasTicket ? "ALS ANBIETEND EINTRAGEN" : "ALS SUCHEND EINTRAGEN");
 
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                /*Erzeuge und verbinde Adapter mit der History ListView*/
-                mAdapter = new MatchingAdapter(getApplicationContext(), matches);
-                lvMatches.setAdapter(mAdapter);
-            }
-        });
+        /*Erzeuge und verbinde Adapter mit der History ListView*/
+        mAdapter = new MatchingAdapter(getApplicationContext(), matches);
+        lvMatches.setAdapter(mAdapter);
 
         /*Fülle Array mit Beispieldaten*/
-        prepareMatchingData();
+        getMatchingData(uniqueTripId, departureSequenceId, targetSequenceId, hasTicket);
+        //prepareMatchingData();
 
         lvMatches.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -86,23 +97,64 @@ public class MatchingActivity extends AppCompatActivity {
         });
     }
 
+    private void getMatchingData(String uniqueTripId, int departureSequenceId, int targetSequenceId, boolean hasTicket){
+
+        final String uri = Uri.parse("http://192.168.0.15:3000/matches")
+                .buildUpon()
+                .appendQueryParameter("unique_trip_id", uniqueTripId)
+                .appendQueryParameter("has_season_ticket", Boolean.toString(hasTicket))
+                .appendQueryParameter("sequence_id_departure_station", Integer.toString(departureSequenceId))
+                .appendQueryParameter("sequence_id_target_station", Integer.toString(targetSequenceId))
+                .appendQueryParameter("user_id", "oh1mann2wie3ist4")
+                .build().toString();
+
+        final JsonArrayRequest jsonRequest = new JsonArrayRequest(
+                Request.Method.GET, uri, null, new Response.Listener<JSONArray>() {
+
+            @Override
+            public void onResponse(JSONArray response) {
+                if(response.length() > 0)
+                    addMatchingData(response);
+            }
+        },
+
+        new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+    }
+
     //<--           prepareVerlaufData Start          -->
-    private void prepareMatchingData(){
+    private void addMatchingData(final JSONArray data){
+        Thread myThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < data.length(); i++) {
+                    try {
+                        String userId = data.getJSONObject(i).getString("user_id"),
+                                picture = data.getJSONObject(i).getString("picture"),
+                                name = data.getJSONObject(i).getString("user_name");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        myThread.start();
+
+
         matches.clear();
         String bild = getString(R.string.unknownPerson);
         matches.add(new MatchingEntry("Peter W.", 3.77, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild, hasTicket));
         matches.add(new MatchingEntry("Holger J.", 2.6, "12:23", "Gummersbach Bf", "13:36", "Köln Hbf", bild, hasTicket));
 
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new Handler().post(new Runnable() {
-
-            @Override
-            public void run() {
-                /*Benachrichtige Adapter über Änderungen*/
-                mAdapter.notifyDataSetChanged();
-            }
-
-        });
+        /*Benachrichtige Adapter über Änderungen*/
+        mAdapter.notifyDataSetChanged();
     }
     //<--           prepareVerlaufData End            -->
 

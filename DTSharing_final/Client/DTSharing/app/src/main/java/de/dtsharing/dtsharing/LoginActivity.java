@@ -2,9 +2,17 @@ package de.dtsharing.dtsharing;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,21 +32,41 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
+    public static final String MY_PREFS_NAME = "MyPrefsFile";
 
     Adapter adapter;
     android.support.v7.app.ActionBar actionBar;
     ViewPager viewPager;
     Toolbar toolbar;
     TextView toolbar_title;
+    ProgressDialog progressDialog;
+
+    SharedPreferences prefs;
+
+    private MyStationStatusReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar_title = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
@@ -63,12 +92,12 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if(position != 1){
+                if (position != 1) {
                     actionBar.setDisplayHomeAsUpEnabled(true);
                     actionBar.setHomeButtonEnabled(true);
                     toolbar_title.setText(adapter.getPageTitle(position).toString());
                     toolbar_title.setGravity(Gravity.LEFT);
-                }else{
+                } else {
                     actionBar.setDisplayHomeAsUpEnabled(false);
                     actionBar.setHomeButtonEnabled(false);
                     toolbar_title.setText(adapter.getPageTitle(position).toString());
@@ -82,6 +111,36 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+
+        Thread myThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                final String message = getStopsVersion() == 0 ? "DTSharing wird für die erste Verwendung vorbereitet" : "Fahrplandaten werden aktualisiert";
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog = new ProgressDialog(LoginActivity.this,
+                                R.style.AppTheme_Dialog);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setIndeterminateDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.progress_circle, null));
+                        progressDialog.setCancelable(false);
+                        progressDialog.setMessage(message);
+                        progressDialog.show();
+                    }
+                });
+
+                IntentFilter filter = new IntentFilter(MyStationStatusReceiver.STATUS_RESPONSE);
+                filter.addCategory(Intent.CATEGORY_DEFAULT);
+                receiver = new MyStationStatusReceiver();
+                registerReceiver(receiver, filter);
+
+                Intent databaseServiceIntent = new Intent(LoginActivity.this, DatabaseStationService.class);
+                startService(databaseServiceIntent);
+            }
+        });
+        myThread.start();
     }
 
     @Override
@@ -101,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void setCurrentPage(int page){
+    public void setCurrentPage(int page) {
         viewPager.setCurrentItem(page, true);
     }
 
@@ -159,4 +218,22 @@ public class LoginActivity extends AppCompatActivity {
     //<--           OnOptionsItemSelected End         -->
 
 
+    public class MyStationStatusReceiver extends BroadcastReceiver {
+
+        public static final String STATUS_RESPONSE = "de.dtsharing.dtsharing.intent.action.STATUS_RESPONSE";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean statusBoolean = intent.getBooleanExtra("finished", true);
+            if (statusBoolean) {
+                progressDialog.dismiss();
+                unregisterReceiver(receiver);
+            }
+        }
+    }
+
+    public int getStopsVersion() {
+        //Lese aktuelle stops_version aus, falls keine vorhanden 0
+        return prefs.getInt("stops_version", 0);
+    }
 }

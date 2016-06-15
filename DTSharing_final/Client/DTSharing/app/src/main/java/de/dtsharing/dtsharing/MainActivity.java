@@ -67,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
             tabs.setupWithViewPager(viewPager);
         }
 
+        /*Intent databaseServiceIntent = new Intent(MainActivity.this, DatabaseStationService.class);
+        startService(databaseServiceIntent);*/
+
     }
 
 

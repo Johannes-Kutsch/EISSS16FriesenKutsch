@@ -28,6 +28,16 @@
             android:textColor="#000000"
             android:text="Gummersbach Bf"/>
 
+        <TextView
+            android:id="@+id/tvDepartureDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_alignParentRight="true"
+            android:textSize="12sp"
+            android:textColor="#a4a4a4"
+            android:text="15.06.2016"/>
+
 
         <RelativeLayout
             android:id="@+id/rlDurationContainer"

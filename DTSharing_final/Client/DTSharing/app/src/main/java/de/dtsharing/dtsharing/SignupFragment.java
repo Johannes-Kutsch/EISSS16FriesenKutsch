@@ -233,9 +233,9 @@ public class SignupFragment extends Fragment {
                 Map<String, String> params = new HashMap<>();
                 // the POST parameters:
                 try {
-                    params.put("birthYear", data.getString("birthYear"));
-                    params.put("firstName", data.getString("firstName"));
-                    params.put("name", data.getString("lastName"));
+                    params.put("birth_year", data.getString("birthYear"));
+                    params.put("first_name", data.getString("firstName"));
+                    params.put("last_name", data.getString("lastName"));
                     params.put("gender", data.getString("gender"));
                     params.put("email", data.getString("mail"));
                     params.put("pass", data.getString("password"));

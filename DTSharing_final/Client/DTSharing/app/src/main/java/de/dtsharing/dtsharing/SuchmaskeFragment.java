@@ -2,14 +2,18 @@ package de.dtsharing.dtsharing;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -37,7 +42,9 @@ import java.util.Locale;
  */
 public class SuchmaskeFragment extends Fragment {
 
-    RelativeLayout v;
+    private static final String LOG_TAG = SuchmaskeFragment.class.getSimpleName();
+
+    FrameLayout v;
     Snackbar snackbar;
     private NonScrollListView lvHistory;
     private Button bSubmit;
@@ -46,7 +53,7 @@ public class SuchmaskeFragment extends Fragment {
     private ScrollView svContainer;
 
     private ArrayList<HistoryEntry> transit = new ArrayList<>();
-    private ArrayAdapter autocompleteAdapter;
+    private ArrayAdapter adapterAutoComplete;
     private HistoryAdapter mAdapter;
 
     private Boolean hasTicket;
@@ -72,7 +79,7 @@ public class SuchmaskeFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         /*Lade fragment_database Layout*/
-        v = (RelativeLayout) inflater.inflate(R.layout.fragment_suchmaske, container, false);
+        v = (FrameLayout) inflater.inflate(R.layout.fragment_suchmaske, container, false);
 
         /*Erfassen der Views mit denen interagiert werden soll*/
         lvHistory = (NonScrollListView) v.findViewById(R.id.lvHistory);
@@ -90,17 +97,18 @@ public class SuchmaskeFragment extends Fragment {
 
         ticketDialogArray = getResources().getStringArray(R.array.ticket_spinner);
 
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new Handler().post(new Runnable() {
+        /*Erzeuge und verbinde Adapter mit der History ListView*/
+        mAdapter = new HistoryAdapter(getContext(), transit);
+        lvHistory.setAdapter(mAdapter);
 
-            @Override
-            public void run() {
-                /*Erzeuge und verbinde Adapter mit der History ListView*/
-                mAdapter = new HistoryAdapter(getContext(), transit);
-                lvHistory.setAdapter(mAdapter);
-            }
+        /*Erzeuge Adapter für Autocomplete*/
+        adapterAutoComplete = new ArrayAdapter(getContext(),android.R.layout.simple_list_item_1);
 
-        });
+        /*Koppel AutoCompleteTextViews mit dem Adapter*/
+        etDeparture.setAdapter(adapterAutoComplete);
+        etDeparture.setThreshold(1);
+        etTarget.setAdapter(adapterAutoComplete);
+        etTarget.setThreshold(1);
 
         /*Fülle Array mit Beispieldaten*/
         prepareVerlaufData();
@@ -178,6 +186,8 @@ public class SuchmaskeFragment extends Fragment {
         /*History item selected listener*/
         historyOnClickListener();
 
+        getStationData();
+
         return v;
     }
 
@@ -205,16 +215,8 @@ public class SuchmaskeFragment extends Fragment {
         transit.add(new HistoryEntry("Paderborn Hbf", "Hamm Hbf"));
         transit.add(new HistoryEntry("Hamm Hbf", "Köln Hbf"));
 
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new Handler().post(new Runnable() {
-
-            @Override
-            public void run() {
-                /*Benachrichtige Adapter über Änderungen*/
-                mAdapter.notifyDataSetChanged();
-            }
-
-        });
+        /*Benachrichtige Adapter über Änderungen*/
+        mAdapter.notifyDataSetChanged();
     }
     //<--           prepareVerlaufData End            -->
 
@@ -292,5 +294,31 @@ public class SuchmaskeFragment extends Fragment {
         });
     }
     //<--           History onClickListener End           -->
+
+    private void getStationData(){
+
+        Thread myThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SQLiteDatabase db;
+                db = getContext().openOrCreateDatabase("Stops", Context.MODE_PRIVATE, null);
+                Cursor cursor = db.rawQuery("SELECT stop_name FROM vrs", null);
+
+                if(cursor.getCount() == 0){
+                    Log.d(LOG_TAG, "Keine Einträge gefunden");
+                }
+                while(cursor.moveToNext()){
+                    String str = cursor.getString(0);
+                    //str = str.replace(",", "")
+                    adapterAutoComplete.add(str);
+                }
+                cursor.close();
+                db.close();
+            }
+        });
+        myThread.start();
+        adapterAutoComplete.notifyDataSetChanged();
+
+    }
 
 }

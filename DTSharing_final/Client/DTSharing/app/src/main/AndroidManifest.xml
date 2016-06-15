@@ -22,6 +22,9 @@
         <activity android:name=".MatchingActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".LoginActivity" />
+
+        <service
+            android:name=".DatabaseStationService"/>
     </application>
 
 </manifest>

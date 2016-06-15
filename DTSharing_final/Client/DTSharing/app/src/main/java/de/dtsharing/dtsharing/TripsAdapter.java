@@ -15,13 +15,7 @@ public class TripsAdapter extends BaseAdapter{
     private Context context_1;
 
     public class ViewHolder {
-        public TextView departureTime;
-        public TextView departureName;
-        public TextView targetTime;
-        public TextView targetName;
-        public TextView transitDuration;
-        public TextView lineName;
-        public TextView badgeCount;
+        public TextView departureTime, departureDate, departureName, targetTime, targetName, transitDuration, lineName, badgeCount;
 
     }
 
@@ -54,6 +48,7 @@ public class TripsAdapter extends BaseAdapter{
 
             viewHolder = new ViewHolder();
             viewHolder.departureTime = (TextView) convertView.findViewById(R.id.tvDepartureTime);
+            viewHolder.departureDate = (TextView) convertView.findViewById(R.id.tvDepartureDate);
             viewHolder.departureName = (TextView) convertView.findViewById(R.id.tvDepartureName);
             viewHolder.targetTime = (TextView) convertView.findViewById(R.id.tvTargetTime);
             viewHolder.targetName = (TextView) convertView.findViewById(R.id.tvTargetName);
@@ -69,6 +64,7 @@ public class TripsAdapter extends BaseAdapter{
         TripsEntry tripsEntry = trips.get(position);
 
         viewHolder.departureTime.setText(tripsEntry.getDepartureTime());
+        viewHolder.departureDate.setText(tripsEntry.getDepartureDate());
         viewHolder.departureName.setText(tripsEntry.getDepartureName());
         viewHolder.targetTime.setText(tripsEntry.getArrivalTime());
         viewHolder.targetName.setText(tripsEntry.getTargetName());
