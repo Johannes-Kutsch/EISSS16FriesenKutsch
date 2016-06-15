@@ -6,6 +6,7 @@ var express 	= require('express'),
     stops_Controller = require('./js/controllers/stops_Controller'),
     ratings_Controller = require('./js/controllers/ratings_Controller'),
     dt_trips_Controller = require('./js/controllers/dt_trips_Controller'),
+    matches_Controller = require('./js/controllers/matches_Controller'),
     bodyParser	= require('body-parser'),
 	https = require('https'),
 	fs = require('fs');
@@ -31,13 +32,18 @@ app.get('/users/:user_id', users_Controller.findUser);
 app.post('/users/:user_id/ratings', ratings_Controller.rate);
 app.get('/users/:user_id/ratings', ratings_Controller.findRating);
 
-//trips ermitteln
-app.get('/trips', trips_Controller.findTrips);
-
 //dt_trips
 app.post('/users/:user_id/dt_trips', dt_trips_Controller.offer);
 app.get('/users/:user_id/dt_trips', dt_trips_Controller.findDtTrips);
 app.get('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.findDtTrip);
+app.put('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.match);
+app.delete('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.removeDtTrip);
+
+//trips ermitteln
+app.get('/trips', trips_Controller.findTrips);
+
+//matches
+app.get('/matches', matches_Controller.findMatches);
 
 //Not Found
 app.use(function(req, res, next) {

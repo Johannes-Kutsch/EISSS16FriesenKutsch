@@ -11,7 +11,7 @@ module.exports = mongoose.model('dt_trips', {
     owner_destination_station_name: String,
     owner_target_station_name: String,
     has_season_ticket: Boolean,
-    partner_user_id: Number,
+    partner_user_id: String,
     partner_sequence_id_target_station: Number,
     partner_sequence_id_departure_station: Number,
     partner_destionation_station_name: String,
