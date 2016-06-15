@@ -268,11 +268,13 @@ module.exports.findTrips = function (req, res) {
             }
         }, function (err) {
             async.eachOf(new_trips, function (trip, key, callback) {
+                console.log(trip);
                 Routes.findOne({route_id : trip[0].route_id}, '-_id route_short_name', function(err, result){
                     if (err) {
                         return callback(err);
-                        trip[key][0].push({route_name : result.route_short_name});
                     }
+                    trip.push({route_name : result.route_short_name});
+                    console.log(trip);
                     callback(null);
                 });
             }, function(err) {
@@ -302,7 +304,7 @@ module.exports.findTrips = function (req, res) {
                         departure_date: utils.formatDay(departure_date),
                         departure_sequence : trip[1].stop_sequence,
                         target_equence : trip[2].stop_sequence,
-                        route_name : trip[0].route_name,
+                        route_name : trip[3].route_name,
                         number_matches : 0,
                     });
                 });
