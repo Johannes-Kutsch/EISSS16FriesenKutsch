@@ -1,5 +1,7 @@
 var async = require('async'),
     utils = require('../lib/utils'),
+    Users = require('../models/users'),
+    Dt_trips = require('../models/dt_trips'),
     StopTimes = require('../models/stop_times'),
     Stops = require('../models/stops'),
     Trips = require('../models/trips'),
@@ -36,9 +38,9 @@ module.exports.findTrips = function (req, res) {
         findConectingTrips,
         async.apply(findTrips, 10),
     ], function (err, result) {
+        //Error Handling, auch in matches_controlles => findNumberMatches
         var end_time = (new Date()).getTime(); 
         console.log('Es wurden ' + [end_time - total_start_time] + ' MS gebraucht um ' + unique_trips.length + ' Verbindungen zu ermitteln!');
-        console.log('');
         res.json(unique_trips);
     });
 
@@ -48,24 +50,27 @@ module.exports.findTrips = function (req, res) {
             async.apply(findStationID, target_station_name)
         ],
         function(err, results){
-            callback(err, results); 
+            departue_station_name = results[0].stop_name;
+            console.log(departue_station_name);
+            target_station_name = results[1].stop_name;
+            callback(err, [results[0].stop_id,results[1].stop_id]); 
         });
     }
 
     function findStationID(station_name, callback) {
-        Stops.findOne({stop_name : station_name}, '-_id stop_id', function (err, result) {
+        Stops.findOne({stop_name : station_name}, '-_id stop_id stop_name', function (err, result) {
             if(err) {
                 return callback(err);
             } else if(result) {
                 console.log('Station ID für ' + station_name + ' ist ' + result.stop_id);
-                callback(err, result.stop_id);
+                callback(err, result);
             } else {
                 var station_name_fragments = station_name.split(' ');
                 var regex_query = [];
                 station_name_fragments.forEach(function(result) {
                     regex_query.push(new RegExp('.*'+result+'.*'));
                 });
-                Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id', function (err, results) {
+                Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, results) {
                     if(err) {
                         return callback(err);
                     } else if (results.length > 1) {
@@ -74,7 +79,7 @@ module.exports.findTrips = function (req, res) {
                         return callback(new Error('No Match for '+station_name));
                     }
                     console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
-                    callback(err, results[0].stop_id); 
+                    callback(err, results[0]); 
                 });
             }
         });  
@@ -268,13 +273,51 @@ module.exports.findTrips = function (req, res) {
             }
         }, function (err) {
             async.eachOf(new_trips, function (trip, key, callback) {
-                console.log(trip);
-                Routes.findOne({route_id : trip[0].route_id}, '-_id route_short_name', function(err, result){
-                    if (err) {
-                        return callback(err);
+                async.parallel([
+                    function(callback) {
+                        Routes.findOne({route_id : trip[0].route_id}, '-_id route_short_name', function(err, result){
+                            if (err) {
+                                return callback(err);
+                            }
+                            callback(null, result);
+                        });
+                    }, function(callback) {
+                        var sequence_querry;
+                        if(has_season_ticket) {
+                            sequence_querry = {
+                                owner_sequence_id_departure_station : {$gte: trip[1].stop_sequence}, 
+                                owner_sequence_id_target_station : {$lte: trip[2].stop_sequence}
+                            }
+                        } else {
+                            sequence_querry = {
+                                owner_sequence_id_departure_station : {$lte: trip[1].stop_sequence}, 
+                                owner_sequence_id_target_station : {$gte: trip[2].stop_sequence}
+                            }
+                        }
+                        Dt_trips.find({
+                            owner_user_id : {$ne: user_id},
+                            unique_trip_id : ''+trip[0].trip_id+[utils.formatDayWithoutDots(date)], 
+                            has_season_ticket : {$ne: has_season_ticket}, 
+                            owner_sequence_id_departure_station : {$lte: trip[1].stop_sequence}, 
+                                owner_sequence_id_target_station : {$gte: trip[2].stop_sequence},
+                            partner_user_id : null
+                        }, '_id', function (err, results) {
+                            if(err) {
+                                res.status(500);
+                                res.send({
+                                    errorMessage: 'Database Error'
+                                });
+                                console.error(err);
+                                return;
+                            }
+                            callback(null, results.length);
+                        });
                     }
-                    trip.push({route_name : result.route_short_name});
-                    console.log(trip);
+                ], function (err, results) {
+                    trip.push({
+                        route_name : results[0].route_short_name,
+                        number_matches : results[1]
+                    });
                     callback(null);
                 });
             }, function(err) {
@@ -297,15 +340,16 @@ module.exports.findTrips = function (req, res) {
                     }
                     unique_trips.push({
                         trip_id : trip[0].trip_id,
-                        service_id : trip[0].service_id,
-                        uniquetrip_id : ''+trip[0].trip_id+[utils.formatDayWithoutDots(date)],
+                        unique_trip_id : ''+trip[0].trip_id+[utils.formatDayWithoutDots(date)],
                         departure_time: utils.secondsToTime(departure_time).slice(0, 5),
                         arrival_time : utils.secondsToTime(arrival_time).slice(0,5),
                         departure_date: utils.formatDay(departure_date),
-                        departure_sequence : trip[1].stop_sequence,
-                        target_equence : trip[2].stop_sequence,
+                        sequence_id_departure_station : trip[1].stop_sequence,
+                        sequence_id_target_station : trip[2].stop_sequence,
+                        departure_station_name : departure_station_name,
+                        target_station_name : target_station_name,
                         route_name : trip[3].route_name,
-                        number_matches : 0,
+                        number_matches : trip[3].number_matches,
                     });
                 });
                 var end_time = (new Date()).getTime();
