@@ -30,7 +30,7 @@ module.exports.rate = function (req, res) {
     ],
     function(err, results){
         if(err) {
-            res.status(444);
+            res.status(500);
             res.send({
                 errorMessage: 'Database Error'
             });
@@ -49,7 +49,7 @@ module.exports.rate = function (req, res) {
         });
         rating.save(function (err, result) {
             if(err) {
-                res.status(444);
+                res.status(500);
                 res.send({
                     errorMessage: 'Database Error'
                 });
@@ -64,7 +64,7 @@ module.exports.rate = function (req, res) {
 module.exports.findRating = function (req, res) {
     Ratings.find({user_id : req.params.user_id}, '-__v', function (err, results) {
         if(err) {
-            res.status(444);
+            res.status(500);
             res.send({
                 errorMessage: 'Database Error'
             });

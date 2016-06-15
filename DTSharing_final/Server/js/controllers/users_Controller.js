@@ -4,7 +4,7 @@ var Users = require('../models/users'),
 module.exports.register = function (req, res) {
     Users.findOne({email : req.body.email}, function(err, result) {
         if(err) {
-            res.status(444);
+            res.status(500);
             res.send({
                 errorMessage: 'Database Error'
             });
@@ -42,7 +42,7 @@ module.exports.register = function (req, res) {
 module.exports.findUser = function (req, res) {
     Users.findById(req.params.user_id, '-__v', function (err, result) {
          if(err) {
-            res.status(444);
+            res.status(500);
             res.send({
                 errorMessage: 'Database Error'
             });
@@ -57,7 +57,7 @@ module.exports.findUser = function (req, res) {
             return;
         }
         var responseObject = {};
-        if(req.query.user_version == undefined && result.user_version != req.query.user_version) {
+        if(req.query.user_version == undefined || result.user_version != req.query.user_version) {
             responseObject.user_version = result.user_version;
             responseObject.birth_year = result.birth_year;
             responseObject.first_name = result.first_name;
@@ -66,7 +66,7 @@ module.exports.findUser = function (req, res) {
             responseObject.interests = result.interests;
             responseObject.more = result.more;
         }
-        if(req.query.picture_version == undefined && result.picture_version != req.query.picture_version) {
+        if(req.query.picture_version == undefined || result.picture_version != req.query.picture_version) {
             responseObject.picture = result.picture;
             responseObject.picture_version = result.picture_version;
         }

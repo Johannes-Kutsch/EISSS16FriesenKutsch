@@ -6,7 +6,7 @@ var Ratings = require('../models/ratings'),
 module.exports.offer = function (req, res) {
     Users.findById(req.params.user_id, '-__v', function (err, result) {
         if(err) {
-            res.status(444);
+            res.status(500);
             res.send({
                 errorMessage: 'Database Error'
             });
@@ -38,7 +38,7 @@ module.exports.offer = function (req, res) {
         });
         dt_trip.save(function (err, result) {
             if(err) {
-                res.status(444);
+                res.status(500);
                 res.send({
                     errorMessage: 'Database Error'
                 });
@@ -48,14 +48,12 @@ module.exports.offer = function (req, res) {
             res.json(result);
         });
     });
-    
-    
 }
 
 module.exports.match = function (req,res) {
     Users.findById(req.params.user_id, '-__v', function (err, result) {
         if(err) {
-            res.status(444);
+            res.status(500);
             res.send({
                 errorMessage: 'Database Error'
             });
@@ -69,9 +67,15 @@ module.exports.match = function (req,res) {
             });
             return;
         }
-        Dt_trips.findById(req.params.dt_trip_id, '-__v', function (err, result) {
+        Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
+            partner_user_id: req.body.user_id,
+            partner_sequence_id_target_station: req.body.sequence_id_target_station,
+            partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
+            partner_destionation_station_name: req.body.destionation_station_name,
+            partner_target_station_name: req.body.target_station_name
+        }, function (err, result) {
             if(err) {
-                res.status(444);
+                res.status(500);
                 res.send({
                     errorMessage: 'Database Error'
                 });
@@ -85,8 +89,7 @@ module.exports.match = function (req,res) {
                 });
                 return;
             }
-            
-            
+            res.json(result);
         });
     });
 }
