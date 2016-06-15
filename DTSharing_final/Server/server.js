@@ -22,21 +22,40 @@ app.use(bodyParser.urlencoded({
 
 //Platzhalter
 //Alle Stops Abrufen 
+
+//Querry: stops_version
 app.get('/stops', stops_Controller.findStops);
 
 //Benutzer
+//Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
 app.post('/users', users_Controller.register);
+
+//URI: User ID des Nutzers
+//Querry: user_version, picture_version
 app.get('/users/:user_id', users_Controller.findUser);
 
 //Ratings
+//URI: User ID des Nutzers der bewertet wird
+//Boddy: author_id,stars,comment
 app.post('/users/:user_id/ratings', ratings_Controller.rate);
 app.get('/users/:user_id/ratings', ratings_Controller.findRating);
 
 //dt_trips
+//URI: user_id
+//Boddy: unique_trip_id: req.body.unique_trip_id,trip_id,date,sequence_id_target_station,sequence_id_departure_station,destination_station_name,target_station_name,has_season_ticket,
 app.post('/users/:user_id/dt_trips', dt_trips_Controller.offer);
+
+//URI: user_id
 app.get('/users/:user_id/dt_trips', dt_trips_Controller.findDtTrips);
+
+//URI: user_id, dt_trip_id
 app.get('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.findDtTrip);
+
+//URI: user_id des Benutzers der die Fahrt anbietet, dt_trip_id des Trips
+//Boddy: user_id,sequence_id_target_station,sequence_id_departure_station,destination_station_name,target_station_name
 app.put('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.match);
+
+//URI: user_id des Benutzers, dt_trip_id des Trips (löscht gesamten Tripp wenn "Eigentümer" ausführt, nur den Partner wenn er ausführt)
 app.delete('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.removeDtTrip);
 
 //trips ermitteln
