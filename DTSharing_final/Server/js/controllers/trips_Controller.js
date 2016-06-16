@@ -10,29 +10,35 @@ var async = require('async'),
     CalendarDates = require('../models/calendar_dates');
 
 module.exports.findTrips = function (req, res) {
-    //Name der Abfahrtshaltestelle
-    var departure_station_name = req.query.departure_station_name;
-    //Name der Zielhaltestelle
-    var target_station_name = req.query.target_station_name;
+    //Querydaten in Formate umwandeln mit denen gearbeitet werden kann
     //Abfahrtszeit wird vom Format SS:HH:MM in Sekunden umgewandelt
     var departure_time = utils.timeToSeconds(req.query.departure_time);
     //Abfahrtsdatum vom Format DD.MM.YY in ein Date objekt geschrieben
 	var	departure_date = utils.formatDate(req.query.departure_date);
+    
+    //Arrays zum speichern
+    //Trips die am Startbahnhof halten
+	var departure_trips = [];
+    //Trips die am Zielbahnhof halten
+    var target_trips = [];
+    //Routen die an beiden Bahnhöfen halten
+    var connecting_routes = [];
+    //Trips die an beiden Bahnhöfen halten
+    var connecting_trips = [];
+    //Die auf den Abfahrtstag und die Abfahrtszeit zugeschnittenen Trips
+    var unique_trips = [];
+    
+    //"Define"
+    //Sekunden die ein Tag hat
+    var seconds_per_day = 86400;
     //Die Anzahl an Trips die wenigstens ermittelt werden sollen
 	var min_number_trips = 10;
-	var departure_trips = [];
-    var target_trips = [];
-    var connecting_routes = [];
-    var connecting_trips = [];
-    var unique_trips = [];
-    var seconds_per_day = 86400;
     
-    console.log(departure_time);
     var total_start_time = (new Date()).getTime();
     async.waterfall([
-        async.apply(findStationIDs, departure_station_name, target_station_name),
+        async.apply(findStationIDs, req.query.departure_station_name, req.query.target_station_name),
         findConectingTrips,
-        async.apply(findTrips, min_number_trips),
+        findTrips,
     ], function (err, result) {
         //ToDo: Error Handling!!!
         var end_time = (new Date()).getTime(); 
@@ -110,7 +116,7 @@ module.exports.findTrips = function (req, res) {
                 ],
                 function(err, results){
                     var end_time = (new Date()).getTime(); 
-                    //console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results[0].length + '|' + results[1].length + ' RouteIDs für ' + departure_trip_ids.length + '|' + target_trip_ids.length + ' Trip IDs zu ermitteln ');
+                    console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results[0].length + '|' + results[1].length + ' RouteIDs für ' + departure_trip_ids.length + '|' + target_trip_ids.length + ' Trip IDs zu ermitteln ');
                     start_time = (new Date()).getTime();
                     results[0].forEach(function (departureRouteID) {
                         results[1].forEach(function (targetRouteID) {
@@ -120,7 +126,7 @@ module.exports.findTrips = function (req, res) {
                         });
                     });
                     var end_time = (new Date()).getTime(); 
-                    console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um die RouteIDs welche von ' + departure_station_name + ' nach ' + target_station_name + ' fahren zu ermitteln: ' + connecting_routes);
+                    console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um die RouteIDs welche von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' fahren zu ermitteln: ' + connecting_routes);
                     start_time = (new Date()).getTime();
                     callback(err); 
                 });
@@ -145,8 +151,8 @@ module.exports.findTrips = function (req, res) {
                 });
             });
             var end_time = (new Date()).getTime();
-            console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + connecting_trips.length + ' Fahrten von ' + departure_station_name + ' nach ' + target_station_name + ' zu ermitteln');
-            callback(err);
+            console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + connecting_trips.length + ' Fahrten von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' zu ermitteln');
+            callback(err, stops);
         });
     }
 
@@ -180,7 +186,7 @@ module.exports.findTrips = function (req, res) {
         });
     }
 
-    function findTrips(min_number_trips, callback) {
+    function findTrips(stops, callback) {
         var current_departure_date = departure_date;
         current_departure_date.setDate(current_departure_date.getDate() - 1);
         var current_departure_time = departure_time + seconds_per_day;
@@ -190,7 +196,7 @@ module.exports.findTrips = function (req, res) {
             function(callback) {
                 console.log('Suche Fahrten für: ' + utils.formatDay(current_departure_date) + ' ab ' + utils.secondsToTime(current_departure_time) + ' Uhr...');
                 async.waterfall([
-                    async.apply(findTripsAtDay, current_departure_time, current_departure_date),
+                    async.apply(findTripsAtDay, current_departure_time, current_departure_date, stops),
                 ], function (err) {
                     current_departure_date.setDate(current_departure_date.getDate() + 1);
                     if(current_departure_time - seconds_per_day > 0) {
@@ -208,12 +214,13 @@ module.exports.findTrips = function (req, res) {
         );
     }
 
-    function findTripsAtDay(time, date, callback) {
+    function findTripsAtDay(time, date, stops, callback) {
         var start_time = (new Date()).getTime();
         var new_trips = [];
         var date_formated = utils.formatDayWithoutDots(date);
         var day_name = utils.getDayName(date).toLowerCase();
-        var day_querry = [];
+        
+        var day_querry;
         if (day_name == 'monday') {
             day_querry = {monday: 1};
         }
@@ -238,26 +245,27 @@ module.exports.findTrips = function (req, res) {
 
         async.forEachOf(connecting_trips, function(trip, key, callback) {
             if (trip[1].departure_time >= time) {
-                Calendars.find({$and: [
-                    {service_id : trip[0].service_id},
-                    day_querry,
-                    {start_date: {$lt: date_formated}},
-                    {end_date: {$gte: date_formated}}
-                    ]
-                },
-                function (err, results) {
-                    if (err || !results.length) {
-                        return callback(err);
-                    }
-                    CalendarDates.find({$and: [
+                Calendars.find({
+                    $and: [
                         {service_id : trip[0].service_id},
-                        {date : { $ne: date_formated }}
-                    ]
-                    }, function (err, results) {
-                        if (err || !results.length) {
+                        {start_date: {$lt: date_formated}},
+                        {end_date: {$gte: date_formated}},
+                        day_querry
+                    ]}, '_id', function (err, results) {
+                    if (err) {
+                        return callback(err);
+                    } else if(!results.length) {
+                        return callback(null);
+                    }
+                    CalendarDates.findOne({
+                        service_id : trip[0].service_id,
+                        date : date_formated
+                    }, function (err, result) {
+                        if (err) {
                             return callback(err);
+                        } else if(!result) {
+                            new_trips.push(trip);
                         }
-                        new_trips.push(trip);
                         callback(null);
                     }); 
                 });
@@ -340,8 +348,8 @@ module.exports.findTrips = function (req, res) {
                         departure_date: utils.formatDay(departure_date),
                         sequence_id_departure_station : trip[1].stop_sequence,
                         sequence_id_target_station : trip[2].stop_sequence,
-                        departure_station_name : departure_station_name,
-                        target_station_name : target_station_name,
+                        departure_station_name : stops[0].stop_name,
+                        target_station_name : stops[1].stop_name,
                         route_name : trip[3].route_name,
                         number_matches : trip[3].number_matches,
                     });
