@@ -27,7 +27,7 @@ app.get('/stops', stops_Controller.findStops);
 
 //Login
 //Querry: email, pass
-app.get('/sessions', sessions_Controller.login);
+app.post('/sessions', sessions_Controller.login);
 
 //Benutzer
 //Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
