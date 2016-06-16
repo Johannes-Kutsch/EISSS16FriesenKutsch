@@ -13,13 +13,13 @@ module.exports.offer = function (req, res) {
         owner_user_id: req.params.user_id,
         owner_sequence_id_target_station: req.body.sequence_id_target_station,
         owner_sequence_id_departure_station: req.body.sequence_id_departure_station,
-        owner_destination_station_name: req.body.destination_station_name,
+        owner_departure_station_name: req.body.departure_station_name,
         owner_target_station_name: req.body.target_station_name,
         has_season_ticket: req.body.has_season_ticket,
         partner_user_id: null,
         partner_sequence_id_target_station: null,
         partner_sequence_id_departure_station: null,
-        partner_destionation_station_name: null,
+        partner_departure_station_name: null,
         partner_target_station_name: null
     });
     dt_trip.save(function (err, result) {
@@ -43,7 +43,7 @@ module.exports.match = function (req,res) {
         partner_arrival_time: req.body.arrival_time,
         partner_sequence_id_target_station: req.body.sequence_id_target_station,
         partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
-        partner_destionation_station_name: req.body.destination_station_name,
+        partner_departure_station_name: req.body.departure_station_name,
         partner_target_station_name: req.body.target_station_name
     }, function (err, result) {
         if(err) {
@@ -99,7 +99,7 @@ module.exports.findDtTrips = function (req, res) {
                         user_id : result.owner_user_id,
                         sequence_id_target_station : result.owner_sequence_id_target_station,
                         sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                        destination_station_name : result.owner_destination_station_name,
+                        departure_station_name : result.owner_departure_station_name,
                         target_station_name : result.owner_target_station_name,
                         arrival_time : result.owner_arrival_time,
                         departure_time : result.owner_departure_time
@@ -108,7 +108,7 @@ module.exports.findDtTrips = function (req, res) {
                         user_id : result.partner_user_id,
                         sequence_id_target_station : result.partner_sequence_id_target_station,
                         sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                        destination_station_name : result.partner_destination_station_name,
+                        departure_station_name : result.partner_departure_station_name,
                         target_station_name : result.partner_target_station_name,
                         arrival_time : result.partner_arrival_time,
                         departure_time : result.partner_departure_time
@@ -125,7 +125,7 @@ module.exports.findDtTrips = function (req, res) {
                         user_id : result.partner_user_id,
                         sequence_id_target_station : result.partner_sequence_id_target_station,
                         sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                        destination_station_name : result.partner_destination_station_name,
+                        departure_station_name : result.partner_departure_station_name,
                         target_station_name : result.partner_target_station_name,
                         arrival_time : result.partner_arrival_time,
                         departure_time : result.partner_departure_time
@@ -134,7 +134,7 @@ module.exports.findDtTrips = function (req, res) {
                         user_id : result.owner_user_id,
                         sequence_id_target_station : result.owner_sequence_id_target_station,
                         sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                        destination_station_name : result.owner_destination_station_name,
+                        departure_station_name : result.owner_departure_station_name,
                         target_station_name : result.owner_target_station_name,
                         arrival_time : result.owner_arrival_time,
                         departure_time : result.owner_departure_time
@@ -175,7 +175,7 @@ module.exports.findDtTrip = function (req, res) {
                     user_id : result.owner_user_id,
                     sequence_id_target_station : result.owner_sequence_id_target_station,
                     sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                    destination_station_name : result.owner_destination_station_name,
+                    departure_station_name : result.owner_departure_station_name,
                     target_station_name : result.owner_target_station_name,
                     arrival_time : result.owner_arrival_time,
                     departure_time : result.owner_departure_time
@@ -184,7 +184,7 @@ module.exports.findDtTrip = function (req, res) {
                     user_id : result.partner_user_id,
                     sequence_id_target_station : result.partner_sequence_id_target_station,
                     sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                    destination_station_name : result.partner_destination_station_name,
+                    departure_station_name : result.partner_departure_station_name,
                     target_station_name : result.partner_target_station_name,
                     arrival_time : result.partner_arrival_time,
                     departure_time : result.partner_departure_time
@@ -201,7 +201,7 @@ module.exports.findDtTrip = function (req, res) {
                     user_id : result.partner_user_id,
                     sequence_id_target_station : result.partner_sequence_id_target_station,
                     sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                    destination_station_name : result.partner_destination_station_name,
+                    departure_station_name : result.partner_departure_station_name,
                     target_station_name : result.partner_target_station_name,
                     arrival_time : result.partner_arrival_time,
                     departure_time : result.partner_departure_time
@@ -210,7 +210,7 @@ module.exports.findDtTrip = function (req, res) {
                     user_id : result.owner_user_id,
                     sequence_id_target_station : result.owner_sequence_id_target_station,
                     sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                    destination_station_name : result.owner_destination_station_name,
+                    departure_station_name : result.owner_departure_station_name,
                     target_station_name : result.owner_target_station_name,
                     arrival_time : result.owner_arrival_time,
                     departure_time : result.owner_departure_time
@@ -257,7 +257,7 @@ module.exports.removeDtTrip = function (req, res) {
                 partner_user_id: null,
                 partner_sequence_id_target_station: null,
                 partner_sequence_id_departure_station: null,
-                partner_destionation_station_name: null,
+                partner_departure_station_name: null,
                 partner_target_station_name: null
             }, function (err, result) {
                 if(err) {
