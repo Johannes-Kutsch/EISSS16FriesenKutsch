@@ -1,5 +1,6 @@
 var Users = require('../models/users'),
     Dt_trips = require('../models/dt_trips'),
+    Ratings = require('../models/ratings'),
     async = require('async'),
     mongoose = require('mongoose');
  
@@ -40,6 +41,47 @@ module.exports.findMatches = function (req, res) {
             });
             return;
         }
-        res.json(results);
+        var matches = []
+        async.each(results, function(result, callback) {
+            Users.findById(result.owner_user_id, '_id picture first_name last_name', function (err, user) {
+                if(err) {
+                    callback(err)
+                }
+                Ratings.find({user_id : result.owner_user_id}, 'stars', function(err, ratings) {
+                    if(err) {
+                        callback(err)
+                    }
+                    var average_rating = 0;
+                    ratings.forEach(function(rating) {
+                        average_rating += rating;
+                    });
+                    if(average_rating.length) {
+                        average_rating/=average_rating.length;
+                    }
+                    var match = {
+                        match : result, 
+                        owner : {
+                            _id : user._id,
+                            first_name : user.first_name,
+                            last_name : user.last_name,
+                            picture : user.picture,
+                            average_rating : average_rating
+                        }
+                    }
+                    matches.push(match);
+                    callback(null);
+                });
+            });
+        }, function(err) {
+            if(err) {
+                res.status(500);
+                res.send({
+                    errorMessage: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            res.json(matches);
+        });
     });
 }
