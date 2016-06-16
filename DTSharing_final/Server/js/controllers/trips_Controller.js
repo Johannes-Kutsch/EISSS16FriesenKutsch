@@ -40,9 +40,33 @@ module.exports.findTrips = function (req, res) {
         findConectingTrips,
         findTrips,
     ], function (err, result) {
-        //ToDo: Error Handling!!!
+        if(err) {
+            if(err.type == '404') {
+                res.status(404);
+                res.send({
+                    error_message: err.message
+                });
+                console.error(err);
+                return;
+            } else {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+        } 
         var end_time = (new Date()).getTime(); 
         console.log('Es wurden ' + [end_time - total_start_time] + ' MS gebraucht um ' + unique_trips.length + ' Verbindungen zu ermitteln!');
+        if(!unique_trips.length) {
+            res.status(404);
+            res.send({
+                error_message: 'no Trips between ' + req.query.departure_station_name + ' and ' + req.query.target_station_name + ' found'
+            });
+            console.error(err);
+            return;
+        }
         res.json(unique_trips);
     });
 
@@ -57,7 +81,8 @@ module.exports.findTrips = function (req, res) {
     }
 
     function findStationID(station_name, callback) {
-        Stops.findOne({stop_name : station_name}, '-_id stop_id stop_name', function (err, result) {
+        var regex_query = [new RegExp(station_name, 'i')];
+        Stops.findOne({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, result) {
             if(err) {
                 return callback(err);
             } else if(result) {
@@ -65,17 +90,16 @@ module.exports.findTrips = function (req, res) {
                 callback(err, result);
             } else {
                 var station_name_fragments = station_name.split(' ');
-                var regex_query = [];
                 station_name_fragments.forEach(function(result) {
-                    regex_query.push(new RegExp('.*'+result+'.*'));
+                    regex_query.push(new RegExp('.*'+result+'.*', 'i'));
                 });
                 Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, results) {
                     if(err) {
                         return callback(err);
                     } else if (results.length > 1) {
-                        return callback(new Error('More then one Match for '+station_name));
+                        return callback(new customError('404','More then one Match for '+station_name));
                     } else if (results.length == 0) {
-                        return callback(new Error('No Match for '+station_name));
+                        return callback(new customError('404','No Match for '+station_name));
                     }
                     console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
                     callback(err, results[0]); 
@@ -125,6 +149,9 @@ module.exports.findTrips = function (req, res) {
                             }
                         });
                     });
+                    if(connecting_routes.length == 0) {
+                        return callback(new customError('404','no route between both Stations found'));
+                    }
                     var end_time = (new Date()).getTime(); 
                     console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um die RouteIDs welche von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' fahren zu ermitteln: ' + connecting_routes);
                     start_time = (new Date()).getTime();
@@ -133,6 +160,9 @@ module.exports.findTrips = function (req, res) {
             }, 
             findTripsOnRoute,
         ], function (err, results) {
+            if(err) {
+                return callback(err);
+            }
             var start_time = (new Date()).getTime();
             results.forEach( function(trip) {
                 departure_trips.forEach( function (departure_trip) {
@@ -158,8 +188,10 @@ module.exports.findTrips = function (req, res) {
 
     function findTripsAtStop(stop_id, callback) {
         StopTimes.find({stop_id: stop_id}, '-_id trip_id departure_time arrival_time stop_sequence', function(err, results) {
-            if (err || results == null) {
-                return callback(new Error('Kein Trip an der Haltestelle ' + stop_id + ' gefunden'));
+            if(err) {
+                return callback(err);
+            } else if (!results.length) {
+                return callback(new customError('404','no Trip at stop ' + stop_id + ' found'));
             }
             callback(null, results);      
         });
@@ -167,8 +199,10 @@ module.exports.findTrips = function (req, res) {
         
     function findDistinctRouteIDs(trip_ids, callback) {
         Trips.distinct('route_id', {trip_id : {$in: trip_ids}}, function (err, results) {
-            if (err || results == null) {
-                return callback(new Error('Route ID nicht gefunden'));
+            if(err) {
+                return callback(err);
+            } else if (!results.length) {
+                return callback(new customError('404','no Route for ' + trip_ids + ' found'));
             }
             callback(null, results);
         });
@@ -177,8 +211,10 @@ module.exports.findTrips = function (req, res) {
     function findTripsOnRoute(callback) {
         var start_time = (new Date()).getTime();
         Trips.find({ route_id: { $in: connecting_routes } }, '-_id service_id trip_id route_id', function (err, results) {
-            if (err || results == null) {
-                    return callback(new Error('Route ID nicht gefunden'));
+            if(err) {
+                return callback(err);
+            } else if (!results.length) {
+                return callback(new customError('404','no Trips on ' + connecting_routes + ' found'));
             }
             var end_time = (new Date()).getTime();
             console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results.length + ' Trips auf den Routen ' + connecting_routes + ' zu finden.');
@@ -198,6 +234,9 @@ module.exports.findTrips = function (req, res) {
                 async.waterfall([
                     async.apply(findTripsAtDay, current_departure_time, current_departure_date, stops),
                 ], function (err) {
+                    if(err) {
+                        return callback(err);
+                    }
                     current_departure_date.setDate(current_departure_date.getDate() + 1);
                     if(current_departure_time - seconds_per_day > 0) {
                         current_departure_time -= seconds_per_day;
@@ -205,7 +244,7 @@ module.exports.findTrips = function (req, res) {
                         current_departure_time = 0;
                     }
                     days++;
-                    callback(null);
+                    callback(err);
                 });
             },
             function (err) {
@@ -273,6 +312,9 @@ module.exports.findTrips = function (req, res) {
                 callback(null);
             }
         }, function (err) {
+            if(err) {
+                return callback(err);
+            }
             async.each(new_trips, function (trip, callback) {
                 async.parallel([
                     function(callback) {
@@ -305,12 +347,7 @@ module.exports.findTrips = function (req, res) {
                         }
                         Dt_trips.find(query, '_id', function (err, results) {
                             if(err) {
-                                res.status(500);
-                                res.send({
-                                    errorMessage: 'Database Error'
-                                });
-                                console.error(err);
-                                return;
+                                callback(err);
                             }
                             callback(null, results.length);
                         });
@@ -320,7 +357,7 @@ module.exports.findTrips = function (req, res) {
                         route_name : results[0].route_short_name,
                         number_matches : results[1]
                     });
-                    callback(null);
+                    callback(err);
                 });
             }, function(err) {
                 
@@ -359,6 +396,12 @@ module.exports.findTrips = function (req, res) {
                 callback(err);
             });
         });
+    }
+
+    //Custom Fehler erzeugen
+    function customError(type, message) {
+        this.type = type;
+        this.message = message;
     }
 
     //wird zur besseren Lesbarkeite der Console beim Testen benötigt
