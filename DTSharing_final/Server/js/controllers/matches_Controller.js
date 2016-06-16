@@ -43,34 +43,43 @@ module.exports.findMatches = function (req, res) {
         }
         var matches = []
         async.each(results, function(result, callback) {
-            Users.findById(result.owner_user_id, '_id picture first_name last_name', function (err, user) {
-                if(err) {
-                    callback(err)
-                }
-                Ratings.find({user_id : result.owner_user_id}, 'stars', function(err, ratings) {
-                    if(err) {
-                        callback(err)
-                    }
-                    var average_rating = 0;
-                    ratings.forEach(function(rating) {
-                        average_rating += rating;
-                    });
-                    if(average_rating.length) {
-                        average_rating/=average_rating.length;
-                    }
-                    var match = {
-                        match : result, 
-                        owner : {
-                            _id : user._id,
-                            first_name : user.first_name,
-                            last_name : user.last_name,
-                            picture : user.picture,
-                            average_rating : average_rating
+            async.parallel([
+                function(callback) {
+                    Users.findById(result.owner_user_id, '_id picture first_name last_name', function (err, user) {
+                        if(err) {
+                            callback(err)
                         }
+                        callback(null, user);
+                    });
+                }, function(callback) {
+                    Ratings.find({user_id : result.owner_user_id}, 'stars', function(err, ratings) {
+                        if(err) {
+                            callback(err)
+                        }
+                        var average_rating = 0;
+                        ratings.forEach(function(rating) {
+                            average_rating += rating;
+                        });
+                        if(average_rating.length) {
+                            average_rating/=average_rating.length;
+                        }
+                        callback(null, average_rating);
+                    });
+                }
+            ],
+            function(err, results){
+                var match = {
+                    match : result, 
+                    owner : {
+                        _id : results[0]._id,
+                        first_name : results[0].first_name,
+                        last_name : results[0].last_name,
+                        picture : results[0].picture,
+                        average_rating : results[1]
                     }
-                    matches.push(match);
-                    callback(null);
-                });
+                }
+                matches.push(match);
+                callback(err); 
             });
         }, function(err) {
             if(err) {
