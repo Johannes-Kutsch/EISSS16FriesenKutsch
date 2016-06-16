@@ -7,6 +7,7 @@ var express 	= require('express'),
     ratings_Controller = require('./js/controllers/ratings_Controller'),
     dt_trips_Controller = require('./js/controllers/dt_trips_Controller'),
     matches_Controller = require('./js/controllers/matches_Controller'),
+    sessions_Controller = require('./js/controllers/sessions_Controller'),
     bodyParser	= require('body-parser'),
 	https = require('https'),
 	fs = require('fs');
@@ -20,11 +21,13 @@ app.use(bodyParser.urlencoded({
 
 
 
-//Platzhalter
 //Alle Stops Abrufen 
-
 //Querry: stops_version
 app.get('/stops', stops_Controller.findStops);
+
+//Login
+//Querry: email, pass
+app.get('/sessions', sessions_Controller.login);
 
 //Benutzer
 //Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
