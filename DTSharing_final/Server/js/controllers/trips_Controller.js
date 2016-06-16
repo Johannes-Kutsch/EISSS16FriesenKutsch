@@ -168,7 +168,6 @@ module.exports.findTrips = function (req, res) {
                 departure_trips.forEach( function (departure_trip) {
                     if(trip.trip_id == departure_trip.trip_id) {
                         target_trips.forEach(function (target_trip) {
-                            //Früher mit der stop_sequence Arbeiten!
                             if(trip.trip_id == target_trip.trip_id && departure_trip.departure_time <= target_trip.arrival_time) {
                                 var connecting_trip = [];
                                 connecting_trip[0] = trip;

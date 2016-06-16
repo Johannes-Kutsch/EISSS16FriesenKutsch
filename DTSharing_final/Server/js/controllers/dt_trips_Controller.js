@@ -31,7 +31,9 @@ module.exports.offer = function (req, res) {
             console.error(err);
             return;
         }
-        res.json(result);
+        res.send({
+            success_message: 'Offer sucessfull'
+        });
     });
 }
 
