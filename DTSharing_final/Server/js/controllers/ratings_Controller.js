@@ -35,6 +35,7 @@ module.exports.findRating = function (req, res) {
         }
         console.log(results);
         if(results.length == 0) {
+            console.log('No Ratings for this User | 404');
             res.status(404);
             res.send({
                 error_message: 'No Ratings for this User'

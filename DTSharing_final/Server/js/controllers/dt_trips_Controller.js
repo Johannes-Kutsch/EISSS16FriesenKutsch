@@ -51,6 +51,7 @@ module.exports.match = function (req,res) {
             return;
         }
         if(!result) {
+            console.log('Trip not found | 404');
             res.status(404);
             res.send({
                 error_message: 'Trip not found'
@@ -74,6 +75,7 @@ module.exports.findDtTrips = function (req, res) {
             return;
         }
         if(!results) {
+            console.log('No Trips found | 404');
             res.status(404);
             res.send({
                 error_message: 'No Trips found'
@@ -95,6 +97,7 @@ module.exports.findDtTrip = function (req, res) {
             return;
         }
         if(!result) {
+            console.log('Trip not found | 404');
             res.status(404);
             res.send({
                 error_message: 'Trip not found'
@@ -116,6 +119,7 @@ module.exports.removeDtTrip = function (req, res) {
             return;
         }
         if(!result) {
+            console.log('Trip not found | 404');
             res.status(404);
             res.send({
                 error_message: 'Trip not found'
@@ -153,6 +157,7 @@ module.exports.removeDtTrip = function (req, res) {
                     return;
                 }
                 if(!result) {
+                    console.log('Trip not found | 404');
                     res.status(404);
                     res.send({
                         errorMessage: 'Trip not found'
@@ -165,6 +170,7 @@ module.exports.removeDtTrip = function (req, res) {
             });
         }
         else {
+            console.log('User is not part of that Trip | 403');
             res.status(403);
             res.send({
                 errorMessage: 'User is not part of that Trip'

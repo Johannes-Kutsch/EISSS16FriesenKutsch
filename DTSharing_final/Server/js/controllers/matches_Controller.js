@@ -35,6 +35,7 @@ module.exports.findMatches = function (req, res) {
             return;
         }
         if(!results.length) {
+            console.log('No Matches found | 404');
             res.status(404);
             res.send({
                 error_message: 'No Matches found'

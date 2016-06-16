@@ -14,6 +14,7 @@ module.exports.register = function (req, res) {
             return;
         }
         if(result) {
+            console.log('A User for that Mail already exists | 409');
             res.status(409);
             res.send({
                 error_message: 'A User for that Mail already exists'
@@ -54,6 +55,7 @@ module.exports.findUser = function (req, res) {
             return;
         }
         if(!result) {
+            console.log('User not found | 404');
             res.status(404);
             res.send({
                 error_message: 'User not found'
