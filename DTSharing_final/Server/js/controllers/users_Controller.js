@@ -21,20 +21,22 @@ module.exports.register = function (req, res) {
             return;
         } else {
             var user = new Users({
-            user_version: 0,
-            birth_year: req.body.birth_year,
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            gender: req.body.gender,
-            interests: req.body.interests,
-            more: req.body.more,
-            email: req.body.email,
-            pass: req.body.pass,
-            picture: default_picture,
-            picture_version: 0
-            });
+                user_version: 0,
+                birth_year: req.body.birth_year,
+                first_name: req.body.first_name,
+                last_name: req.body.last_name,
+                gender: req.body.gender,
+                interests: req.body.interests,
+                more: req.body.more,
+                email: req.body.email,
+                pass: req.body.pass,
+                picture: default_picture,
+                picture_version: 0
+                });
             user.save(function (err, result) {
-                res.json(result);
+                res.send({
+                    success_message: 'Registration sucessfull'
+                });
             });
         }
     });
