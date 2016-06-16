@@ -9,7 +9,7 @@ module.exports.offer = function (req, res) {
         trip_id: req.body.trip_id,
         date: req.body.date,
         owner_departure_time: req.departure_time,
-        owner_arrival_time: req.arrival_time
+        owner_arrival_time: req.arrival_time,
         owner_user_id: req.params.user_id,
         owner_sequence_id_target_station: req.body.sequence_id_target_station,
         owner_sequence_id_departure_station: req.body.sequence_id_departure_station,
@@ -39,6 +39,7 @@ module.exports.offer = function (req, res) {
 module.exports.match = function (req,res) {
     Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
         partner_user_id: req.body.user_id,
+         
         partner_sequence_id_target_station: req.body.sequence_id_target_station,
         partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
         partner_destionation_station_name: req.body.destination_station_name,
