@@ -243,7 +243,7 @@ module.exports.findTrips = function (req, res) {
             day_querry = {sunday: 1};
         }
 
-        async.forEachOf(connecting_trips, function(trip, key, callback) {
+        async.each(connecting_trips, function(trip, callback) {
             if (trip[1].departure_time >= time) {
                 Calendars.find({
                     $and: [
@@ -273,7 +273,7 @@ module.exports.findTrips = function (req, res) {
                 callback(null);
             }
         }, function (err) {
-            async.eachOf(new_trips, function (trip, key, callback) {
+            async.each(new_trips, function (trip, callback) {
                 async.parallel([
                     function(callback) {
                         Routes.findOne({route_id : trip[0].route_id}, '-_id route_short_name', function(err, result){
@@ -335,7 +335,7 @@ module.exports.findTrips = function (req, res) {
                     var departure_date = date;
                     if (departure_time > seconds_per_day) {
                         departure_time -= seconds_per_day;
-                        departure_date = new Date(departure_date.getYear(), departure_date.getMonth(), departure_date.getDate() + 1);
+                        departure_date = new Date(departure_date.getFullYear(), departure_date.getMonth(), departure_date.getDate() + 1);
                     }
                     if(arrival_time > seconds_per_day) {
                         arrival_time -= seconds_per_day;
