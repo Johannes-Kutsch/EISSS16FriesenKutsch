@@ -86,7 +86,63 @@ module.exports.findDtTrips = function (req, res) {
             });
             return;
         }
-        res.json(results);
+        var dt_trips = []
+        results.forEach( function(result) {
+            if(result.owner_user_id == req.params.user_id) {
+                dt_trips.push({
+                    trip: {
+                        _id : result._id,
+                        unique_trip_id : result.unique_trip_id,
+                        date : result.date,
+                    },
+                    user: {
+                        user_id : result.owner_user_id,
+                        sequence_id_target_station : result.owner_sequence_id_target_station,
+                        sequence_id_departure_station : result.owner_sequence_id_departure_station,
+                        destination_station_name : result.owner_destination_station_name,
+                        target_station_name : result.owner_target_station_name,
+                        arrival_time : result.owner_arrival_time,
+                        departure_time : result.owner_departure_time
+                    },
+                    partner: {
+                        user_id : result.partner_user_id,
+                        sequence_id_target_station : result.partner_sequence_id_target_station,
+                        sequence_id_departure_station : result.partner_sequence_id_departure_station,
+                        destination_station_name : result.partner_destination_station_name,
+                        target_station_name : result.partner_target_station_name,
+                        arrival_time : result.partner_arrival_time,
+                        departure_time : result.partner_departure_time
+                    }
+                });
+            } else {
+                dt_trips.push({
+                    trip: {
+                        _id : result._id,
+                        unique_trip_id : result.unique_trip_id,
+                        date : result.date,
+                    },
+                    user: {
+                        user_id : result.partner_user_id,
+                        sequence_id_target_station : result.partner_sequence_id_target_station,
+                        sequence_id_departure_station : result.partner_sequence_id_departure_station,
+                        destination_station_name : result.partner_destination_station_name,
+                        target_station_name : result.partner_target_station_name,
+                        arrival_time : result.partner_arrival_time,
+                        departure_time : result.partner_departure_time
+                    },
+                    partner: {
+                        user_id : result.owner_user_id,
+                        sequence_id_target_station : result.owner_sequence_id_target_station,
+                        sequence_id_departure_station : result.owner_sequence_id_departure_station,
+                        destination_station_name : result.owner_destination_station_name,
+                        target_station_name : result.owner_target_station_name,
+                        arrival_time : result.owner_arrival_time,
+                        departure_time : result.owner_departure_time
+                    }
+                });
+            }
+        });
+        res.json(dt_trips);
     });
 }
 
@@ -108,7 +164,59 @@ module.exports.findDtTrip = function (req, res) {
             });
             return;
         }
-        res.json(result);
+        if(result.owner_user_id == req.params.user_id) {
+            res.json({
+                trip: {
+                    _id : result._id,
+                    unique_trip_id : result.unique_trip_id,
+                    date : result.date,
+                },
+                user: {
+                    user_id : result.owner_user_id,
+                    sequence_id_target_station : result.owner_sequence_id_target_station,
+                    sequence_id_departure_station : result.owner_sequence_id_departure_station,
+                    destination_station_name : result.owner_destination_station_name,
+                    target_station_name : result.owner_target_station_name,
+                    arrival_time : result.owner_arrival_time,
+                    departure_time : result.owner_departure_time
+                },
+                partner: {
+                    user_id : result.partner_user_id,
+                    sequence_id_target_station : result.partner_sequence_id_target_station,
+                    sequence_id_departure_station : result.partner_sequence_id_departure_station,
+                    destination_station_name : result.partner_destination_station_name,
+                    target_station_name : result.partner_target_station_name,
+                    arrival_time : result.partner_arrival_time,
+                    departure_time : result.partner_departure_time
+                }
+            });
+        } else {
+            res.json({
+                trip: {
+                    _id : result._id,
+                    unique_trip_id : result.unique_trip_id,
+                    date : result.date,
+                },
+                user: {
+                    user_id : result.partner_user_id,
+                    sequence_id_target_station : result.partner_sequence_id_target_station,
+                    sequence_id_departure_station : result.partner_sequence_id_departure_station,
+                    destination_station_name : result.partner_destination_station_name,
+                    target_station_name : result.partner_target_station_name,
+                    arrival_time : result.partner_arrival_time,
+                    departure_time : result.partner_departure_time
+                },
+                partner: {
+                    user_id : result.owner_user_id,
+                    sequence_id_target_station : result.owner_sequence_id_target_station,
+                    sequence_id_departure_station : result.owner_sequence_id_departure_station,
+                    destination_station_name : result.owner_destination_station_name,
+                    target_station_name : result.owner_target_station_name,
+                    arrival_time : result.owner_arrival_time,
+                    departure_time : result.owner_departure_time
+                }
+            });
+        }
     });
 }
 
