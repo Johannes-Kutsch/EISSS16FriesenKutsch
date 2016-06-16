@@ -8,6 +8,7 @@ module.exports.offer = function (req, res) {
         unique_trip_id: req.body.unique_trip_id,
         trip_id: req.body.trip_id,
         date: req.body.date,
+        time: req.body.time,
         owner_user_id: req.params.user_id,
         owner_sequence_id_target_station: req.body.sequence_id_target_station,
         owner_sequence_id_departure_station: req.body.sequence_id_departure_station,
