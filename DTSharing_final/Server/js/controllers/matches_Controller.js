@@ -4,7 +4,27 @@ var Users = require('../models/users'),
     mongoose = require('mongoose');
  
 module.exports.findMatches = function (req, res) {
-    Users.findById(req.query.user_id, function (err, result) {
+    var query;
+    if(req.query.has_season_ticket == 'true') {
+        query = {
+            owner_user_id : {$ne: req.query.user_id},
+            unique_trip_id : req.query.unique_trip_id, 
+            has_season_ticket : false, 
+            owner_sequence_id_departure_station : {$gte: req.query.sequence_id_departure_station}, 
+            owner_sequence_id_target_station : {$lte: req.query.sequence_id_target_station},
+            partner_user_id : null
+        }
+    } else {
+        query = {
+            owner_user_id : {$ne: req.query.user_id},
+            unique_trip_id : req.query.unique_trip_id, 
+            has_season_ticket : true, 
+            owner_sequence_id_departure_station : {$lte: req.query.sequence_id_departure_station}, 
+            owner_sequence_id_target_station : {$gte: req.query.sequence_id_target_station},
+            partner_user_id : null
+        }
+    }
+    Dt_trips.find(query, '_id trip_id date owner_user_id owner_sequence_id_target_station owner_sequence_id_departure_station owner_destination_station_name owner_target_station_name has_season_ticket', function (err, results) {
         if(err) {
             res.status(500);
             res.send({
@@ -13,37 +33,13 @@ module.exports.findMatches = function (req, res) {
             console.error(err);
             return;
         }
-        if(!result) {
+        if(!results.length) {
             res.status(404);
             res.send({
-                errorMessage: 'User not found'
+                errorMessage: 'No Matches found'
             });
             return;
         }
-        Dt_trips.find({
-            owner_user_id : {$ne: req.query.user_id},
-            unique_trip_id : req.query.unique_trip_id, 
-            has_season_ticket : {$ne: req.query.has_season_ticket}, 
-            owner_sequence_id_departure_station : {$gte: req.query.sequence_id_departure_station}, 
-            owner_sequence_id_target_station : {$lte: req.query.sequence_id_target_station},
-            partner_user_id : null
-        }, '_id trip_id date owner_user_id owner_sequence_id_target_station owner_sequence_id_departure_station owner_destination_station_name owner_target_station_name has_season_ticket', function (err, results) {
-            if(err) {
-                res.status(500);
-                res.send({
-                    errorMessage: 'Database Error'
-                });
-                console.error(err);
-                return;
-            }
-            if(!results.length) {
-                res.status(404);
-                res.send({
-                    errorMessage: 'No Matches found'
-                });
-                return;
-            }
-            res.json(results);
-        });
+        res.json(results);
     });
 }

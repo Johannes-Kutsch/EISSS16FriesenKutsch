@@ -37,6 +37,7 @@ module.exports = {
     return '' + year + month + day;
   },
 
+  //etwas abgeändert
   timeToSeconds: function(time) {
     var timeParts;
     if (time instanceof Date) {
@@ -44,7 +45,7 @@ module.exports = {
     } else {
       timeParts = time.split(':');
       if (timeParts.length == 2) {
-        timeparts[2] = 0;
+        timeParts[2] = 0;
       }
     }
     return parseInt(timeParts[0], 10) * 60 * 60 + parseInt(timeParts[1], 10) * 60 + parseInt(timeParts[2], 10);
