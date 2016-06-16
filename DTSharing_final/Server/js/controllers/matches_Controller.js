@@ -25,7 +25,7 @@ module.exports.findMatches = function (req, res) {
             partner_user_id : null
         }
     }
-    Dt_trips.find(query, '_id trip_id date owner_user_id owner_sequence_id_target_station owner_sequence_id_departure_station owner_destination_station_name owner_target_station_name has_season_ticket', function (err, results) {
+    Dt_trips.find(query, '_id trip_id date owner_user_id owner_sequence_id_target_station owner_sequence_id_departure_station owner_departure_time owner_departure_station_name owner_arrival_time owner_target_station_name has_season_ticket', function (err, results) {
         if(err) {
             res.status(500);
             res.send({

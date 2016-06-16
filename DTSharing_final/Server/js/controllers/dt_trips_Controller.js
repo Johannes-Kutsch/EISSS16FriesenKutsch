@@ -71,7 +71,7 @@ module.exports.match = function (req,res) {
 }
 
 module.exports.findDtTrips = function (req, res) {
-    Dt_trips.find({$or:[{owner_user_id : req.params.user_id},{partne_user_id : req.params.user_id}]}, '-__v', function (err, results) {
+    Dt_trips.find({$or:[{owner_user_id : req.params.user_id},{partner_user_id : req.params.user_id}]}, '-__v', function (err, results) {
         if(err) {
             res.status(500);
             res.send({
