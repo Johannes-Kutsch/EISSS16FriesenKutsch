@@ -12,8 +12,8 @@ module.exports.login = function (req, res) {
             console.error(err);
             return;
         } else if(!result) {
-            console.log('wrong pass or email | 404');
-            res.status(404);
+            console.log('wrong pass or email | 403');
+            res.status(403);
             res.send({
                 error_message: 'wrong pass or email'
             });
