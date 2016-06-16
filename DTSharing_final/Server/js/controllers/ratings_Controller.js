@@ -14,7 +14,7 @@ module.exports.rate = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -28,7 +28,7 @@ module.exports.findRating = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -37,7 +37,7 @@ module.exports.findRating = function (req, res) {
         if(results.length == 0) {
             res.status(404);
             res.send({
-                errorMessage: 'No Ratings for this User'
+                error_message: 'No Ratings for this User'
             });
             return;
         }

@@ -29,7 +29,7 @@ module.exports.findMatches = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -37,7 +37,7 @@ module.exports.findMatches = function (req, res) {
         if(!results.length) {
             res.status(404);
             res.send({
-                errorMessage: 'No Matches found'
+                error_message: 'No Matches found'
             });
             return;
         }

@@ -8,7 +8,7 @@ module.exports.register = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -16,7 +16,7 @@ module.exports.register = function (req, res) {
         if(result) {
             res.status(409);
             res.send({
-                errorMessage: 'A User for that Mail already exists'
+                error_message: 'A User for that Mail already exists'
             });
             return;
         } else {
@@ -46,7 +46,7 @@ module.exports.findUser = function (req, res) {
          if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -54,7 +54,7 @@ module.exports.findUser = function (req, res) {
         if(!result) {
             res.status(404);
             res.send({
-                errorMessage: 'User not found'
+                error_message: 'User not found'
             });
             return;
         }

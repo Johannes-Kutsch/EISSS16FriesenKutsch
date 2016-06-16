@@ -24,7 +24,7 @@ module.exports.offer = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -45,7 +45,7 @@ module.exports.match = function (req,res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -53,12 +53,12 @@ module.exports.match = function (req,res) {
         if(!result) {
             res.status(404);
             res.send({
-                errorMessage: 'Trip not found'
+                error_message: 'Trip not found'
             });
             return;
         }
         res.send({
-                successMessage: 'successfully matched'
+                success_message: 'successfully matched'
             });
     });
 }
@@ -68,7 +68,7 @@ module.exports.findDtTrips = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -76,7 +76,7 @@ module.exports.findDtTrips = function (req, res) {
         if(!results) {
             res.status(404);
             res.send({
-                errorMessage: 'No Trips found'
+                error_message: 'No Trips found'
             });
             return;
         }
@@ -89,7 +89,7 @@ module.exports.findDtTrip = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -97,7 +97,7 @@ module.exports.findDtTrip = function (req, res) {
         if(!result) {
             res.status(404);
             res.send({
-                errorMessage: 'Trip not found'
+                error_message: 'Trip not found'
             });
             return;
         }
@@ -110,7 +110,7 @@ module.exports.removeDtTrip = function (req, res) {
         if(err) {
             res.status(500);
             res.send({
-                errorMessage: 'Database Error'
+                error_message: 'Database Error'
             });
             console.error(err);
             return;
@@ -118,7 +118,7 @@ module.exports.removeDtTrip = function (req, res) {
         if(!result) {
             res.status(404);
             res.send({
-                errorMessage: 'Trip not found'
+                error_message: 'Trip not found'
             });
             return;
         }
@@ -127,13 +127,13 @@ module.exports.removeDtTrip = function (req, res) {
             if(err) {
                 res.status(500);
                 res.send({
-                    errorMessage: 'Database Error'
+                    error_message: 'Database Error'
                 });
                 console.error(err);
                 return;
             }
             res.send({
-                    successMessage: 'successfully removed'
+                    success_message: 'successfully removed'
                 });
             });
         } else if(req.params.user_id == result.partner_user_id) {
