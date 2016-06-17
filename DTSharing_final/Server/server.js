@@ -39,8 +39,10 @@ app.get('/users/:user_id', users_Controller.findUser);
 
 //Ratings
 //URI: User ID des Nutzers der bewertet wird
-//Boddy: author_id,stars,comment
+//Boddy: author_id, stars, comment, date
 app.post('/users/:user_id/ratings', ratings_Controller.rate);
+
+//URI: User ID des Nutzers
 app.get('/users/:user_id/ratings', ratings_Controller.findRatings);
 
 //dt_trips
