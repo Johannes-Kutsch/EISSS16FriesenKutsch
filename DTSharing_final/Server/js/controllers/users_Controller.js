@@ -1,5 +1,5 @@
 var Users = require('../models/users'),
-    mongoose = require('mongoose'),    
+    mongoose = require('mongoose');    
 
 
 module.exports.register = function (req, res) {
@@ -41,7 +41,6 @@ module.exports.register = function (req, res) {
             });
         }
     });
-
 }
 
 module.exports.findUser = function (req, res) {
