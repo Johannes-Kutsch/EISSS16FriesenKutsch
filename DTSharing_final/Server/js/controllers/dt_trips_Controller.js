@@ -31,6 +31,7 @@ module.exports.offer = function (req, res) {
             console.error(err);
             return;
         }
+        res.status(201);
         res.send({
             success_message: 'Offer sucessfull'
         });

@@ -41,8 +41,7 @@ module.exports.findTrips = function (req, res) {
         findTrips,
     ], function (err, result) {
         if(err) {
-            if(err.type == '404') {
-                res.status(404);
+            if(err.type == '200') {
                 res.send({
                     error_message: err.message
                 });
@@ -60,9 +59,8 @@ module.exports.findTrips = function (req, res) {
         var end_time = (new Date()).getTime(); 
         console.log('Es wurden ' + [end_time - total_start_time] + ' MS gebraucht um ' + unique_trips.length + ' Verbindungen zu ermitteln!');
         if(!unique_trips.length) {
-            res.status(404);
             res.send({
-                error_message: 'no Trips between ' + req.query.departure_station_name + ' and ' + req.query.target_station_name + ' found'
+                error_message: 'Es wurde keine direckte Verbindung zwischen ' + req.query.departure_station_name + ' und ' + req.query.target_station_name + ' gefunden.'
             });
             console.error(err);
             return;
@@ -97,9 +95,9 @@ module.exports.findTrips = function (req, res) {
                     if(err) {
                         return callback(err);
                     } else if (results.length > 1) {
-                        return callback(new customError('404','More then one Match for '+station_name));
+                        return callback(new customError('200','Es wurde mehr als ein Bahnhof mit dem Namen '+station_name+' gefunden.'));
                     } else if (results.length == 0) {
-                        return callback(new customError('404','No Match for '+station_name));
+                        return callback(new customError('200','Es wurde kein Bahnhof mit dem Namen '+station_name+' gefunden.'));
                     }
                     console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
                     callback(err, results[0]); 
@@ -150,7 +148,7 @@ module.exports.findTrips = function (req, res) {
                         });
                     });
                     if(connecting_routes.length == 0) {
-                        return callback(new customError('404','no route between both Stations found'));
+                        return callback(new customError('200','Es konnte keine direckte Verbindung von '+ stops[0].stop_name + ' nach ' + stops[1].stop_name +' gefunden werden.'));
                     }
                     var end_time = (new Date()).getTime(); 
                     console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um die RouteIDs welche von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' fahren zu ermitteln: ' + connecting_routes);
@@ -189,8 +187,6 @@ module.exports.findTrips = function (req, res) {
         StopTimes.find({stop_id: stop_id}, '-_id trip_id departure_time arrival_time stop_sequence', function(err, results) {
             if(err) {
                 return callback(err);
-            } else if (!results.length) {
-                return callback(new customError('404','no Trip at stop ' + stop_id + ' found'));
             }
             callback(null, results);      
         });
@@ -200,8 +196,6 @@ module.exports.findTrips = function (req, res) {
         Trips.distinct('route_id', {trip_id : {$in: trip_ids}}, function (err, results) {
             if(err) {
                 return callback(err);
-            } else if (!results.length) {
-                return callback(new customError('404','no Route for ' + trip_ids + ' found'));
             }
             callback(null, results);
         });
@@ -212,8 +206,6 @@ module.exports.findTrips = function (req, res) {
         Trips.find({ route_id: { $in: connecting_routes } }, '-_id service_id trip_id route_id', function (err, results) {
             if(err) {
                 return callback(err);
-            } else if (!results.length) {
-                return callback(new customError('404','no Trips on ' + connecting_routes + ' found'));
             }
             var end_time = (new Date()).getTime();
             console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results.length + ' Trips auf den Routen ' + connecting_routes + ' zu finden.');

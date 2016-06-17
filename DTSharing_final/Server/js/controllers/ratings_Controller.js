@@ -19,11 +19,14 @@ module.exports.rate = function (req, res) {
             console.error(err);
             return;
         }
-        res.json(result);
+        res.status(201);
+        res.send({
+            success_message: 'successfully rated'
+        });
     });
 }
 
-module.exports.findRating = function (req, res) {
+module.exports.findRatings = function (req, res) {
     Ratings.find({user_id : req.params.user_id}, '-__v', function (err, results) {
         if(err) {
             res.status(500);
