@@ -2,11 +2,14 @@ package de.dtsharing.dtsharing;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
@@ -44,6 +47,8 @@ import java.util.Locale;
 
 public class TripsActivity extends AppCompatActivity {
 
+    public static final String MY_PREFS_NAME = "MyPrefsFile";
+
     private ListView lvTrips;
     private CardView cvContainer;
     private CoordinatorLayout coordinatorLayout;
@@ -51,7 +56,7 @@ public class TripsActivity extends AppCompatActivity {
     private ArrayList<TripsEntry> trips = new ArrayList<>();
     private TripsAdapter mAdapter;
 
-    private String departureName, targetName, departureDate, departureTime;
+    private String departureName, targetName, departureDate, departureTime, userId;
     private Boolean hasTicket;
 
     @Override
@@ -59,7 +64,7 @@ public class TripsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_trips);
 
-
+        userId = new SharedPrefsManager(getApplicationContext()).getUserIdSharedPrefs();
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -108,6 +113,12 @@ public class TripsActivity extends AppCompatActivity {
                 Intent matchingIntent = new Intent(TripsActivity.this, MatchingActivity.class);
                 matchingIntent.putExtra("hasTicket", hasTicket);
                 matchingIntent.putExtra("uniqueTripId", trips.get(position).getUniqueTripID());
+                matchingIntent.putExtra("tripId", trips.get(position).getTripID());
+                matchingIntent.putExtra("departureDate", trips.get(position).getDepartureDate());
+                matchingIntent.putExtra("departureName", trips.get(position).getDepartureName());
+                matchingIntent.putExtra("departureTime", trips.get(position).getDepartureTime());
+                matchingIntent.putExtra("targetName", trips.get(position).getTargetName());
+                matchingIntent.putExtra("arrivalTime", trips.get(position).getArrivalTime());
                 matchingIntent.putExtra("departureSequenceId", trips.get(position).getDepartureSequence());
                 matchingIntent.putExtra("targetSequenceId", trips.get(position).getTargetSequence());
                 /*Starte Matching Activity*/
@@ -123,18 +134,20 @@ public class TripsActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
         progressDialog.setIndeterminateDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.progress_circle, null));
         progressDialog.setCancelable(false);
-        progressDialog.setMessage("Trips werden ermitteln...");
+        progressDialog.setMessage("Trips werden ermittelt...");
         progressDialog.show();
 
-        final String uri = Uri.parse("http://192.168.0.15:3000/trips")
+        String base_url = getResources().getString(R.string.base_url);
+        final String uri = Uri.parse(base_url+"/trips")
                 .buildUpon()
                 .appendQueryParameter("departure_station_name", departureName)
                 .appendQueryParameter("target_station_name", targetName)
-                .appendQueryParameter("departure_time", departureTime+":00")
-                .appendQueryParameter("departureDate", departureDate)
+                .appendQueryParameter("departure_time", departureTime)
+                .appendQueryParameter("departure_date", departureDate)
                 .appendQueryParameter("has_season_ticket", Boolean.toString(hasTicket))
-                .appendQueryParameter("user_id", "oh1mann2wie3ist4")
+                .appendQueryParameter("user_id", userId)
                 .build().toString();
+
 
         trips.clear();
 
@@ -191,9 +204,7 @@ public class TripsActivity extends AppCompatActivity {
                         mAdapter.notifyDataSetChanged();
                         progressDialog.dismiss();
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
+                    } catch (JSONException | ParseException e) {
                         e.printStackTrace();
                     }
                 }
@@ -213,7 +224,7 @@ public class TripsActivity extends AppCompatActivity {
         });
 
         jsonRequest.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
+                20000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 

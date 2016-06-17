@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -18,9 +20,24 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginFragment extends Fragment {
 
     RelativeLayout v;
+
+    public ProgressDialog progressDialog;
 
     Button _signin;
     TextView _forgotPassword, _signup, toolbar_title;
@@ -63,7 +80,7 @@ public class LoginFragment extends Fragment {
                         password = _password.getText().toString();
 
                 if(verifyInput(mail, password)){
-                    submitData(mail, password);
+                    submitData(mail, HashString.md5(password));
                 }
             }
         });
@@ -88,28 +105,83 @@ public class LoginFragment extends Fragment {
         return valid;
     }
 
-    private void submitData(String mail, String password){
+    private void submitData(final String mail, final String password){
 
-        final ProgressDialog progressDialog = new ProgressDialog(v.getContext(),
+        String base_url = getResources().getString(R.string.base_url);
+        final String url = base_url+"/sessions";
+
+        progressDialog = new ProgressDialog(v.getContext(),
                 R.style.AppTheme_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setIndeterminateDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.progress_circle, null));
-        //progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        //progressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         progressDialog.setCancelable(false);
-        progressDialog.setMessage("Es wird ein Preis für deine Daten ermitteln...");
+        progressDialog.setMessage("Es wird ein Preis für deine Daten ermittelt...");
         progressDialog.show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.dismiss();
-                Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
-                startActivity(mainIntent);
-                getActivity().finish();
-            }
-        }, 5000);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String user_id = jsonObject.getString("_id");
 
+                            Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
+                            mainIntent.putExtra("user_id", user_id);
+                            startActivity(mainIntent);
+                            getActivity().finish();
+
+                            progressDialog.dismiss();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+
+                int  statusCode = error.networkResponse.statusCode;
+                NetworkResponse response = error.networkResponse;
+
+                if(progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
+
+                switch (statusCode) {
+                    case 403:
+                        _password.setError("Die E-Mail und Kennwort Kombination ist nicht im System vorhanden");
+                        break;
+                    case 500:
+                        Snackbar snackbar = Snackbar.make(v, "Fehler im System. Versuche es später erneut", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Action", null);
+                        View snackBarView = snackbar.getView();
+                        snackBarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                        TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                        textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                        snackbar.show();
+                        break;
+                }
+
+            }
+        })
+        {
+            /*Daten welche der Post-Request mitgegeben werden*/
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String> params = new HashMap<>();
+                // the POST parameters:
+                params.put("email", mail);
+                params.put("pass", password);
+
+                return params;
+            }
+
+        };
+
+        Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
     public static void hideSoftKeyboard (Activity activity, View view)

@@ -48,7 +48,9 @@ public class DatabaseStationService extends IntentService {
 
     public boolean setupStopsDatabase(){
 
-        String uri = Uri.parse("http://192.168.0.15:3000/stops")
+
+        String base_url = getResources().getString(R.string.base_url);
+        String uri = Uri.parse(base_url+"/stops")
                 .buildUpon()
                 .appendQueryParameter("stops_version", Integer.toString(getStopsVersion()))
                 .build().toString();
@@ -84,6 +86,11 @@ public class DatabaseStationService extends IntentService {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction(MyStationStatusReceiver.STATUS_RESPONSE);
+                        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                        broadcastIntent.putExtra("error", true);
+                        sendBroadcast(broadcastIntent);
                     }
 
                 });

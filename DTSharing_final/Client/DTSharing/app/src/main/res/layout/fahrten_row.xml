@@ -134,7 +134,7 @@
                 android:layout_height="fill_parent"
                 android:adjustViewBounds="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/ic_person_24dp"/>
+                android:src="@drawable/ic_person_32dp"/>
         </FrameLayout>
 
         <RelativeLayout

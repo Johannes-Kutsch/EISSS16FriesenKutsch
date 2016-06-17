@@ -12,7 +12,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/ivAvatar"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_marginTop="6dp"
         android:src="@color/colorAccent"
         android:scaleType="fitXY"/>
@@ -21,22 +21,38 @@
         android:id="@+id/rlContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/ivAvatar"
-        android:layout_marginLeft="8dp">
+        android:layout_toEndOf="@id/ivAvatar"
+        android:layout_marginStart="8dp">
         <TextView
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:textSize="20sp"
             android:textColor="#000000"
             android:text="Peter W."/>
+
+        <FrameLayout
+            android:id="@+id/flNoRatingContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/tvNoRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Keine Bewertung" />
+
+        </FrameLayout>
 
         <RelativeLayout
             android:id="@+id/rlStarsContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true">
+            android:layout_alignParentEnd="true"
+            android:visibility="invisible">
 
             <ImageView
                 android:id="@+id/ivStar1"
@@ -47,25 +63,25 @@
                 android:id="@+id/ivStar2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/ivStar1"
+                android:layout_toEndOf="@+id/ivStar1"
                 android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/ivStar2"
+                android:layout_toEndOf="@+id/ivStar2"
                 android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/ivStar3"
+                android:layout_toEndOf="@+id/ivStar3"
                 android:src="@drawable/ic_star_border_24dp"/>
             <ImageView
                 android:id="@+id/ivStar5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/ivStar4"
+                android:layout_toEndOf="@+id/ivStar4"
                 android:src="@drawable/ic_star_border_24dp"/>
 
         </RelativeLayout>
@@ -74,7 +90,7 @@
             android:id="@+id/tvDepartureTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_below="@+id/tvUserName"
             android:textSize="18sp"
             android:textColor="@color/positive"
@@ -84,9 +100,9 @@
             android:id="@+id/tvDepartureName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="6dp"
-            android:layout_toRightOf="@+id/tvDepartureTime"
+            android:layout_toEndOf="@+id/tvDepartureTime"
             android:layout_below="@+id/tvUserName"
             android:textSize="12sp"
             android:textColor="#000000"
@@ -96,7 +112,7 @@
             android:id="@+id/tvTargetTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_below="@+id/tvDepartureTime"
             android:textSize="18sp"
             android:textColor="#E06666"
@@ -107,8 +123,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@+id/tvTargetTime"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/tvTargetTime"
             android:layout_below="@+id/tvDepartureTime"
             android:textSize="12sp"
             android:textColor="#000000"
@@ -117,7 +133,7 @@
         <RelativeLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_below="@+id/tvUserName"
             android:layout_marginTop="-1dp">
 
@@ -128,7 +144,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_centerInParent="true"
-                android:background="@drawable/ic_add_circle_24dp"/>
+                android:background="@drawable/ic_add_circle_48dp"/>
 
         </RelativeLayout>
 

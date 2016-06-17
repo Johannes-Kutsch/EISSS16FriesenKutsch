@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">DTSharing</string>
+    <!-- Heimnetz: 192.168.0.15   Emulator: 10.0.2.2-->
+    <string name="base_url">http://10.0.2.2:3000</string>
 
     <string name="notEmpty">Darf nicht leer sein</string>
+
+    <string name="noMatch">Kein Match gefunden!\nErgreife selbst initiative und trage dich als %1$s ein. Sobald ein passender Match gefunden wurde wirst du benachrichtigt.</string>
 
     <string name="start">Von</string>
     <string name="destination">Nach</string>

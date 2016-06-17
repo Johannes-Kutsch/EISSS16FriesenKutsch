@@ -314,10 +314,17 @@ public class SuchmaskeFragment extends Fragment {
                 }
                 cursor.close();
                 db.close();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapterAutoComplete.notifyDataSetChanged();
+                    }
+                });
+
             }
         });
         myThread.start();
-        adapterAutoComplete.notifyDataSetChanged();
 
     }
 

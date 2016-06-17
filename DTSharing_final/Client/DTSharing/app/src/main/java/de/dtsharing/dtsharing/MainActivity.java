@@ -8,10 +8,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Process;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,12 +41,32 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String MY_PREFS_NAME = "MyPrefsFile";
+
     ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*Sichere die Empfangenen Daten in Variablen*/
+        Intent loginIntent = getIntent();
+        if (loginIntent != null) {
+            String user_id = loginIntent.getStringExtra("user_id");
+            new SharedPrefsManager(getApplicationContext()).setUserIdSharedPrefs(user_id);
+        }
+        CoordinatorLayout mainContent = (CoordinatorLayout) findViewById(R.id.main_content);
+
+        if(getIntent().getBooleanExtra("trip_created", false)){
+            Snackbar snackbar = Snackbar.make(mainContent, "Trip erfolgreich angelegt\nDu wirst benachrichtig sobald sich ein Match findet", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null);
+            View snackBarView = snackbar.getView();
+            snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.positive));
+            TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+            snackbar.show();
+        }
 
         // Adding Toolbar to Main screen
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

@@ -13,10 +13,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.support.design.widget.Snackbar;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
     Toolbar toolbar;
     TextView toolbar_title;
     ProgressDialog progressDialog;
+    Snackbar snackbar;
 
     SharedPreferences prefs;
 
@@ -224,10 +227,20 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean statusBoolean = intent.getBooleanExtra("finished", true);
-            if (statusBoolean) {
+            boolean statusBoolean = intent.getBooleanExtra("finished", false),
+                    errorBoolean = intent.getBooleanExtra("error", false);
+            if (statusBoolean || errorBoolean) {
                 progressDialog.dismiss();
                 unregisterReceiver(receiver);
+                if (errorBoolean){
+                    snackbar = Snackbar.make(findViewById(R.id.viewpager), "Keine Verbindung zum Server möglich", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Action", null);
+                    View snackBarView = snackbar.getView();
+                    snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                    TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+                    snackbar.show();
+                }
             }
         }
     }

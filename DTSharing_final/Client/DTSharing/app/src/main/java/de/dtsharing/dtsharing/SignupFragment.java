@@ -1,7 +1,9 @@
 package de.dtsharing.dtsharing;
 
 import android.content.DialogInterface;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ScrollingView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -194,19 +196,22 @@ public class SignupFragment extends Fragment {
 
     private void submitData(final JSONObject data){
 
-        String url = "http://10.0.2.2:3000/users";
+        String base_url = getResources().getString(R.string.base_url);
+        String url = base_url+"/users";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObjResponse = new JSONObject(response);
-                            System.out.println(response);
-                            System.out.println(jsonObjResponse);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        Snackbar snackbar = Snackbar.make(v, "Account wurde erfolgreich erstellt", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null);
+                        View snackBarView = snackbar.getView();
+                        snackBarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.positive));
+                        TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                        textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                        snackbar.show();
+
+                        ((LoginActivity)getActivity()).setCurrentPage(1);
                     }
                 }, new Response.ErrorListener() {
 
@@ -220,7 +225,17 @@ public class SignupFragment extends Fragment {
 
                 switch (statusCode) {
                     case 409:
-                        System.out.println("errorcode 400!!");
+                        _mail.setError("Diese E-Mail Adresse ist bereits vergeben");
+                        break;
+                    case 500:
+                        Snackbar snackbar = Snackbar.make(v, "Fehler im System. Versuche es später erneut", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Action", null);
+                        View snackBarView = snackbar.getView();
+                        snackBarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                        TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                        textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                        snackbar.show();
+                        break;
                 }
 
             }

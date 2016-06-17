@@ -15,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ public class MatchingAdapter extends BaseAdapter{
         public TextView userName, departureTime, departureName, targetTime, targetName;
         public Button matchingButton;
         public ImageView picture, star1, star2, star3, star4, star5;
+        public RelativeLayout starsContainer;
+        public FrameLayout noRatingContainer;
 
     }
 
@@ -67,6 +71,8 @@ public class MatchingAdapter extends BaseAdapter{
             viewHolder.targetName = (TextView) convertView.findViewById(R.id.tvTargetName);
             viewHolder.matchingButton = (Button) convertView.findViewById(R.id.bMatching);
             viewHolder.picture = (ImageView) convertView.findViewById(R.id.ivAvatar);
+            viewHolder.starsContainer = (RelativeLayout) convertView.findViewById(R.id.rlStarsContainer);
+            viewHolder.noRatingContainer = (FrameLayout) convertView.findViewById(R.id.flNoRatingContainer);
             viewHolder.star1 = (ImageView) convertView.findViewById(R.id.ivStar1);
             viewHolder.star2 = (ImageView) convertView.findViewById(R.id.ivStar2);
             viewHolder.star3 = (ImageView) convertView.findViewById(R.id.ivStar3);
@@ -86,7 +92,12 @@ public class MatchingAdapter extends BaseAdapter{
         viewHolder.targetTime.setText(matchesEntry.getTargetTime());
         viewHolder.targetName.setText(matchesEntry.getTargetName());
 
-        setRating(matchesEntry.getAverageRating(), viewHolder);
+        if(matchesEntry.getAverageRating() == 0){
+            viewHolder.noRatingContainer.setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.starsContainer.setVisibility(View.VISIBLE);
+            setRating(matchesEntry.getAverageRating(), viewHolder);
+        }
 
         RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(matchesEntry.getPicture()));
         roundDrawable.setCircular(true);
@@ -108,7 +119,6 @@ public class MatchingAdapter extends BaseAdapter{
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(parent.getContext(), R.style.AppTheme_Dialog_Alert);
 
-                //builder.setTitle("Dialog");
                 builder.setMessage(message);
                 builder.setPositiveButton(positiveButton, new DialogInterface.OnClickListener() {
 
