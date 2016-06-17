@@ -1,4 +1,5 @@
 var Users = require('../models/users'),
+    Dt_trips = require('../models/dt_trips'),
     mongoose = require('mongoose');    
 
 
@@ -61,20 +62,41 @@ module.exports.findUser = function (req, res) {
             });
             return;
         }
-        var responseObject = {};
+        var response_object = {};
         if(req.query.user_version == undefined || result.user_version != req.query.user_version) {
-            responseObject.user_version = result.user_version;
-            responseObject.birth_year = result.birth_year;
-            responseObject.first_name = result.first_name;
-            responseObject.last_name = result.last_name;
-            responseObject.gender = result.gender;
-            responseObject.interests = result.interests;
-            responseObject.more = result.more;
+            response_object.user_version = result.user_version;
+            response_object.birth_year = result.birth_year;
+            response_object.first_name = result.first_name;
+            response_object.last_name = result.last_name;
+            response_object.gender = result.gender;
+            response_object.interests = result.interests;
+            response_object.more = result.more;
         }
         if(req.query.picture_version == undefined || result.picture_version != req.query.picture_version) {
-            responseObject.picture = result.picture;
-            responseObject.picture_version = result.picture_version;
+            response_object.picture = result.picture;
+            response_object.picture_version = result.picture_version;
         }
-        res.json(responseObject);
+        Dt_trips.find({$or:[{owner_user_id : req.params.user_id},{partner_user_id : req.params.user_id}]}, 'owner_user_id partner_user_id', function (err, results) {
+            if(err) {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            var count_offerer = 0;
+            var count_passenger = 0;
+            results.forEach( function(result) {
+                if(result.owner_user_id == req.params.user_id) {
+                    count_offerer++;
+                } else if (result.partner_user_id == req.params.user_id) {
+                    count_passenger++;
+                }
+            });
+            response_object.count_offerer = count_offerer;
+            response_object.count_passenger = count_passenger;
+            res.json(response_object);
+        });
     });
 }
