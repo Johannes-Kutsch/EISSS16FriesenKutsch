@@ -124,10 +124,20 @@ public class LoginFragment extends Fragment {
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            String user_id = jsonObject.getString("_id");
+                            String user_id = jsonObject.getString("_id"),
+                                    picture = jsonObject.getString("picture"),
+                                    firstName = jsonObject.getString("first_name"),
+                                    lastName = jsonObject.getString("last_name"),
+                                    more = jsonObject.getString("more"),
+                                    interests = jsonObject.getString("interests");
 
                             Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
                             mainIntent.putExtra("user_id", user_id);
+                            mainIntent.putExtra("picture", picture);
+                            mainIntent.putExtra("firstName", firstName);
+                            mainIntent.putExtra("lastName", lastName);
+                            mainIntent.putExtra("more", more);
+                            mainIntent.putExtra("interests", interests);
                             startActivity(mainIntent);
                             getActivity().finish();
 

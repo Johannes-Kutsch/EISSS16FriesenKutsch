@@ -10,6 +10,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,9 +100,17 @@ public class MatchingAdapter extends BaseAdapter{
             setRating(matchesEntry.getAverageRating(), viewHolder);
         }
 
-        RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(matchesEntry.getPicture()));
-        roundDrawable.setCircular(true);
-        viewHolder.picture.setImageDrawable(roundDrawable);
+        Log.d("MatchingAdapter", matchesEntry.getPicture());
+        if(matchesEntry.getPicture().equals("null")) {
+            Log.d("MatchingAdapter", "PICTURE IS NULL");
+            int placeholder = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
+            viewHolder.picture.setImageResource(placeholder);
+        }else {
+            Log.d("MatchingAdapter", "PICTURE IS NOT NULL");
+            RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(matchesEntry.getPicture()));
+            roundDrawable.setCircular(true);
+            viewHolder.picture.setImageDrawable(roundDrawable);
+        }
 
         viewHolder.matchingButton.setOnClickListener(new View.OnClickListener() {
             @Override

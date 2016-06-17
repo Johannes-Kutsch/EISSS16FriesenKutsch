@@ -20,7 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.TextView;
 import android.database.sqlite.SQLiteCursor;
 
@@ -36,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,8 +57,15 @@ public class MainActivity extends AppCompatActivity {
         /*Sichere die Empfangenen Daten in Variablen*/
         Intent loginIntent = getIntent();
         if (loginIntent != null) {
-            String user_id = loginIntent.getStringExtra("user_id");
-            new SharedPrefsManager(getApplicationContext()).setUserIdSharedPrefs(user_id);
+            String user_id = loginIntent.getStringExtra("user_id"),
+                    picture = loginIntent.getStringExtra("picture"),
+                    firstName = loginIntent.getStringExtra("firstName"),
+                    lastName = loginIntent.getStringExtra("lastName"),
+                    interests = loginIntent.getStringExtra("interests"),
+                    more = loginIntent.getStringExtra("more");
+
+            SharedPrefsManager spm = new SharedPrefsManager(getApplicationContext());
+            spm.setLoggedInSharedPrefs(user_id, picture, firstName, lastName, interests, more);
         }
         CoordinatorLayout mainContent = (CoordinatorLayout) findViewById(R.id.main_content);
 
@@ -90,11 +101,46 @@ public class MainActivity extends AppCompatActivity {
             tabs.setupWithViewPager(viewPager);
         }
 
-        /*Intent databaseServiceIntent = new Intent(MainActivity.this, DatabaseStationService.class);
-        startService(databaseServiceIntent);*/
+        getOverflowMenu();
 
     }
 
+    private void getOverflowMenu() {
+
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if(menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        /*Füge Layout menu.main (Slide Menu) hinzu*/
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        /*Settings Toggle klick*/
+        switch (id){
+            case R.id.action_settings:
+                break;
+            case R.id.action_profile:
+                Intent editProfileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                startActivity(editProfileIntent);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onBackPressed() {

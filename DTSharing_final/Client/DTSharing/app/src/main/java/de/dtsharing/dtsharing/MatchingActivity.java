@@ -100,8 +100,6 @@ public class MatchingActivity extends AppCompatActivity {
         bSubmit = (Button) findViewById(R.id.bSubmit);
         cvContainer = (CardView) findViewById(R.id.cvContainer);
         tvNoMatch = (TextView) findViewById(R.id.tvNoMatch);
-        cvContainer.setVisibility(View.INVISIBLE);
-        tvNoMatch.setVisibility(View.INVISIBLE);
 
         role = tripData.getAsBoolean("hasTicket") ? "Anbietend" : "Suchend";
         bSubmit.setText("ALS "+role.toUpperCase()+" EINTRAGEN");
@@ -122,8 +120,7 @@ public class MatchingActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 /*Erzeuge die Userprofile Activity und füge Daten hinzu*/
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                userProfileIntent.putExtra("profilePicture", getString(R.string.unknownPerson));
-                userProfileIntent.putExtra("userName", matches.get(position).getUserName());
+                userProfileIntent.putExtra("userId", matches.get(position).getUserId());
                 /*Starte Matching Activity*/
                 startActivity(userProfileIntent);
             }
@@ -248,7 +245,7 @@ public class MatchingActivity extends AppCompatActivity {
                 error.printStackTrace();
                 NetworkResponse response = error.networkResponse;
                 if(response.statusCode == 404){
-                    lvMatches.setVisibility(View.INVISIBLE);
+                    lvMatches.setVisibility(View.GONE);
                     cvContainer.setVisibility(View.VISIBLE);
                     tvNoMatch.setVisibility(View.VISIBLE);
                 }
@@ -271,7 +268,8 @@ public class MatchingActivity extends AppCompatActivity {
                         JSONObject match = data.getJSONObject(i).getJSONObject("match"),
                                 owner = data.getJSONObject(i).getJSONObject("owner");
 
-                        String first_name = owner.getString("first_name"),
+                        String profileUserId = owner.getString("_id"),
+                                first_name = owner.getString("first_name"),
                                 last_name = owner.getString("last_name"),
                                 picture = owner.getString("picture"),
                                 departureName = match.getString("owner_departure_station_name"),
@@ -292,7 +290,7 @@ public class MatchingActivity extends AppCompatActivity {
 
 
 
-                        matches.add(new MatchingEntry(name, averageRating, departureTime, departureName, arrivalTime, targetName, picture, tripData.getAsBoolean("hasTicket")));
+                        matches.add(new MatchingEntry(name, averageRating, departureTime, departureName, arrivalTime, targetName, picture, tripData.getAsBoolean("hasTicket"), profileUserId));
                         Log.d(LOG_TAG, "MATCH DETAILS: "+match.toString());
                         Log.d(LOG_TAG, "OWNER DETAILS: "+owner.toString());
                     } catch (JSONException e) {

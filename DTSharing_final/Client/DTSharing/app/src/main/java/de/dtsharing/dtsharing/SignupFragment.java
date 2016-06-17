@@ -221,7 +221,6 @@ public class SignupFragment extends Fragment {
                 error.printStackTrace();
 
                 int  statusCode = error.networkResponse.statusCode;
-                NetworkResponse response = error.networkResponse;
 
                 switch (statusCode) {
                     case 409:

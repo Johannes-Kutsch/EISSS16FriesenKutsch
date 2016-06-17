@@ -10,13 +10,15 @@
         android:id="@+id/cvContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        cardView:cardCornerRadius="2dp">
+        cardView:cardCornerRadius="2dp"
+        android:visibility="gone">
         <TextView
             android:id="@+id/tvNoMatch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:visibility="gone"/>
         <ListView
             android:id="@+id/lvMatches"
             android:layout_width="match_parent"

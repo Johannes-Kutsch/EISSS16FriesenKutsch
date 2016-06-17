@@ -1,20 +1,29 @@
 package de.dtsharing.dtsharing;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,20 +31,20 @@ import java.util.ArrayList;
 
 public class UserProfileActivity extends AppCompatActivity {
 
-    private TextView mTitle, tvUserAge, tvUserHobbys, tvUserDescription, tvCountOfferer, tvCountPassenger, tvAverageRating, tvCountRating;
+    private TextView mTitle, tvUserBirth, tvUserInterests, tvUserDescription, tvCountOfferer, tvCountPassenger, tvAverageRating, tvCountRating;
     private ImageView userAvatar, ivStar1, ivStar2, ivStar3, ivStar4, ivStar5;
     private ListView lvRatings;
+    private FrameLayout noRatingsContainer;
 
-    private ArrayList<RatingsEntry> ratings = new ArrayList<>();
+    private ArrayList<RatingsEntry> ratingsList = new ArrayList<>();
     private RatingsAdapter mAdapter = null;
 
-    private String userProfilePicture, userName, userHobbys, userDescription;
-    private int userAge, userCountOfferer, userCountPassenger;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         setContentView(R.layout.activity_userprofile);
+        setContentView(R.layout.activity_userprofile);
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -54,13 +63,14 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         /*Erfassen der Views mit denen interagiert werden soll*/
-        tvUserAge = (TextView) findViewById(R.id.tvUserAge);
-        tvUserHobbys = (TextView) findViewById(R.id.tvUserHobbys);
+        tvUserBirth = (TextView) findViewById(R.id.tvUserBirth);
+        tvUserInterests = (TextView) findViewById(R.id.tvUserInterests);
         tvUserDescription = (TextView) findViewById(R.id.tvUserDescription);
         tvCountOfferer = (TextView) findViewById(R.id.tvCountOfferer);
         tvCountPassenger = (TextView) findViewById(R.id.tvCountPassenger);
         tvCountRating = (TextView) findViewById(R.id.tvCountRatings);
         tvAverageRating = (TextView) findViewById(R.id.tvAverageRating);
+        noRatingsContainer = (FrameLayout) findViewById(R.id.noRatingsContainer);
 
         ivStar1 = (ImageView) findViewById(R.id.ivStar1);
         ivStar2 = (ImageView) findViewById(R.id.ivStar2);
@@ -74,47 +84,156 @@ public class UserProfileActivity extends AppCompatActivity {
         /*Sichere die Empfangenen Daten in Variablen*/
         Intent userProfileIntent = getIntent();
         if (userProfileIntent != null) {
-            userName = userProfileIntent.getStringExtra("userName");
-            userProfilePicture = userProfileIntent.getStringExtra("profilePicture");
+            userId = userProfileIntent.getStringExtra("userId");
         }
 
-        prepareUserProfileData();
-        setupUserProfile(userProfilePicture, userName, userAge, userHobbys, userDescription, userCountOfferer, userCountPassenger, 2.5, 2);
+        getUserProfileData();
+        getRatingData();
+        //setupUserProfile(userProfilePicture, userName, userAge, userInterests, userDescription, userCountOfferer, userCountPassenger, 2.5, 2);
 
         /*Erzeuge und verbinde Adapter mit der History ListView*/
-        mAdapter = new RatingsAdapter(getApplicationContext(), ratings);
+        mAdapter = new RatingsAdapter(getApplicationContext(), ratingsList);
         lvRatings.setAdapter(mAdapter);
+    }
 
-        /*Fülle Array mit Beispieldaten*/
-        prepareRatingData();
+    public void getUserProfileData(){
+
+        String base_url = getResources().getString(R.string.base_url);
+        final String URI = base_url+"/users/"+userId;
+
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(
+                Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                ContentValues profileData = new ContentValues();
+                try {
+                    profileData.put("name",             response.getString("first_name")+" "+response.getString("last_name"));
+                    profileData.put("birthYear",        response.getString("birth_year"));
+                    profileData.put("gender",           response.getString("gender"));
+                    profileData.put("interests",        response.getString("interests"));
+                    profileData.put("more",             response.getString("more"));
+                    profileData.put("picture",          response.getString("picture"));
+                    profileData.put("countOfferer",     0);
+                    profileData.put("countPassenger",   0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                addUserProfileData(profileData);
+            }
+
+        },
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+
+                });
+
+        Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
 
     }
 
-    private void prepareUserProfileData(){
+    private void addUserProfileData(ContentValues profileData){
 
-        userAge = 23;
-        userHobbys = "Kellerkind. Sagt alles, oder?";
-        userDescription = "Tja was soll ich groß sagen? Ich fahre gerne Zug und Zug fährt gerne mich.. Win Win. Gelacht wird später.";
-        userCountOfferer = 4;
-        userCountPassenger = 11;
+        if(profileData.getAsString("picture").equals("null")){
+            int placeholder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
+            userAvatar.setImageResource(placeholder);
+        }else{
+            RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), EncodeDecodeBase64.decodeBase64(profileData.getAsString("picture")));
+            roundDrawable.setCircular(true);
+            userAvatar.setImageDrawable(roundDrawable);
+        }
 
+        mTitle              .setText(profileData.getAsString("name"));
+        tvUserBirth         .setText(profileData.getAsString("birthYear"));
+        tvUserInterests        .setText(profileData.getAsString("interests"));
+        tvUserDescription   .setText(profileData.getAsString("more"));
+        tvCountOfferer      .setText(profileData.getAsString("countOfferer"));
+        tvCountPassenger    .setText(profileData.getAsString("countPassenger"));
+
+        if(tvUserInterests.getText().equals("")) {
+            tvUserInterests.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.grey));
+            tvUserInterests.setText("Keine Angabe");
+        }
+        if(tvUserDescription.getText().equals("")) {
+            tvUserDescription.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.grey));
+            tvUserDescription.setText("Keine Angabe");
+        }
     }
 
-    private void setupUserProfile(String picture, String name, int age, String hobbys, String description, int countOfferer, int countPassenger, double averageRating, int countRatings){
-        RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), EncodeDecodeBase64.decodeBase64(picture));
-        roundDrawable.setCircular(true);
-        userAvatar.setImageDrawable(roundDrawable);
+    private void getRatingData(){
 
-        mTitle.setText(name);
-        tvUserAge.setText(age + " Jahre");
-        tvUserHobbys.setText(hobbys);
-        tvUserDescription.setText(description);
-        tvCountOfferer.setText(Integer.toString(countOfferer));
-        tvCountPassenger.setText(Integer.toString(countPassenger));
-        tvAverageRating.setText(Double.toString(averageRating));
-        tvCountRating.setText("("+Integer.toString(countRatings)+")");
+        String base_url = getResources().getString(R.string.base_url);
+        final String URI = base_url+"/users/"+userId+"/ratings";
 
-        setRating(averageRating);
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(
+                Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+
+                final ContentValues container = new ContentValues();
+
+                try {
+                    JSONObject userData = response.getJSONObject("user_data");
+                    JSONArray ratings = new JSONArray(response.getJSONObject("rating"));
+
+                    container.put("averageRating", userData.getDouble("average_rating"));
+                    container.put("countRatings", userData.length());
+
+                    for(int i = 0; i < ratings.length(); i++){
+
+                        JSONObject author = ratings.getJSONObject(i).getJSONObject("author"),
+                                rating = ratings.getJSONObject(i).getJSONObject("rating");
+
+                        String name = author.getString("first_name")+" "+author.getString("last_name"),
+                                picture = author.getString("picture"),
+                                date = rating.getString("date"),
+                                message = rating.getString("comment");
+                        int stars = rating.getInt("stars");
+
+                        ratingsList.add(new RatingsEntry(name, date, message, picture, stars));
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                lvRatings.setVisibility(View.VISIBLE);
+                tvAverageRating.setText(container.getAsString("averageRating"));
+                tvCountRating.setText(container.getAsString("countRatings"));
+                if(container.getAsDouble("averageRating") != 0)
+                    setRating(container.getAsDouble("averageRating"));
+
+                mAdapter.notifyDataSetChanged();
+
+            }
+
+        },
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        switch (error.networkResponse.statusCode){
+                            case 404:
+                                noRatingsContainer.setVisibility(View.VISIBLE);
+                                tvAverageRating.setText("0");
+                                tvCountRating.setText("(0)");
+                                break;
+                        }
+                    }
+
+                });
+
+        Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+
     }
 
     private void setRating(double averageRating){
@@ -179,22 +298,6 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
     }
-
-    //<--           prepareRatingData Start          -->
-    private void prepareRatingData(){
-        ratings.clear();
-        String bild = getString(R.string.unknownPerson);
-        String message1 = "Eine Unterhaltung gestaltet sich schwierig. Ziel jedoch lebend erreicht! :)",
-                message2 = "Die Fahrt war der Hammer! Bin ja auch etwas verrückt aber der Peter übertrifft alles! Immer wieder gerne!";
-        ratings.add(new RatingsEntry("Angela M.", "16.05.2016", message1, bild, 1));
-        ratings.add(new RatingsEntry("Werner R.", "13.05.2016", message2, bild, 4));
-        ratings.add(new RatingsEntry("Werner R.", "13.05.2016", message2, bild, 4));
-
-        /*Benachrichtige Adapter über Änderungen*/
-        mAdapter.notifyDataSetChanged();
-
-    }
-    //<--           prepareRatingData End            -->
 
     //<--           OnOptionsItemSelected Start         -->
     @Override

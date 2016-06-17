@@ -26,16 +26,16 @@
                 <TextView
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Alter"
+                    android:text="Geboren"
                     android:layout_column="1"
                     android:textStyle="bold"
                     android:textColor="@color/grey" />
 
                 <TextView
-                    android:id="@+id/tvUserAge"
+                    android:id="@+id/tvUserBirth"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="48 Jahre"
+                    android:text="1991"
                     android:layout_column="2"
                     android:layout_weight="1"
                     android:textColor="#000" />
@@ -49,13 +49,13 @@
                 <TextView
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Hobbys"
+                    android:text="Interessen"
                     android:layout_column="1"
                     android:textStyle="bold"
                     android:textColor="@color/grey" />
 
                 <TextView
-                    android:id="@+id/tvUserHobbys"
+                    android:id="@+id/tvUserInterests"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:text="Brüllen, Schrauben sortieren, Kämmen"
@@ -168,7 +168,6 @@
         android:layout_height="wrap_content"
         cardView:cardCornerRadius="2dp">
 
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -242,6 +241,22 @@
 
                 </FrameLayout>
 
+                <FrameLayout
+                    android:id="@+id/noRatingsContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/divider"
+                    android:layout_centerHorizontal="true"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Noch keine Bewertungen vorhanden"/>
+
+                </FrameLayout>
+
                 <ListView
                     android:id="@+id/lvRatings"
                     android:layout_width="match_parent"
@@ -249,7 +264,8 @@
                     android:layout_below="@id/divider"
                     android:divider="@drawable/list_divider_ratings"
                     android:dividerHeight="1dp"
-                    android:scrollbars="none">
+                    android:scrollbars="none"
+                    android:visibility="gone">
 
                 </ListView>
             </RelativeLayout>

@@ -79,9 +79,14 @@ public class RatingsAdapter extends BaseAdapter{
 
         setRating(ratingsEntry.getRating(), viewHolder);
 
-        RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(ratingsEntry.getPicture()));
-        roundDrawable.setCircular(true);
-        viewHolder.picture.setImageDrawable(roundDrawable);
+        if(ratingsEntry.getPicture().equals("null")){
+            int placeholder = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
+            viewHolder.picture.setImageResource(placeholder);
+        }else {
+            RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(ratingsEntry.getPicture()));
+            roundDrawable.setCircular(true);
+            viewHolder.picture.setImageDrawable(roundDrawable);
+        }
 
         return convertView;
     }
