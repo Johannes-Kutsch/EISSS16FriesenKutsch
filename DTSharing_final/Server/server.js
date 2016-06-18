@@ -8,6 +8,7 @@ var express 	= require('express'),
     dt_trips_Controller = require('./js/controllers/dt_trips_Controller'),
     matches_Controller = require('./js/controllers/matches_Controller'),
     sessions_Controller = require('./js/controllers/sessions_Controller'),
+    chats_Controller = require('./js/controllers/chats_Controller'),
     bodyParser	= require('body-parser'),
 	https = require('https'),
 	fs = require('fs');
@@ -25,9 +26,11 @@ app.use(bodyParser.urlencoded({
 //Querry: stops_version
 app.get('/stops', stops_Controller.findStops);
 
+
 //Login
 //Querry: email, pass
 app.post('/sessions', sessions_Controller.login);
+
 
 //Benutzer
 //Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
@@ -37,9 +40,9 @@ app.post('/users', users_Controller.register);
 //Querry: user_version, picture_version
 app.get('/users/:user_id', users_Controller.findUser);
 
-//Benutzer
 //Boddy: interests, more, picture (nur die die geändert wurden)
 app.put('/users/:user_id', users_Controller.updateUser);
+
 
 //Ratings
 //URI: User ID des Nutzers der bewertet wird
@@ -48,6 +51,7 @@ app.post('/users/:user_id/ratings', ratings_Controller.rate);
 
 //URI: User ID des Nutzers
 app.get('/users/:user_id/ratings', ratings_Controller.findRatings);
+
 
 //dt_trips
 //URI: user_id
@@ -67,11 +71,31 @@ app.put('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.match);
 //URI: user_id des Benutzers, dt_trip_id des Trips (löscht gesamten Tripp wenn "Eigentümer" ausführt, nur den Partner wenn er ausführt)
 app.delete('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.removeDtTrip);
 
+
+//Chat
+//URI: User ID des Nutzers der den Chatraum erstellt
+//Body: partner_user_id, key
+app.post('/users/:user_id/chats', chats_Controller.createChat);
+
+//Uri: User ID des Nutzers
+app.get('/users/:user_id/chats', chats_Controller.findChats);
+
+//Uri: User ID des Nutzers
+//Body: message_text,
+app.post('/users/:user_id/chats/:chat_id/messages', chats_Controller.createMessage);
+
+app.get('/users/:user_id/chats/:chat_id/messages', chats_Controller.findMessages);
+
+
+
+
 //trips ermitteln
 app.get('/trips', trips_Controller.findTrips);
 
 //matches
 app.get('/matches', matches_Controller.findMatches);
+
+
 
 //Not Found
 app.use(function(req, res, next) {
