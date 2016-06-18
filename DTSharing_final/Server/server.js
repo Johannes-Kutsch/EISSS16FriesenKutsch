@@ -38,7 +38,7 @@ app.post('/users', users_Controller.register);
 app.get('/users/:user_id', users_Controller.findUser);
 
 //Benutzer
-//Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
+//Boddy: interests, more, picture (nur die die geändert wurden)
 app.put('/users/:user_id', users_Controller.updateUser);
 
 //Ratings
