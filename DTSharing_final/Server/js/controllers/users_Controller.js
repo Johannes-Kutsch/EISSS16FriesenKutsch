@@ -35,6 +35,14 @@ module.exports.register = function (req, res) {
                 picture_version: 0
                 });
             user.save(function (err, result) {
+                if(err) {
+                    res.status(500);
+                    res.send({
+                        error_message: 'Database Error'
+                    });
+                    console.error(err);
+                    return;
+                }
                 res.status(201);
                 res.send({
                     success_message: 'Registration sucessfull'
@@ -62,20 +70,6 @@ module.exports.findUser = function (req, res) {
             });
             return;
         }
-        var response_object = {};
-        if(req.query.user_version == undefined || result.user_version != req.query.user_version) {
-            response_object.user_version = result.user_version;
-            response_object.birth_year = result.birth_year;
-            response_object.first_name = result.first_name;
-            response_object.last_name = result.last_name;
-            response_object.gender = result.gender;
-            response_object.interests = result.interests;
-            response_object.more = result.more;
-        }
-        if(req.query.picture_version == undefined || result.picture_version != req.query.picture_version) {
-            response_object.picture = result.picture;
-            response_object.picture_version = result.picture_version;
-        }
         Dt_trips.find({$or:[{owner_user_id : req.params.user_id},{partner_user_id : req.params.user_id}]}, 'owner_user_id partner_user_id', function (err, results) {
             if(err) {
                 res.status(500);
@@ -85,6 +79,7 @@ module.exports.findUser = function (req, res) {
                 console.error(err);
                 return;
             }
+            var response_object = {};
             var count_offerer = 0;
             var count_passenger = 0;
             results.forEach( function(result) {
@@ -94,8 +89,21 @@ module.exports.findUser = function (req, res) {
                     count_passenger++;
                 }
             });
-            response_object.count_offerer = count_offerer;
-            response_object.count_passenger = count_passenger;
+            if(req.query.user_version == undefined || result.user_version != req.query.user_version) {
+                response_object.user_version = result.user_version;
+                response_object.birth_year = result.birth_year;
+                response_object.first_name = result.first_name;
+                response_object.last_name = result.last_name;
+                response_object.gender = result.gender;
+                response_object.interests = result.interests;
+                response_object.more = result.more;
+                response_object.count_offerer = count_offerer;
+                response_object.count_passenger = count_passenger;
+            }
+            if(req.query.picture_version == undefined || result.picture_version != req.query.picture_version) {
+                response_object.picture = result.picture;
+                response_object.picture_version = result.picture_version;
+            }
             res.json(response_object);
         });
     });
