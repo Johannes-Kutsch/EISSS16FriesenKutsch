@@ -132,6 +132,7 @@ public class LoginFragment extends Fragment {
                                     interests = jsonObject.getString("interests");
 
                             Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
+                            mainIntent.putExtra("cameFromLogin", true);
                             mainIntent.putExtra("user_id", user_id);
                             mainIntent.putExtra("picture", picture);
                             mainIntent.putExtra("firstName", firstName);

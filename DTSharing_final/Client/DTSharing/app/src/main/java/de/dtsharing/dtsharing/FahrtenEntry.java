@@ -1,47 +1,60 @@
 package de.dtsharing.dtsharing;
 
+import android.content.ContentValues;
+
 public class FahrtenEntry {
 
-    private String departureTime, departureName, targetTime, targetName, transitDuration, lineName;
-    private String badgeCount;
+    ContentValues trip = new ContentValues();
+    String travelDuration;
 
     public FahrtenEntry(){}
 
-    public FahrtenEntry(String departureTime, String departureName, String targetTime, String targetName, String transitDuration, String lineName, String badgeCount) {
-        this.departureTime = departureTime;
-        this.departureName = departureName;
-        this.targetTime = targetTime;
-        this.targetName = targetName;
-        this.transitDuration = transitDuration;
-        this.lineName = lineName;
-        this.badgeCount = badgeCount;
+    public FahrtenEntry(ContentValues trip) {
+        this.trip.put("tripId", trip.getAsString("tripId"));
+        this.trip.put("routeName", trip.getAsString("routeName"));
+        this.trip.put("departureName", trip.getAsString("departureName"));
+        this.trip.put("targetName", trip.getAsString("targetName"));
+        this.trip.put("departureTime", trip.getAsString("departureTime"));
+        this.trip.put("arrivalTime", trip.getAsString("arrivalTime"));
+        this.trip.put("date", trip.getAsString("date"));
+        this.trip.put("numberPartners", trip.getAsString("numberPartners"));
+        this.travelDuration = new CalculateTravelDuration().getHoursMinutes(trip.getAsString("departureTime"), trip.getAsString("arrivalTime"));
     }
 
-    public String getDepartureTime(){
-        return departureTime;
+
+    public String getTripId(){
+        return trip.getAsString("tripId");
+    }
+
+    public String getRouteName(){
+        return trip.getAsString("routeName");
     }
 
     public String getDepartureName(){
-        return departureName;
-    }
-
-    public String getTargetTime(){
-        return targetTime;
+        return trip.getAsString("departureName");
     }
 
     public String getTargetName(){
-        return targetName;
+        return trip.getAsString("targetName");
     }
 
-    public String getTransitDuration(){
-        return transitDuration;
+    public String getDepartureTime(){
+        return trip.getAsString("departureTime");
     }
 
-    public String getLineName(){
-        return lineName;
+    public String getArrivalTime(){
+        return trip.getAsString("arrivalTime");
     }
 
-    public String getBadgeCount(){
-        return badgeCount;
+    public String getTravelDuration(){
+        return travelDuration;
+    }
+
+    public String getDate(){
+        return trip.getAsString("date");
+    }
+
+    public String getNumberPartners(){
+        return trip.getAsString("numberPartners");
     }
 }

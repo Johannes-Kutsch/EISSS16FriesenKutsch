@@ -48,15 +48,18 @@ public class MainActivity extends AppCompatActivity {
     public static final String MY_PREFS_NAME = "MyPrefsFile";
 
     ViewPager viewPager;
+    CoordinatorLayout mainContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mainContent = (CoordinatorLayout) findViewById(R.id.main_content);
+
         /*Sichere die Empfangenen Daten in Variablen*/
-        Intent loginIntent = getIntent();
-        if (loginIntent != null) {
+        if (getIntent().getBooleanExtra("cameFromLogin", false)) {
+            Intent loginIntent = getIntent();
             String user_id = loginIntent.getStringExtra("user_id"),
                     picture = loginIntent.getStringExtra("picture"),
                     firstName = loginIntent.getStringExtra("firstName"),
@@ -64,19 +67,10 @@ public class MainActivity extends AppCompatActivity {
                     interests = loginIntent.getStringExtra("interests"),
                     more = loginIntent.getStringExtra("more");
 
-            SharedPrefsManager spm = new SharedPrefsManager(getApplicationContext());
+            SharedPrefsManager spm = new SharedPrefsManager(this);
             spm.setLoggedInSharedPrefs(user_id, picture, firstName, lastName, interests, more);
-        }
-        CoordinatorLayout mainContent = (CoordinatorLayout) findViewById(R.id.main_content);
 
-        if(getIntent().getBooleanExtra("trip_created", false)){
-            Snackbar snackbar = Snackbar.make(mainContent, "Trip erfolgreich angelegt\nDu wirst benachrichtig sobald sich ein Match findet", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null);
-            View snackBarView = snackbar.getView();
-            snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.positive));
-            TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
-            textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-            snackbar.show();
+            getIntent().removeExtra("cameFromLogin");
         }
 
         // Adding Toolbar to Main screen
@@ -102,6 +96,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
         getOverflowMenu();
+
+        if(getIntent().getBooleanExtra("trip_created", false)){
+
+            viewPager.setCurrentItem(2, true);
+
+            Snackbar snackbar = Snackbar.make(mainContent, "Trip erfolgreich angelegt\nDu wirst benachrichtig sobald sich ein Match findet", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null);
+            View snackBarView = snackbar.getView();
+            snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.positive));
+            TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+            snackbar.show();
+
+        }
+        if(getIntent().getBooleanExtra("matching_success", false)){
+
+            viewPager.setCurrentItem(2, true);
+
+            String matchName = getIntent().getStringExtra("matchName");
+
+            Snackbar snackbar = Snackbar.make(mainContent, "Du hast dich erfolgreich bei "+matchName+" eingetragen", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null);
+            View snackBarView = snackbar.getView();
+            snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.positive));
+            TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+            snackbar.show();
+
+        }
 
     }
 
@@ -137,6 +160,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_profile:
                 Intent editProfileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
                 startActivity(editProfileIntent);
+                break;
+            case R.id.action_signout:
+                Intent mainIntent = new Intent(getApplicationContext(), LoginActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainIntent);
         }
 
         return super.onOptionsItemSelected(item);

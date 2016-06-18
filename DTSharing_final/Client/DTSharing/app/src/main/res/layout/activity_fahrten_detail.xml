@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".FahrtenDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fahrtdetails"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp"
+                    android:id="@+id/toolbar_title" />
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="8dp">
+
+                        <TableRow
+                            android:id="@+id/trDeparture1"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:id="@+id/departureTime1"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="12:23"
+                                android:textColor="@color/positive" />
+
+                            <Space android:layout_width="16dp"/>
+
+                            <TextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_directions_subway_24dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <LinearLayout
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/departureStationName1"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Gummersbach Bf" />
+
+                                <TextView
+                                    android:id="@+id/departureUserName1"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Heinz steigt ein"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/grey" />
+
+                            </LinearLayout>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/trSpace1"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_column="2"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_more_vert_24dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/trDeparture2"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:id="@+id/departureTime2"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="12:58"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <TextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_radio_button_unchecked_20dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <LinearLayout
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/departureStationName2"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Overath" />
+
+                                <TextView
+                                    android:id="@+id/departureUserName2"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Footballschädel steigt ein"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/grey" />
+
+                            </LinearLayout>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/trSpace2"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_column="2"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_more_vert_24dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/trTarget1"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:id="@+id/arrivalTime1"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="13:36"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <TextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_radio_button_unchecked_20dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <LinearLayout
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/targetStationName1"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Köln Hbf" />
+
+                                <TextView
+                                    android:id="@+id/targetUserName1"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Footballschädel steigt aus"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/grey" />
+
+                            </LinearLayout>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/trSpace3"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_column="2"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_more_vert_24dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/trTarget2"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:id="@+id/arrivalTime2"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="13:39"
+                                android:textColor="@color/colorPrimaryDark"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <TextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:drawableLeft="@drawable/ic_flag_lightgrey_24dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                            <Space android:layout_width="16dp"/>
+
+                            <LinearLayout
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/targetStationName2"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Köln Hansaring" />
+
+                                <TextView
+                                    android:id="@+id/targetUserName2"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Heinz steigt aus"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/grey" />
+
+                            </LinearLayout>
+
+                        </TableRow>
+
+                    </TableLayout>
+
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
+
+
+
+        </android.support.design.widget.CoordinatorLayout>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

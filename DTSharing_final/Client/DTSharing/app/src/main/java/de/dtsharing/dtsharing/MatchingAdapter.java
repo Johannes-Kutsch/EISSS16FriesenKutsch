@@ -1,7 +1,9 @@
 package de.dtsharing.dtsharing;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -21,11 +23,20 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MatchingAdapter extends BaseAdapter{
 
     private ArrayList<MatchingEntry> matches;
+    private ContentValues enteredTripDetails;
     private Context context_1;
 
     public class ViewHolder {
@@ -37,9 +48,10 @@ public class MatchingAdapter extends BaseAdapter{
 
     }
 
-    public MatchingAdapter(Context context, ArrayList<MatchingEntry> matches) {
+    public MatchingAdapter(Context context, ArrayList<MatchingEntry> matches, ContentValues enteredTripDetails) {
         this.context_1 = context;
         this.matches = matches;
+        this.enteredTripDetails = enteredTripDetails;
     }
 
     @Override
@@ -117,7 +129,7 @@ public class MatchingAdapter extends BaseAdapter{
             public void onClick(final View view) {
 
                 String message, positiveButton;
-                if(matchesEntry.hasTicket()) {
+                if(enteredTripDetails.getAsBoolean("hasTicket")) {
                     message = "Möchtest du wirklich " + matchesEntry.getUserName() + " mitnehmen?";
                     positiveButton = "Mitnehmen";
                 }else {
@@ -133,8 +145,7 @@ public class MatchingAdapter extends BaseAdapter{
 
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Snackbar.make(parent, "OK", Snackbar.LENGTH_SHORT)
-                                .setAction("Action", null).show();
+                        commitMatch(matchesEntry);
                     }
 
                 });
@@ -145,6 +156,57 @@ public class MatchingAdapter extends BaseAdapter{
         });
 
         return convertView;
+    }
+
+    private void commitMatch(final MatchingEntry matchData){
+
+        String base_url = context_1.getResources().getString(R.string.base_url);
+        String url = base_url+"/users/"+matchData.getOwnerUserId()+"/dt_trips/"+matchData.getDtTripId();
+
+
+        StringRequest postRequest = new StringRequest(Request.Method.PUT, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if(response.contains("success")){
+                            Intent mainIntent = new Intent(context_1, MainActivity.class);
+                            mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mainIntent.putExtra("matching_success", true);
+                            mainIntent.putExtra("matchName", matchData.getUserName());
+                            context_1.startActivity(mainIntent);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+            }
+        })
+        {
+            /*Daten welche der Post-Request mitgegeben werden*/
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String> params = new HashMap<>();
+                // the POST parameters:
+                //params.put("interests", _interests.getText().toString());
+                params.put("user_id", new SharedPrefsManager(context_1).getUserIdSharedPrefs());
+                params.put("departure_time", enteredTripDetails.getAsString("departureTime"));
+                params.put("arrival_time", enteredTripDetails.getAsString("arrivalTime"));
+                params.put("sequence_id_departure_station", enteredTripDetails.getAsString("departureSequenceId"));
+                params.put("sequence_id_target_station", enteredTripDetails.getAsString("targetSequenceId"));
+                params.put("departure_station_name", enteredTripDetails.getAsString("departureName"));
+                params.put("target_station_name", enteredTripDetails.getAsString("targetName"));
+                Log.d("MatchingAdapter", "Params: "+params);
+                return params;
+            }
+
+        };
+
+        Volley.newRequestQueue(context_1).add(postRequest);
+
     }
 
     private void setRating(final double rating, ViewHolder viewHolder){

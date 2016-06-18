@@ -36,6 +36,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -87,9 +88,11 @@ public class MatchingActivity extends AppCompatActivity {
             tripData.put("departureName", tripsIntent.getStringExtra("departureName"));
             tripData.put("targetName", tripsIntent.getStringExtra("targetName"));
             tripData.put("arrivalTime", tripsIntent.getStringExtra("arrivalTime"));
+            tripData.put("routeName", tripsIntent.getStringExtra("routeName"));
             tripData.put("departureSequenceId", tripsIntent.getIntExtra("departureSequenceId", 0));
             tripData.put("targetSequenceId", tripsIntent.getIntExtra("targetSequenceId", 0));
         }
+
 
         if (mTitle != null) {
             mTitle.setText(tripData.getAsBoolean("hasTicket") ? "Mitfahrgelegenheit Suchende" : "Mitfahrgelegenheiten");
@@ -108,7 +111,7 @@ public class MatchingActivity extends AppCompatActivity {
         tvNoMatch.setText(noMatchFound);
 
         /*Erzeuge und verbinde Adapter mit der History ListView*/
-        mAdapter = new MatchingAdapter(getApplicationContext(), matches);
+        mAdapter = new MatchingAdapter(getApplicationContext(), matches, tripData);
         lvMatches.setAdapter(mAdapter);
 
         /*Fülle Array mit Beispieldaten*/
@@ -120,7 +123,7 @@ public class MatchingActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 /*Erzeuge die Userprofile Activity und füge Daten hinzu*/
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                userProfileIntent.putExtra("userId", matches.get(position).getUserId());
+                userProfileIntent.putExtra("userId", matches.get(position).getOwnerUserId());
                 /*Starte Matching Activity*/
                 startActivity(userProfileIntent);
             }
@@ -202,6 +205,7 @@ public class MatchingActivity extends AppCompatActivity {
                 params.put("departure_station_name", tripData.getAsString("departureName"));
                 params.put("target_station_name", tripData.getAsString("targetName"));
                 params.put("has_season_ticket", tripData.getAsString("hasTicket"));
+                params.put("route_name", tripData.getAsString("routeName"));
                 Log.d(LOG_TAG, "PARAMS: " + params);
                 return params;
             }
@@ -268,31 +272,23 @@ public class MatchingActivity extends AppCompatActivity {
                         JSONObject match = data.getJSONObject(i).getJSONObject("match"),
                                 owner = data.getJSONObject(i).getJSONObject("owner");
 
-                        String profileUserId = owner.getString("_id"),
-                                first_name = owner.getString("first_name"),
-                                last_name = owner.getString("last_name"),
-                                picture = owner.getString("picture"),
-                                departureName = match.getString("owner_departure_station_name"),
-                                targetName = match.getString("owner_target_station_name"),
-                                departureTime = match.getString("owner_departure_time"),
-                                arrivalTime = match.getString("owner_arrival_time"),
-                                name = first_name+" "+last_name;
+                        ContentValues ownerTripDetails = new ContentValues(),
+                                ownerDetails = new ContentValues();
 
-                        double averageRating = owner.getDouble("average_rating");
-                        Log.d(LOG_TAG, first_name);
-                        Log.d(LOG_TAG, last_name);
-                        Log.d(LOG_TAG, departureName);
-                        Log.d(LOG_TAG, targetName);
-                        Log.d(LOG_TAG, departureTime);
-                        Log.d(LOG_TAG, arrivalTime);
-                        Log.d(LOG_TAG, name);
-                        Log.d(LOG_TAG, Double.toString(averageRating));
+                        ownerTripDetails.put("dtTripId", match.getString("_id"));
+                        ownerTripDetails.put("date", match.getString("date"));
+                        ownerTripDetails.put("departureTime", match.getString("owner_departure_time"));
+                        ownerTripDetails.put("arrivalTime", match.getString("owner_arrival_time"));
+                        ownerTripDetails.put("departureName", match.getString("owner_departure_station_name"));
+                        ownerTripDetails.put("targetName", match.getString("owner_target_station_name"));
 
+                        ownerDetails.put("ownerUserId", owner.getString("_id"));
+                        ownerDetails.put("firstName", owner.getString("first_name"));
+                        ownerDetails.put("lastName", owner.getString("last_name"));
+                        ownerDetails.put("picture", owner.getString("picture"));
+                        ownerDetails.put("averageRating", owner.getDouble("average_rating"));
 
-
-                        matches.add(new MatchingEntry(name, averageRating, departureTime, departureName, arrivalTime, targetName, picture, tripData.getAsBoolean("hasTicket"), profileUserId));
-                        Log.d(LOG_TAG, "MATCH DETAILS: "+match.toString());
-                        Log.d(LOG_TAG, "OWNER DETAILS: "+owner.toString());
+                        matches.add(new MatchingEntry(ownerTripDetails, ownerDetails));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -307,9 +303,6 @@ public class MatchingActivity extends AppCompatActivity {
             }
         });
         myThread.start();
-
-        /*Benachrichtige Adapter über Änderungen*/
-        //mAdapter.notifyDataSetChanged();
     }
     //<--           prepareVerlaufData End            -->
 

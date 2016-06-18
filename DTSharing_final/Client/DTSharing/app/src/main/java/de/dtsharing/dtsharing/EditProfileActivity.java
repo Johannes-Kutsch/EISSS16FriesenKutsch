@@ -136,7 +136,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     builder.show();
                 }else{
 
-                    Snackbar snackbar = Snackbar.make(_mainContent, "Es wurden keine Änderungen vorgenommen", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar snackbar = Snackbar.make(_mainContent, "Es wurden keine Änderungen vorgenommen", Snackbar.LENGTH_LONG)
                             .setAction("Action", null);
                     View snackBarView = snackbar.getView();
                     snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.positive));
@@ -162,6 +162,17 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
 
+                        if(response.contains("success_message")) {
+                            new SharedPrefsManager(getApplicationContext()).setEditProfileSharedPrefs(newPicture, _interests.getText().toString(), _more.getText().toString());
+
+                            Snackbar snackbar = Snackbar.make(_mainContent, "Profil wurde aktualisiert", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null);
+                            View snackBarView = snackbar.getView();
+                            snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.positive));
+                            TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                            textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+                            snackbar.show();
+                        }
                     }
                 }, new Response.ErrorListener() {
 
@@ -169,15 +180,6 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
 
                 error.printStackTrace();
-
-                int  statusCode = error.networkResponse.statusCode;
-
-                switch (statusCode) {
-                    case 409:
-                        break;
-                    case 500:
-                        break;
-                }
 
             }
         })
@@ -191,6 +193,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 if (interestsChanged) params.put("interests", _interests.getText().toString());
                 if (moreChanged) params.put("more", _more.getText().toString());
                 if (pictureChanged) params.put("picture", newPicture);
+                Log.d("EditProfileActivity", "Parameter: "+params);
                 return params;
             }
 
@@ -202,10 +205,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
     public Bitmap centerCropImage(Bitmap bitmap){
 
-        /*http://stackoverflow.com/a/30609107
+        /*http://stackoverflow.com/a/30609107   Hat als Inspiration gedient, jedoch Nullpointerexception mit unterschiedlichen Galerie Apps
+        * http://stackoverflow.com/a/20177611   Hat die Nullpointerexception "behoben"
         * Bild wird auf maximal 1024x1024 runter skaliert (aspect ratio wird beachtet)*/
-        int maxHeight = 1024;
-        int maxWidth = 1024;
+        int maxHeight = 512;
+        int maxWidth = 512;
         float scale = Math.min(((float)maxHeight / bitmap.getWidth()), ((float)maxWidth / bitmap.getHeight()));
 
         Matrix matrix = new Matrix();

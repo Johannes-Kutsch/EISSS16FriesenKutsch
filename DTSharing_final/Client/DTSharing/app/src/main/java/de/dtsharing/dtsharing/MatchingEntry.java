@@ -1,59 +1,51 @@
 package de.dtsharing.dtsharing;
 
+import android.content.ContentValues;
+
 public class MatchingEntry {
 
-    private String userId, userName, departureTime, departureName, targetTime, targetName, picture;
-    private double rating;
-    private boolean hasTicket;
+    ContentValues ownerTripDetails, ownerDetails;
 
     public MatchingEntry(){}
 
-    public MatchingEntry(String userName, double rating, String departureTime, String departureName, String targetTime, String targetName, String picture, boolean hasTicket, String userId) {
-        this.userName = userName;
-        this.rating = rating;
-        this.departureTime = departureTime;
-        this.departureName = departureName;
-        this.targetTime = targetTime;
-        this.targetName = targetName;
-        this.picture = picture;
-        this.hasTicket = hasTicket;
-        this.userId = userId;
-
+    public MatchingEntry(ContentValues ownerTripDetails, ContentValues ownerDetails) {
+        this.ownerTripDetails = ownerTripDetails;
+        this.ownerDetails = ownerDetails;
     }
 
     public String getUserName(){
-        return userName;
+        return ownerDetails.getAsString("firstName")+" "+ownerDetails.getAsString("lastName");
     }
 
-    public String getUserId(){
-        return userId;
+    public String getOwnerUserId(){
+        return ownerDetails.getAsString("ownerUserId");
     }
 
     public double getAverageRating(){
-        return rating;
+        return ownerDetails.getAsDouble("averageRating");
     }
 
     public String getDepartureTime(){
-        return departureTime;
+        return ownerTripDetails.getAsString("departureTime");
     }
 
     public String getDepartureName(){
-        return departureName;
+        return ownerTripDetails.getAsString("departureName");
     }
 
     public String getTargetTime(){
-        return targetTime;
+        return ownerTripDetails.getAsString("arrivalTime");
     }
 
     public String getTargetName(){
-        return targetName;
+        return ownerTripDetails.getAsString("targetName");
     }
 
     public String getPicture(){
-        return picture;
+        return ownerDetails.getAsString("picture");
     }
 
-    public boolean hasTicket(){
-        return hasTicket;
+    public String getDtTripId(){
+        return ownerTripDetails.getAsString("dtTripId");
     }
 }

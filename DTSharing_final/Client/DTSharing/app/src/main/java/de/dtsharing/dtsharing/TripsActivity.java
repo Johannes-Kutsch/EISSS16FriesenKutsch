@@ -119,6 +119,7 @@ public class TripsActivity extends AppCompatActivity {
                 matchingIntent.putExtra("departureTime", trips.get(position).getDepartureTime());
                 matchingIntent.putExtra("targetName", trips.get(position).getTargetName());
                 matchingIntent.putExtra("arrivalTime", trips.get(position).getArrivalTime());
+                matchingIntent.putExtra("routeName", trips.get(position).getRouteName());
                 matchingIntent.putExtra("departureSequenceId", trips.get(position).getDepartureSequence());
                 matchingIntent.putExtra("targetSequenceId", trips.get(position).getTargetSequence());
                 /*Starte Matching Activity*/
@@ -175,23 +176,7 @@ public class TripsActivity extends AppCompatActivity {
                                     departureName = response.getJSONObject(i).getString("departure_station_name"),
                                     targetName = response.getJSONObject(i).getString("target_station_name");
 
-                            /*http://stackoverflow.com/a/31725197
-                            *Berechnung der Zeitdifferenz zweier Uhrzeiten*/
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
-                            Date dt = simpleDateFormat.parse(departureTime);
-                            Date at = simpleDateFormat.parse(arrivalTime);
-
-                            long difference = at.getTime() - dt.getTime();
-                            if(difference < 0){ //Wenn die Ankunftszeit kleiner ist als die Abfahrtszeit, weil Abfahrt vor und Ankunft nach 0 Uhr
-                                Date dateMax = simpleDateFormat.parse("24:00");
-                                Date dateMin = simpleDateFormat.parse("00:00");
-                                difference = (dateMax.getTime() - dt.getTime()) + (at.getTime() - dateMin.getTime());
-                            }
-                            int days    = (int) (difference / (1000 * 60 * 60 * 24));
-                            int hours   = (int) ((difference - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
-                            int min     = (int) (difference - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60);
-
-                            String travelDuration = hours+":"+min;
+                            String travelDuration = new CalculateTravelDuration().getHoursMinutes(departureTime, arrivalTime);
 
                             int departureSequence = response.getJSONObject(i).getInt("sequence_id_departure_station"),
                                     targetSequence = response.getJSONObject(i).getInt("sequence_id_target_station"),
@@ -204,7 +189,7 @@ public class TripsActivity extends AppCompatActivity {
                         mAdapter.notifyDataSetChanged();
                         progressDialog.dismiss();
 
-                    } catch (JSONException | ParseException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -230,19 +215,6 @@ public class TripsActivity extends AppCompatActivity {
 
         Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
     }
-
-    //<--           addTripsData Start          -->
-    private void addTripsData(){
-        trips.clear();
-        trips.add(new TripsEntry("12345", "123456", 2,"13:23", "11-06-2016", "Gummersbach Bf", 5, "14:36", "Köln Hbf", "1:13", "RB11549", 2));
-        trips.add(new TripsEntry("12345", "123456", 2,"13:23", "11-06-2016", "Gummersbach Bf", 5, "14:36", "Köln Hbf", "1:13", "RB11549", 2));
-        trips.add(new TripsEntry("12345", "123456", 2,"13:23", "11-06-2016", "Gummersbach Bf", 5, "14:36", "Köln Hbf", "1:13", "RB11549", 2));
-        trips.add(new TripsEntry("12345", "123456", 2,"13:23", "11-06-2016", "Gummersbach Bf", 5, "14:36", "Köln Hbf", "1:13", "RB11549", 2));
-
-        /*Benachrichtige Adapter über Änderungen*/
-        mAdapter.notifyDataSetChanged();
-    }
-    //<--           prepareVerlaufData End            -->
 
     //<--           OnOptionsItemSelected Start         -->
     @Override

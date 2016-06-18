@@ -1,16 +1,32 @@
 package de.dtsharing.dtsharing;
 
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -25,9 +41,12 @@ public class FahrtenFragment extends Fragment {
     RelativeLayout v;
 
     private ListView lvFahrten;
+    private TextView noTripsContainer;
 
     private ArrayList<FahrtenEntry> fahrten = new ArrayList<>();
-    private FahrtenAdapter mAdapter;
+    public FahrtenAdapter mAdapter;
+
+    String userId;
 
     public FahrtenFragment() {
         // Required empty public constructor
@@ -43,41 +62,91 @@ public class FahrtenFragment extends Fragment {
 
         /*Erfassen der Views mit denen interagiert werden soll*/
         lvFahrten = (ListView) v.findViewById(R.id.lvFahrten);
+        noTripsContainer = (TextView) v.findViewById(R.id.noTripsContainer);
 
+        userId = new SharedPrefsManager(this.getContext()).getUserIdSharedPrefs();
 
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new android.os.Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                /*Erzeuge und verbinde Adapter mit der FahrtenFragment ListView*/
-                mAdapter = new FahrtenAdapter(getContext(), fahrten);
-                lvFahrten.setAdapter(mAdapter);
-            }
-        });
+        /*Erzeuge und verbinde Adapter mit der FahrtenFragment ListView*/
+        mAdapter = new FahrtenAdapter(getContext(), fahrten, userId);
+        lvFahrten.setAdapter(mAdapter);
 
         /*Fülle Array mit Beispieldaten*/
-        prepareFahrtenData();
+        getDtTrips();
 
+        lvFahrten.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                /*Erzeuge die Matching Activity und füge Daten hinzu*/
+                Intent fahrtDetailIntent = new Intent(v.getContext(), FahrtenDetailActivity.class);
+                fahrtDetailIntent.putExtra("dtTripId", fahrten.get(position).getTripId());
+                fahrtDetailIntent.putExtra("userId", userId);
+
+                /*Starte Matching Activity*/
+                startActivity(fahrtDetailIntent);
+            }
+        });
 
         return v;
     }
 
-    //<--           prepareVerlaufData Start          -->
-    private void prepareFahrtenData(){
-        fahrten.clear();
-        fahrten.add(new FahrtenEntry("13:23", "Gummersbach Bf", "14:36", "Köln Hbf", "1:13", "RB11549", "2"));
-        fahrten.add(new FahrtenEntry("13:53", "Gummersbach Bf", "15:06", "Köln Hbf", "1:13", "RB11549", "0"));
+    private void getDtTrips(){
 
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new android.os.Handler().post(new Runnable() {
+        String base_url = getResources().getString(R.string.base_url);
+        final String URI = base_url+"/users/"+userId+"/dt_trips";
+        fahrten.clear();
+
+        Log.d("FahrtenFragment", "URI: "+URI);
+
+        final JsonArrayRequest jsonRequest = new JsonArrayRequest(
+                Request.Method.GET, URI, null, new Response.Listener<JSONArray>() {
 
             @Override
-            public void run() {
-                /*Benachrichtige Adapter über Änderungen*/
+            public void onResponse(JSONArray response) {
+
+                Log.d("FahrtenFragment", "response: "+response.toString());
+                if(response.length() > 0) {
+
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject trip = response.getJSONObject(i);
+                            ContentValues tripData = new ContentValues();
+
+                            tripData.put("tripId", trip.getString("_id"));
+                            tripData.put("routeName", trip.getString("route_name"));
+                            tripData.put("departureName", trip.getString("departure_station_name"));
+                            tripData.put("targetName", trip.getString("target_station_name"));
+                            tripData.put("departureTime", trip.getString("departure_time"));
+                            tripData.put("arrivalTime", trip.getString("arrival_time"));
+                            tripData.put("date", trip.getString("date"));
+                            tripData.put("numberPartners", trip.getString("number_partners"));
+
+                            fahrten.add(new FahrtenEntry(tripData));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }else{
+                    noTripsContainer.setVisibility(View.VISIBLE);
+                }
+
                 mAdapter.notifyDataSetChanged();
+                lvFahrten.setVisibility(View.VISIBLE);
+
             }
 
-        });
+        },
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+
+                });
+
+        Volley.newRequestQueue(getContext()).add(jsonRequest);
+
     }
-    //<--           prepareVerlaufData End            -->
 }

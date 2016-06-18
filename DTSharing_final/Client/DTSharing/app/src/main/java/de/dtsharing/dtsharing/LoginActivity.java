@@ -71,6 +71,8 @@ public class LoginActivity extends AppCompatActivity {
 
         prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
 
+        new SharedPrefsManager(getApplicationContext()).setLoggedOutSharedPrefs();
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar_title = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
@@ -119,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                final String message = getStopsVersion() == 0 ? "DTSharing wird für die erste Verwendung vorbereitet" : "Fahrplandaten werden aktualisiert";
+                final String message = new SharedPrefsManager(getApplicationContext()).getStopsVersion() == 0 ? "DTSharing wird für die erste Verwendung vorbereitet" : "Fahrplandaten werden aktualisiert";
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -243,10 +245,5 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    public int getStopsVersion() {
-        //Lese aktuelle stops_version aus, falls keine vorhanden 0
-        return prefs.getInt("stops_version", 0);
     }
 }

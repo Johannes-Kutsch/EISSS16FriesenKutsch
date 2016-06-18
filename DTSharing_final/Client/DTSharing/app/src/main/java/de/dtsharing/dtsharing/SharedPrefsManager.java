@@ -30,11 +30,10 @@ public class SharedPrefsManager {
         editor.putString("picture", picture);
         editor.putString("interests", interests);
         editor.putString("more", more);
-        editor.apply();
+        editor.commit();
     }
 
     public ContentValues getEditProfileSharedPrefs(){
-
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
 
         ContentValues data = new ContentValues();
@@ -53,6 +52,20 @@ public class SharedPrefsManager {
     public String getProfilePictureSharedPrefs(){
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getString("picture", null);
+    }
+    public int getStopsVersion() {
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getInt("stops_version", 0);
+    }
+
+    public void setLoggedOutSharedPrefs(){
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().remove("user_id").apply();
+        prefs.edit().remove("picture").apply();
+        prefs.edit().remove("firstName").apply();
+        prefs.edit().remove("lastName").apply();
+        prefs.edit().remove("interests").apply();
+        prefs.edit().remove("more").apply();
     }
 
 }
