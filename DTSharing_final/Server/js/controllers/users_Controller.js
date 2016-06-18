@@ -115,7 +115,6 @@ module.exports.updateUser = function (req, res) {
         query.picture = req.body.picture;
         query.$inc.picture_version = 1;
     }
-    console.log(query);
     Users.findByIdAndUpdate(req.params.user_id, query, function (err, result) {
         if(err) {
             res.status(500);
