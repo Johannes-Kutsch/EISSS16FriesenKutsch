@@ -8,6 +8,7 @@ module.exports.offer = function (req, res) {
         unique_trip_id: req.body.unique_trip_id,
         trip_id: req.body.trip_id,
         date: req.body.date,
+        route_name: req.body.route_name,
         owner_departure_time: req.body.departure_time,
         owner_arrival_time: req.body.arrival_time,
         owner_user_id: req.params.user_id,
@@ -92,56 +93,30 @@ module.exports.findDtTrips = function (req, res) {
         var dt_trips = []
         results.forEach( function(result) {
             if(result.owner_user_id == req.params.user_id) {
+                var number_partners = 0;
+                if(result.partner_user_id) {
+                    number_partners = 1;
+                }
                 dt_trips.push({
-                    trip: {
-                        _id : result._id,
-                        unique_trip_id : result.unique_trip_id,
-                        date : result.date,
-                    },
-                    user: {
-                        user_id : result.owner_user_id,
-                        sequence_id_target_station : result.owner_sequence_id_target_station,
-                        sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                        departure_station_name : result.owner_departure_station_name,
-                        target_station_name : result.owner_target_station_name,
-                        arrival_time : result.owner_arrival_time,
-                        departure_time : result.owner_departure_time
-                    },
-                    partner: {
-                        user_id : result.partner_user_id,
-                        sequence_id_target_station : result.partner_sequence_id_target_station,
-                        sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                        departure_station_name : result.partner_departure_station_name,
-                        target_station_name : result.partner_target_station_name,
-                        arrival_time : result.partner_arrival_time,
-                        departure_time : result.partner_departure_time
-                    }
+                    _id : result._id,
+                    date : result.date,
+                    route_name : result.route_name,
+                    departure_station_name : result.owner_departure_station_name,
+                    target_station_name : result.owner_target_station_name,
+                    arrival_time : result.owner_arrival_time,
+                    departure_time : result.owner_departure_time,
+                    number_partners : number_partners
                 });
             } else {
                 dt_trips.push({
-                    trip: {
-                        _id : result._id,
-                        unique_trip_id : result.unique_trip_id,
-                        date : result.date,
-                    },
-                    user: {
-                        user_id : result.partner_user_id,
-                        sequence_id_target_station : result.partner_sequence_id_target_station,
-                        sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                        departure_station_name : result.partner_departure_station_name,
-                        target_station_name : result.partner_target_station_name,
-                        arrival_time : result.partner_arrival_time,
-                        departure_time : result.partner_departure_time
-                    },
-                    partner: {
-                        user_id : result.owner_user_id,
-                        sequence_id_target_station : result.owner_sequence_id_target_station,
-                        sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                        departure_station_name : result.owner_departure_station_name,
-                        target_station_name : result.owner_target_station_name,
-                        arrival_time : result.owner_arrival_time,
-                        departure_time : result.owner_departure_time
-                    }
+                    _id : result._id,
+                    date : result.date,
+                    route_name : result.route_name,
+                    departure_station_name : result.partner_departure_station_name,
+                    target_station_name : result.partner_target_station_name,
+                    arrival_time : result.partner_arrival_time,
+                    departure_time : result.partner_departure_time,
+                    number_partners : 1
                 });
             }
         });
@@ -171,8 +146,8 @@ module.exports.findDtTrip = function (req, res) {
             res.json({
                 trip: {
                     _id : result._id,
-                    unique_trip_id : result.unique_trip_id,
                     date : result.date,
+                    route_name : result.route_name
                 },
                 user: {
                     user_id : result.owner_user_id,

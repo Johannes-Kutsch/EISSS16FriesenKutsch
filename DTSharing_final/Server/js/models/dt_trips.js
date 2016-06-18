@@ -5,6 +5,7 @@ module.exports = mongoose.model('dt_trips', {
     unique_trip_id: String,
     trip_id: String,
     date: String,
+    route_name: String,
     owner_departure_time: String,
     owner_arrival_time: String,
     owner_user_id: String,

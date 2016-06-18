@@ -47,7 +47,7 @@ app.get('/users/:user_id/ratings', ratings_Controller.findRatings);
 
 //dt_trips
 //URI: user_id
-//Boddy: unique_trip_id, trip_id, date, departure_time, arrival_time, sequence_id_target_station, sequence_id_departure_station, destination_station_name, target_station_name, has_season_ticket,
+//Boddy: unique_trip_id, trip_id, date, departure_time, arrival_time, sequence_id_target_station, sequence_id_departure_station, destination_station_name, target_station_name, has_season_ticket, route_name
 app.post('/users/:user_id/dt_trips', dt_trips_Controller.offer);
 
 //URI: user_id
