@@ -21,7 +21,9 @@ module.exports.offer = function (req, res) {
         partner_sequence_id_target_station: null,
         partner_sequence_id_departure_station: null,
         partner_departure_station_name: null,
-        partner_target_station_name: null
+        partner_target_station_name: null,
+        partner_departure_time: null,
+        partner_arrival_time: null
     });
     dt_trip.save(function (err, result) {
         if(err) {
@@ -142,59 +144,79 @@ module.exports.findDtTrip = function (req, res) {
             });
             return;
         }
-        if(result.owner_user_id == req.params.user_id) {
-            res.json({
-                trip: {
-                    _id : result._id,
-                    date : result.date,
-                    route_name : result.route_name
-                },
-                user: {
-                    user_id : result.owner_user_id,
-                    sequence_id_target_station : result.owner_sequence_id_target_station,
-                    sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                    departure_station_name : result.owner_departure_station_name,
-                    target_station_name : result.owner_target_station_name,
-                    arrival_time : result.owner_arrival_time,
-                    departure_time : result.owner_departure_time
-                },
-                partner: {
-                    user_id : result.partner_user_id,
-                    sequence_id_target_station : result.partner_sequence_id_target_station,
-                    sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                    departure_station_name : result.partner_departure_station_name,
-                    target_station_name : result.partner_target_station_name,
-                    arrival_time : result.partner_arrival_time,
-                    departure_time : result.partner_departure_time
-                }
-            });
-        } else {
-            res.json({
-                trip: {
-                    _id : result._id,
-                    unique_trip_id : result.unique_trip_id,
-                    date : result.date,
-                },
-                user: {
-                    user_id : result.partner_user_id,
-                    sequence_id_target_station : result.partner_sequence_id_target_station,
-                    sequence_id_departure_station : result.partner_sequence_id_departure_station,
-                    departure_station_name : result.partner_departure_station_name,
-                    target_station_name : result.partner_target_station_name,
-                    arrival_time : result.partner_arrival_time,
-                    departure_time : result.partner_departure_time
-                },
-                partner: {
-                    user_id : result.owner_user_id,
-                    sequence_id_target_station : result.owner_sequence_id_target_station,
-                    sequence_id_departure_station : result.owner_sequence_id_departure_station,
-                    departure_station_name : result.owner_departure_station_name,
-                    target_station_name : result.owner_target_station_name,
-                    arrival_time : result.owner_arrival_time,
-                    departure_time : result.owner_departure_time
-                }
-            });
-        }
+        async.parallel([
+            function(callback) {
+                Users.findById(result.owner_user_id, 'first_name',function(err, result) {
+                    callback(err, result);
+                });
+            }, function(callback) {
+                Users.findById(result.partner_user_id, '-_id first_name',function(err, result) {
+                    callback(err, result);
+                });
+            }
+        ], function(err, results){
+                    console.log(results);
+            if(err) {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            if(result.owner_user_id == req.params.user_id) {
+                res.json({
+                    trip: {
+                        date : result.date,
+                        route_name : result.route_name
+                    },
+                    user: {
+                        first_name : results[0].first_name,
+                        sequence_id_target_station : result.owner_sequence_id_target_station,
+                        sequence_id_departure_station : result.owner_sequence_id_departure_station,
+                        departure_station_name : result.owner_departure_station_name,
+                        target_station_name : result.owner_target_station_name,
+                        arrival_time : result.owner_arrival_time,
+                        departure_time : result.owner_departure_time
+                    },
+                    partner: {
+                        first_name : results[1].first_name,
+                        sequence_id_target_station : result.partner_sequence_id_target_station,
+                        sequence_id_departure_station : result.partner_sequence_id_departure_station,
+                        departure_station_name : result.partner_departure_station_name,
+                        target_station_name : result.partner_target_station_name,
+                        arrival_time : result.partner_arrival_time,
+                        departure_time : result.partner_departure_time
+                    }
+                });
+            } else {
+                res.json({
+                    trip: {
+                        _id : result._id,
+                        unique_trip_id : result.unique_trip_id,
+                        date : result.date,
+                    },
+                    user: {
+                        user_id : results[1].first_name,
+                        sequence_id_target_station : result.partner_sequence_id_target_station,
+                        sequence_id_departure_station : result.partner_sequence_id_departure_station,
+                        departure_station_name : result.partner_departure_station_name,
+                        target_station_name : result.partner_target_station_name,
+                        arrival_time : result.partner_arrival_time,
+                        departure_time : result.partner_departure_time
+                    },
+                    partner: {
+                        user_id : results[0].first_name,
+                        sequence_id_target_station : result.owner_sequence_id_target_station,
+                        sequence_id_departure_station : result.owner_sequence_id_departure_station,
+                        departure_station_name : result.owner_departure_station_name,
+                        target_station_name : result.owner_target_station_name,
+                        arrival_time : result.owner_arrival_time,
+                        departure_time : result.owner_departure_time
+                    }
+                });
+            }
+        });
     });
 }
 
