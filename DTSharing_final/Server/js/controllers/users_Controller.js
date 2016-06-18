@@ -100,3 +100,41 @@ module.exports.findUser = function (req, res) {
         });
     });
 }
+
+module.exports.updateUser = function (req, res) {
+    var query = {$inc : {}};
+    if(req.body.interests) {
+        query.interests = req.body.interests;
+        query.$inc.user_version = 1;
+    }
+    if(req.body.more) {
+        query.more = req.body.more;
+        query.$inc.user_version = 1;
+    }
+    if(req.body.picture) {
+        query.picture = req.body.picture;
+        query.$inc.picture_version = 1;
+    }
+    console.log(query);
+    Users.findByIdAndUpdate(req.params.user_id, query, function (err, result) {
+        if(err) {
+            res.status(500);
+            res.send({
+                error_message: 'Database Error'
+            });
+            console.error(err);
+            return;
+        }
+        if(!result) {
+            console.log('Trip not found | 404');
+            res.status(404);
+            res.send({
+                error_message: 'Trip not found'
+            });
+            return;
+        }
+        res.send({
+                success_message: 'successfully updated'
+            });
+    });
+}

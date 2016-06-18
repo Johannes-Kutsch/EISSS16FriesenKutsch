@@ -37,6 +37,10 @@ app.post('/users', users_Controller.register);
 //Querry: user_version, picture_version
 app.get('/users/:user_id', users_Controller.findUser);
 
+//Benutzer
+//Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
+app.put('/users/:user_id', users_Controller.updateUser);
+
 //Ratings
 //URI: User ID des Nutzers der bewertet wird
 //Boddy: author_id, stars, comment, date
