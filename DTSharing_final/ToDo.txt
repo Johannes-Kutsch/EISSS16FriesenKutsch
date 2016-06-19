@@ -11,5 +11,4 @@ Code kommentieren
 nice to have:
 Chats auch offline ansehen
 Chat-Verschlüsselung
-Detailierte Fahrtenansicht
 https/sessions
