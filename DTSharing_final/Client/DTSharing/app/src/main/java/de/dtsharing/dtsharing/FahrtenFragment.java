@@ -67,7 +67,7 @@ public class FahrtenFragment extends Fragment {
         userId = new SharedPrefsManager(this.getContext()).getUserIdSharedPrefs();
 
         /*Erzeuge und verbinde Adapter mit der FahrtenFragment ListView*/
-        mAdapter = new FahrtenAdapter(getContext(), fahrten, userId);
+        mAdapter = new FahrtenAdapter(getContext(), fahrten, userId, FahrtenFragment.this);
         lvFahrten.setAdapter(mAdapter);
 
         /*Fülle Array mit Beispieldaten*/
@@ -80,6 +80,8 @@ public class FahrtenFragment extends Fragment {
                 Intent fahrtDetailIntent = new Intent(v.getContext(), FahrtenDetailActivity.class);
                 fahrtDetailIntent.putExtra("dtTripId", fahrten.get(position).getTripId());
                 fahrtDetailIntent.putExtra("userId", userId);
+                fahrtDetailIntent.putExtra("date", fahrten.get(position).getDate());
+                fahrtDetailIntent.putExtra("routeName", fahrten.get(position).getRouteName());
 
                 /*Starte Matching Activity*/
                 startActivity(fahrtDetailIntent);
@@ -147,6 +149,15 @@ public class FahrtenFragment extends Fragment {
                 });
 
         Volley.newRequestQueue(getContext()).add(jsonRequest);
+
+    }
+
+    public void refreshList(){
+
+        mAdapter.notifyDataSetChanged();
+        if (mAdapter.getCount() == 0) {
+            noTripsContainer.setVisibility(View.VISIBLE);
+        }
 
     }
 }

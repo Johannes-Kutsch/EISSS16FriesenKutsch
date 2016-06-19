@@ -1,9 +1,11 @@
 package de.dtsharing.dtsharing;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ public class FahrtenAdapter extends BaseAdapter{
 
     private ArrayList<FahrtenEntry> fahrten;
     private Context context_1;
+    private FahrtenFragment fahrtenFragment;
     private String userId;
 
     public class ViewHolder {
@@ -36,10 +39,11 @@ public class FahrtenAdapter extends BaseAdapter{
         public Button delete;
     }
 
-    public FahrtenAdapter(Context context, ArrayList<FahrtenEntry> fahrten, String userId) {
+    public FahrtenAdapter(Context context, ArrayList<FahrtenEntry> fahrten, String userId, FahrtenFragment fahrtenFragment) {
         this.context_1 = context;
         this.fahrten = fahrten;
         this.userId = userId;
+        this.fahrtenFragment = fahrtenFragment;
     }
 
     @Override
@@ -148,9 +152,9 @@ public class FahrtenAdapter extends BaseAdapter{
     }
 
     public void updateFahrtenList(ArrayList<FahrtenEntry> newlist) {
-        fahrten.clear();
-        fahrten.addAll(newlist);
-        this.notifyDataSetChanged();
+        /*fahrten.clear();
+        fahrten.addAll(newlist);*/
+        fahrtenFragment.refreshList();
     }
 
 }

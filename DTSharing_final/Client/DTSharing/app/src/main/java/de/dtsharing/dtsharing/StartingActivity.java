@@ -59,7 +59,7 @@ public class StartingActivity extends AppCompatActivity {
         db.close();
 
         db = openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS history(departure_station_name VARCHAR(255),target_station_name VARCHAR(255),date VARCHAR(255),rating NUMERIC,last_calculated VARCHAR(255));");
+        db.execSQL("CREATE TABLE IF NOT EXISTS history(departure_station_name VARCHAR(255),target_station_name VARCHAR(255),rating NUMERIC,last_calculated VARCHAR(255),count INTEGER);");
         db.execSQL("CREATE TABLE IF NOT EXISTS chats(chat_id VARCHAR(255),user_one_id VARCHAR(255),user_two_id VARCHAR(255),key VARCHAR(255));");
         db.execSQL("CREATE TABLE IF NOT EXISTS messages(message_id VARCHAR(255),chat_id VARCHAR(255),author_id VARCHAR(255),message_text VARCHAR(255));");
         //db.execSQL("CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(255),picture_version NUMERIC,picture VARCHAR(255),birth_year VARCHAR(5),first_name VARCHAR(255),last_name VARCHAR(255),gender VARCHAR(10),interests VARCHAR(255),more VARCHAR(255));");

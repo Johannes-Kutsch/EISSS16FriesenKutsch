@@ -70,6 +70,7 @@ public class DatabaseStationService extends IntentService {
                     sendBroadcast(broadcastIntent);
                 } else {
                     insertStationData(response);
+
                     Intent broadcastIntent = new Intent();
                     broadcastIntent.setAction(MyStationStatusReceiver.STATUS_RESPONSE);
                     broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

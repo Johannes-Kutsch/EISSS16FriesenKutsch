@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "527220351720",
+    "firebase_url": "https://project-4403795799627661382.firebaseio.com",
+    "project_id": "project-4403795799627661382",
+    "storage_bucket": "project-4403795799627661382.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527220351720:android:4786de744b7bb4b4",
+        "android_client_info": {
+          "package_name": "de.dtsharing.dtsharing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527220351720-2r76pftnjg4pnl9veqqfe5agcetom5kb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBecruP060z7SXvBQ8QnUqFQvelcx6f4u0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

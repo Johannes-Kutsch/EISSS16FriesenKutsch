@@ -27,7 +27,11 @@
         <service android:name=".DatabaseStationService" />
 
         <activity android:name=".EditProfileActivity" />
-        <activity android:name=".FahrtenDetailActivity"></activity>
+        <activity android:name=".FahrtenDetailActivity" />
+
+        <service
+            android:name=".HistoryService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

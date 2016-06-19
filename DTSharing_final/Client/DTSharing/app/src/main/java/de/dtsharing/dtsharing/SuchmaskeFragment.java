@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -48,6 +49,7 @@ public class SuchmaskeFragment extends Fragment {
     Snackbar snackbar;
     private NonScrollListView lvHistory;
     private Button bSubmit;
+    private TextView noHistoryContainer;
     private EditText etDate, etTime, etTicket;
     private AutoCompleteTextView etDeparture, etTarget;
     private ScrollView svContainer;
@@ -86,6 +88,7 @@ public class SuchmaskeFragment extends Fragment {
         svContainer = (ScrollView) v.findViewById(R.id.svContainer);
         etDeparture = (AutoCompleteTextView) v.findViewById(R.id.etDeparture);
         etTarget = (AutoCompleteTextView) v.findViewById(R.id.etTarget);
+        noHistoryContainer = (TextView) v.findViewById(R.id.noHistoryContainer);
         etDate = (EditText) v.findViewById(R.id.etDate);
         etTime = (EditText) v.findViewById(R.id.etTime);
         etTicket = (EditText) v.findViewById(R.id.etTicket);
@@ -111,7 +114,23 @@ public class SuchmaskeFragment extends Fragment {
         etTarget.setThreshold(1);
 
         /*Fülle Array mit Beispieldaten*/
-        prepareVerlaufData();
+        getStationData();
+        getHistoryData();
+
+        etDeparture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                etDeparture.setText(adapterView.getItemAtPosition(position).toString());
+                hideSoftKeyboard(getActivity(), view);
+            }
+        });
+        etTarget.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                etTarget.setText(adapterView.getItemAtPosition(position).toString());
+                hideSoftKeyboard(getActivity(), view);
+            }
+        });
 
         etTicket.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +189,7 @@ public class SuchmaskeFragment extends Fragment {
                 }
 
                 if(valid){
+                    HistoryService.startActionAddToHistory(v.getContext(), departureName, targetName);
                     /*Erzeuge die Matching Activity und füge Daten hinzu*/
                     Intent tripsIntent = new Intent(getContext(), TripsActivity.class);
                     tripsIntent.putExtra("departureName", departureName);
@@ -186,8 +206,6 @@ public class SuchmaskeFragment extends Fragment {
         /*History item selected listener*/
         historyOnClickListener();
 
-        getStationData();
-
         return v;
     }
 
@@ -203,18 +221,30 @@ public class SuchmaskeFragment extends Fragment {
             TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
             textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
             snackbar.show();
+        }else if (requestCode == REQUEST_CODE_TRIPS && resultCode == Activity.RESULT_OK) {
+            getHistoryData();
         }
 
     }
 
     //<--           prepareVerlaufData Start          -->
-    private void prepareVerlaufData(){
-        transit.add(new HistoryEntry("Köln, Hansaring", "Gummersbach Bf"));
-        transit.add(new HistoryEntry("Köln Hbf", "Paderborn Hbf"));
-        transit.add(new HistoryEntry("Paderborn Hbf", "Bad Driburg Bahnhof"));
-        transit.add(new HistoryEntry("Paderborn Hbf", "Hamm Hbf"));
-        transit.add(new HistoryEntry("Hamm Hbf", "Köln Hbf"));
+    private void getHistoryData(){
+        transit.clear();
 
+        SQLiteDatabase db;
+        db = v.getContext().openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+        Cursor cursor = db.query("history", new String[] {"departure_station_name", "target_station_name"}, null, null, null, null, "rating DESC", "5");
+
+        if(cursor.getCount() > 0){
+            noHistoryContainer.setVisibility(View.GONE);
+            while (cursor.moveToNext()){
+                transit.add(new HistoryEntry(cursor.getString(0), cursor.getString(1)));
+            }
+        } else {
+            noHistoryContainer.setVisibility(View.VISIBLE);
+        }
+        cursor.close();
+        db.close();
         /*Benachrichtige Adapter über Änderungen*/
         mAdapter.notifyDataSetChanged();
     }
@@ -326,6 +356,12 @@ public class SuchmaskeFragment extends Fragment {
         });
         myThread.start();
 
+    }
+
+    public static void hideSoftKeyboard (Activity activity, View view)
+    {
+        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
 }

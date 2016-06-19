@@ -32,3 +32,5 @@ dependencies {
     compile 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:1.2.32'
     compile 'com.wdullaer:materialdatetimepicker:2.3.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
