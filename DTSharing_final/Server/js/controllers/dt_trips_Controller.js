@@ -146,16 +146,23 @@ module.exports.findDtTrip = function (req, res) {
         }
         async.parallel([
             function(callback) {
-                Users.findById(result.owner_user_id, 'first_name',function(err, result) {
-                    callback(err, result);
-                });
+                if(result.owner_user_id) {
+                    Users.findById(result.owner_user_id, '-_id first_name',function(err, result) {
+                        callback(err, result.first_name);
+                    });
+                } else {
+                    callback(null);
+                }
             }, function(callback) {
-                Users.findById(result.partner_user_id, '-_id first_name',function(err, result) {
-                    callback(err, result);
-                });
+                if(result.partner_user_id) {
+                    Users.findById(result.partner_user_id, '-_id first_name',function(err, result) {
+                        callback(err, result.first_name);
+                    });
+                } else {
+                    callback(null);
+                }
             }
         ], function(err, results){
-                    console.log(results);
             if(err) {
                 res.status(500);
                 res.send({
@@ -171,7 +178,7 @@ module.exports.findDtTrip = function (req, res) {
                         route_name : result.route_name
                     },
                     user: {
-                        first_name : results[0].first_name,
+                        first_name : results[0],
                         sequence_id_target_station : result.owner_sequence_id_target_station,
                         sequence_id_departure_station : result.owner_sequence_id_departure_station,
                         departure_station_name : result.owner_departure_station_name,
@@ -180,7 +187,7 @@ module.exports.findDtTrip = function (req, res) {
                         departure_time : result.owner_departure_time
                     },
                     partner: {
-                        first_name : results[1].first_name,
+                        first_name : results[1],
                         sequence_id_target_station : result.partner_sequence_id_target_station,
                         sequence_id_departure_station : result.partner_sequence_id_departure_station,
                         departure_station_name : result.partner_departure_station_name,
@@ -197,7 +204,7 @@ module.exports.findDtTrip = function (req, res) {
                         date : result.date,
                     },
                     user: {
-                        user_id : results[1].first_name,
+                        user_id : results[1],
                         sequence_id_target_station : result.partner_sequence_id_target_station,
                         sequence_id_departure_station : result.partner_sequence_id_departure_station,
                         departure_station_name : result.partner_departure_station_name,
@@ -206,7 +213,7 @@ module.exports.findDtTrip = function (req, res) {
                         departure_time : result.partner_departure_time
                     },
                     partner: {
-                        user_id : results[0].first_name,
+                        user_id : results[0],
                         sequence_id_target_station : result.owner_sequence_id_target_station,
                         sequence_id_departure_station : result.owner_sequence_id_departure_station,
                         departure_station_name : result.owner_departure_station_name,
