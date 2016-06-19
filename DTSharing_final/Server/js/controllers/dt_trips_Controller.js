@@ -284,7 +284,7 @@ module.exports.removeDtTrip = function (req, res) {
                     return;
                 }
                 res.send({
-                        successMessage: 'successfully unmatched'
+                        success_message: 'successfully unmatched'
                     });
             });
         }
