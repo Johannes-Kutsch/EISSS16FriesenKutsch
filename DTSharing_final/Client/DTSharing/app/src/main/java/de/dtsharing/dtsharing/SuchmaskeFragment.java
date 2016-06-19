@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -35,7 +38,11 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
+import java.util.Objects;
 
 
 /**
@@ -116,6 +123,66 @@ public class SuchmaskeFragment extends Fragment {
         /*Fülle Array mit Beispieldaten*/
         getStationData();
         getHistoryData();
+
+        /*GPSTracker mGPS = new GPSTracker(v.getContext());
+        if(mGPS.canGetLocation() ){
+            etDeparture.setText("Lat: "+mGPS.getLatitude());
+            etTarget.setText("Lon: "+mGPS.getLongitude());
+            mGPS.stopUsingGPS();
+        }else{
+            etDeparture.setText("Kein GPS");
+        }*/
+        if(true){
+            double lat = 51.0251, lon = 7.6035;
+            SQLiteDatabase db;
+            db = getContext().openOrCreateDatabase("Stops", Context.MODE_PRIVATE, null);
+            Cursor cursor = db.rawQuery("SELECT * FROM vrs", null);
+
+            ArrayList<Stop> stopsInRadius = new ArrayList<>();
+
+            if(cursor.getCount() > 0){
+
+                cursor.moveToFirst();
+
+                while (cursor.moveToNext()){
+
+                    String stopName = cursor.getString(0);
+                    double stop_lat = cursor.getDouble(1),
+                            stop_lon = cursor.getDouble(2);
+
+                    Location user_location = new Location("User");
+                    user_location.setLatitude(lat);
+                    user_location.setLongitude(lon);
+
+                    Location stop_location = new Location("Stop");
+                    stop_location.setLatitude(stop_lat);
+                    stop_location.setLongitude(stop_lon);
+
+                    int distance = Math.round(user_location.distanceTo(stop_location));
+
+                    if(distance <= 2000) {
+                        stopsInRadius.add(new Stop(stopName, distance));
+                    }
+
+                }
+
+                Collections.sort(stopsInRadius, new Comparator<Stop>() {
+                    @Override
+                    public int compare(Stop stop1, Stop stop2) {
+                        int distance1 = ((Stop) stop1).getDistance(),
+                                distance2 = ((Stop) stop2).getDistance();
+                        return distance1 - distance2;
+                    }
+                });
+
+                for(Stop str : stopsInRadius) {
+                    Log.d(LOG_TAG, "STOP: "+str.getStopName()+" DISTANCE: "+str.getDistance());
+                }
+
+            }
+
+        }
+
 
         etDeparture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -362,6 +429,24 @@ public class SuchmaskeFragment extends Fragment {
     {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+    }
+
+    public class Stop {
+        public String stopName;
+        public int distance;
+
+        public Stop(String stopName, int distance){
+            this.stopName = stopName;
+            this.distance = distance;
+        }
+
+        public int getDistance(){
+            return distance;
+        }
+
+        public String getStopName(){
+            return stopName;
+        }
     }
 
 }

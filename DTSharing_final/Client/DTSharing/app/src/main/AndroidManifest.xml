@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -23,15 +25,15 @@
         <activity android:name=".MatchingActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".LoginActivity" />
-
-        <service android:name=".DatabaseStationService" />
-
         <activity android:name=".EditProfileActivity" />
         <activity android:name=".FahrtenDetailActivity" />
 
         <service
+            android:name=".DatabaseStationService"
+            android:exported="false" />
+        <service
             android:name=".HistoryService"
-            android:exported="false"></service>
+            android:exported="false" />
     </application>
 
 </manifest>
