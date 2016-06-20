@@ -39,6 +39,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +70,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Thread myThread2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new MyFirebaseInstanceIDService().onTokenRefresh();
+            }
+        });
+        myThread2.start();
 
         prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
 

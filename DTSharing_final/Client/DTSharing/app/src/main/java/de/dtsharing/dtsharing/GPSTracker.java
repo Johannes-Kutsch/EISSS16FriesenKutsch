@@ -11,7 +11,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-/*http://www.androidhive.info/2012/07/android-gps-location-manager-tutorial/*/
+/* http://www.androidhive.info/2012/07/android-gps-location-manager-tutorial/ */
 public class GPSTracker extends Service implements LocationListener {
 
     private final Context context;

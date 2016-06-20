@@ -25,12 +25,23 @@ public class SharedPrefsManager {
         editor.apply();
     }
 
+    public void setFCMToken(String token){
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString("token", token);
+        editor.apply();
+    }
+
+    public String getFCMToken(){
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getString("token", null);
+    }
+
     public void setEditProfileSharedPrefs(String picture, String interests, String more){
         SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
         editor.putString("picture", picture);
         editor.putString("interests", interests);
         editor.putString("more", more);
-        editor.commit();
+        editor.apply();
     }
 
     public ContentValues getEditProfileSharedPrefs(){

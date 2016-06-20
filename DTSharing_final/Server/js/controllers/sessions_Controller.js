@@ -3,7 +3,7 @@ var Users = require('../models/users'),
     mongoose = require('mongoose');
  
 module.exports.login = function (req, res) {
-    Users.findOne({email : req.body.email, pass : req.body.pass}, '_id', function (err, user) {
+    Users.findOne({email : req.body.email, pass : req.body.pass}, '_id picture first_name last_name interests more', function (err, user) {
         if(err) {
             res.status(500);
             res.send({

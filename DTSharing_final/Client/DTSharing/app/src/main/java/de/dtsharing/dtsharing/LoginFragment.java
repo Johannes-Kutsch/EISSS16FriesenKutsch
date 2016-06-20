@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +46,8 @@ public class LoginFragment extends Fragment {
     TextView _forgotPassword, _signup, toolbar_title;
     EditText _mail, _password;
 
+    MyFirebaseInstanceIDService myFirebaseInstanceIDService;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -55,6 +60,9 @@ public class LoginFragment extends Fragment {
         _signin = (Button) v.findViewById(R.id.bSignin);
         _mail = (EditText) v.findViewById(R.id.etMail);
         _password = (EditText) v.findViewById(R.id.etPassword);
+
+        myFirebaseInstanceIDService = new MyFirebaseInstanceIDService();
+        myFirebaseInstanceIDService.onTokenRefresh();
 
         _signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,7 +163,6 @@ public class LoginFragment extends Fragment {
                 error.printStackTrace();
 
                 int  statusCode = error.networkResponse.statusCode;
-                NetworkResponse response = error.networkResponse;
 
                 if(progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
@@ -186,6 +193,9 @@ public class LoginFragment extends Fragment {
                 // the POST parameters:
                 params.put("email", mail);
                 params.put("pass", password);
+                params.put("token", myFirebaseInstanceIDService.getToken());
+
+                Log.d("LoginFragment", "FCM TOKEN: "+params.toString());
 
                 return params;
             }

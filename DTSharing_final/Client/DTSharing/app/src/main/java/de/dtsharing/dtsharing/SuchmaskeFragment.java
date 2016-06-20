@@ -27,6 +27,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -41,6 +42,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -56,12 +58,13 @@ public class SuchmaskeFragment extends Fragment {
     Snackbar snackbar;
     private NonScrollListView lvHistory;
     private Button bSubmit;
-    private TextView noHistoryContainer;
+    private TextView noHistoryContainer, radiusSearch, swapStations;
     private EditText etDate, etTime, etTicket;
     private AutoCompleteTextView etDeparture, etTarget;
     private ScrollView svContainer;
 
     private ArrayList<HistoryEntry> transit = new ArrayList<>();
+    private String[] stopsInRadius;
     private ArrayAdapter adapterAutoComplete;
     private HistoryAdapter mAdapter;
 
@@ -96,6 +99,8 @@ public class SuchmaskeFragment extends Fragment {
         etDeparture = (AutoCompleteTextView) v.findViewById(R.id.etDeparture);
         etTarget = (AutoCompleteTextView) v.findViewById(R.id.etTarget);
         noHistoryContainer = (TextView) v.findViewById(R.id.noHistoryContainer);
+        radiusSearch = (TextView) v.findViewById(R.id.radiusSearch);
+        swapStations = (TextView) v.findViewById(R.id.swapStations);
         etDate = (EditText) v.findViewById(R.id.etDate);
         etTime = (EditText) v.findViewById(R.id.etTime);
         etTicket = (EditText) v.findViewById(R.id.etTicket);
@@ -120,69 +125,8 @@ public class SuchmaskeFragment extends Fragment {
         etTarget.setAdapter(adapterAutoComplete);
         etTarget.setThreshold(1);
 
-        /*Fülle Array mit Beispieldaten*/
         getStationData();
         getHistoryData();
-
-        /*GPSTracker mGPS = new GPSTracker(v.getContext());
-        if(mGPS.canGetLocation() ){
-            etDeparture.setText("Lat: "+mGPS.getLatitude());
-            etTarget.setText("Lon: "+mGPS.getLongitude());
-            mGPS.stopUsingGPS();
-        }else{
-            etDeparture.setText("Kein GPS");
-        }*/
-        if(true){
-            double lat = 51.0251, lon = 7.6035;
-            SQLiteDatabase db;
-            db = getContext().openOrCreateDatabase("Stops", Context.MODE_PRIVATE, null);
-            Cursor cursor = db.rawQuery("SELECT * FROM vrs", null);
-
-            ArrayList<Stop> stopsInRadius = new ArrayList<>();
-
-            if(cursor.getCount() > 0){
-
-                cursor.moveToFirst();
-
-                while (cursor.moveToNext()){
-
-                    String stopName = cursor.getString(0);
-                    double stop_lat = cursor.getDouble(1),
-                            stop_lon = cursor.getDouble(2);
-
-                    Location user_location = new Location("User");
-                    user_location.setLatitude(lat);
-                    user_location.setLongitude(lon);
-
-                    Location stop_location = new Location("Stop");
-                    stop_location.setLatitude(stop_lat);
-                    stop_location.setLongitude(stop_lon);
-
-                    int distance = Math.round(user_location.distanceTo(stop_location));
-
-                    if(distance <= 2000) {
-                        stopsInRadius.add(new Stop(stopName, distance));
-                    }
-
-                }
-
-                Collections.sort(stopsInRadius, new Comparator<Stop>() {
-                    @Override
-                    public int compare(Stop stop1, Stop stop2) {
-                        int distance1 = ((Stop) stop1).getDistance(),
-                                distance2 = ((Stop) stop2).getDistance();
-                        return distance1 - distance2;
-                    }
-                });
-
-                for(Stop str : stopsInRadius) {
-                    Log.d(LOG_TAG, "STOP: "+str.getStopName()+" DISTANCE: "+str.getDistance());
-                }
-
-            }
-
-        }
-
 
         etDeparture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -196,6 +140,42 @@ public class SuchmaskeFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 etTarget.setText(adapterView.getItemAtPosition(position).toString());
                 hideSoftKeyboard(getActivity(), view);
+            }
+        });
+
+        swapStations.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String tmpHolder;
+                tmpHolder = etDeparture.getText().toString();
+                etDeparture.setText(etTarget.getText().toString());
+                etTarget.setText(tmpHolder);
+            }
+        });
+
+        radiusSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GPSTracker mGPS = new GPSTracker(v.getContext());
+                if(mGPS.canGetLocation()){
+                    stopsInRadius = new RadiusSearch(v.getContext()).startRadiusSearch(mGPS.getLatitude(), mGPS.getLongitude());
+                    mGPS.stopUsingGPS();
+                    Log.d(LOG_TAG, stopsInRadius.toString());
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog_Alert);
+                    builder.setTitle("Haltestellen in einem Umkreis von 2 km");
+                    builder.setIcon(R.drawable.ic_my_location_24dp);
+                    builder.setItems(stopsInRadius, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            etDeparture.setText(stopsInRadius[i]);
+                        }
+                    });
+                    builder.show();
+
+                } else {
+
+                }
             }
         });
 
@@ -298,22 +278,36 @@ public class SuchmaskeFragment extends Fragment {
     private void getHistoryData(){
         transit.clear();
 
-        SQLiteDatabase db;
-        db = v.getContext().openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
-        Cursor cursor = db.query("history", new String[] {"departure_station_name", "target_station_name"}, null, null, null, null, "rating DESC", "5");
+        Thread myThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        if(cursor.getCount() > 0){
-            noHistoryContainer.setVisibility(View.GONE);
-            while (cursor.moveToNext()){
-                transit.add(new HistoryEntry(cursor.getString(0), cursor.getString(1)));
+                SQLiteDatabase db;
+                db = v.getContext().openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+                Cursor cursor = db.query("history", new String[] {"departure_station_name", "target_station_name"}, null, null, null, null, "rating DESC", "5");
+
+                if(cursor.getCount() > 0){
+                    while (cursor.moveToNext()){
+                        transit.add(new HistoryEntry(cursor.getString(0), cursor.getString(1)));
+                    }
+                }
+                cursor.close();
+                db.close();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        /*Benachrichtige Adapter über Änderungen*/
+                        if(!transit.isEmpty()) {
+                            noHistoryContainer.setVisibility(View.GONE);
+                            mAdapter.notifyDataSetChanged();
+                        }else{
+                            noHistoryContainer.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
             }
-        } else {
-            noHistoryContainer.setVisibility(View.VISIBLE);
-        }
-        cursor.close();
-        db.close();
-        /*Benachrichtige Adapter über Änderungen*/
-        mAdapter.notifyDataSetChanged();
+        });
+        myThread.start();
     }
     //<--           prepareVerlaufData End            -->
 
@@ -429,24 +423,6 @@ public class SuchmaskeFragment extends Fragment {
     {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
-    }
-
-    public class Stop {
-        public String stopName;
-        public int distance;
-
-        public Stop(String stopName, int distance){
-            this.stopName = stopName;
-            this.distance = distance;
-        }
-
-        public int getDistance(){
-            return distance;
-        }
-
-        public String getStopName(){
-            return stopName;
-        }
     }
 
 }

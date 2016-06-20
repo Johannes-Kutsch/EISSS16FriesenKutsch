@@ -135,14 +135,14 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
                             _tableRowTarget1.setVisibility(View.GONE);
                             _tableRowSpace3.setVisibility(View.GONE);
-                            _targetUserName2.setText(user.getString("first_name")+" steigt ein\n"+partner.getString("first_name")+" steigt ein");
+                            _targetUserName2.setText(user.getString("first_name")+" steigt aus\n"+partner.getString("first_name")+" steigt aus");
                             _targetStationName2.setText(user.getString("target_station_name"));
                             _arrivalTime2.setText(user.getString("arrival_time"));
 
                         } else if(user.getInt("sequence_id_target_station") > partner.getInt("sequence_id_target_station")){
 
-                            _targetUserName1.setText(partner.getString("first_name")+" steigt ein");
-                            _targetUserName2.setText(user.getString("first_name")+" steigt ein");
+                            _targetUserName1.setText(partner.getString("first_name")+" steigt aus");
+                            _targetUserName2.setText(user.getString("first_name")+" steigt aus");
                             _targetStationName1.setText(partner.getString("target_station_name"));
                             _targetStationName2.setText(user.getString("target_station_name"));
                             _arrivalTime1.setText(partner.getString("arrival_time"));
@@ -150,8 +150,8 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
                         } else if(user.getInt("sequence_id_target_station") < partner.getInt("sequence_id_target_station")){
 
-                            _targetUserName1.setText(user.getString("first_name")+" steigt ein");
-                            _targetUserName2.setText(partner.getString("first_name")+" steigt ein");
+                            _targetUserName1.setText(user.getString("first_name")+" steigt aus");
+                            _targetUserName2.setText(partner.getString("first_name")+" steigt aus");
                             _targetStationName1.setText(user.getString("target_station_name"));
                             _targetStationName2.setText(partner.getString("target_station_name"));
                             _arrivalTime1.setText(user.getString("arrival_time"));
