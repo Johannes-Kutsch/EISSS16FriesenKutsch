@@ -3,7 +3,7 @@ var Users = require('../models/users'),
     mongoose = require('mongoose');
  
 module.exports.login = function (req, res) {
-    Users.findOne({email : req.body.email, pass : req.body.pass}, '-__v', function (err, result) {
+    Users.findOne({email : req.body.email, pass : req.body.pass}, '_id', function (err, user) {
         if(err) {
             res.status(500);
             res.send({
@@ -11,14 +11,35 @@ module.exports.login = function (req, res) {
             });
             console.error(err);
             return;
-        } else if(!result) {
+        } else if(user) {
+            Users.findOneAndUpdate({token : req.body.token}, {token : null}, function(err, result) {
+                if(err) {
+                    res.status(500);
+                    res.send({
+                        error_message: 'Database Error'
+                    });
+                    console.error(err);
+                    return;
+                }
+                Users.findByIdAndUpdate(user._id, {token : req.body.token}, function(err, result) {
+                    if(err) {
+                        res.status(500);
+                        res.send({
+                            error_message: 'Database Error'
+                        });
+                        console.error(err);
+                        return;
+                    }
+                    res.json(user);
+                });
+            });       
+        } else {
             console.log('wrong pass or email | 403');
             res.status(403);
             res.send({
                 error_message: 'wrong pass or email'
             });
-            return;
+            return
         }
-        res.json(result);
     });
 }

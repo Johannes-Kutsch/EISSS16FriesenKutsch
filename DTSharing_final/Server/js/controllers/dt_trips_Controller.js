@@ -69,8 +69,8 @@ module.exports.match = function (req,res) {
             return;
         }
         res.send({
-                success_message: 'successfully matched'
-            });
+            success_message: 'successfully matched'
+        });
     });
 }
 

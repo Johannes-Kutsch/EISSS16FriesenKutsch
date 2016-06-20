@@ -2,6 +2,7 @@ var Chats = require('../models/chats'),
     Messages = require('../models/messages'),
     async = require('async'),
     utils = require('../lib/utils'),
+    gcm = require('node-gcm'),
     mongoose = require('mongoose');
  
 module.exports.createChat = function (req, res) {
@@ -84,6 +85,23 @@ module.exports.createMessage = function (req, res) {
             res.status(201);
             res.send({
                 success_message: 'message created'
+            });
+            var message = new gcm.Message({
+                data: {
+                    key1: 'message1',
+                    key2: 'message2'
+                },
+                notification: {
+                    title: "Neuer Mitfahrer gefunden",
+                    body: "Es wurde blablubbla ok lol iksdeh"
+                }
+            });
+            var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+            var registrationTokens = [];
+            registrationTokens.push('e7Nqcw-M0_Q:APA91bF-4suN1sAqw5s6hT-FJJnoQeBNqf1ekyQ4uN6uEOmgQRxLFjJW6V0TkXB8UniokaAasUrka6TyvGhKAC_9yIoM2_-gKb5ko_2ISTqSY4dsYU8VxJ5qZ7JwKpH_nqw-QSjaTjei');
+            sender.send(message, { registrationTokens: registrationTokens }, function (err, response) {
+              if(err) console.error(err);
+              else    console.log(response);
             });
         });
     });
