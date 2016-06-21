@@ -151,21 +151,42 @@ module.exports.createMessage = function (req, res) {
                 success_message: 'message created'
             });
             
-            
-            /*var message = new gcm.Message({
-                data: {
-                    chat_id: req.params.chat_id
-                },
-                notification: {
-                    title: "Neue Nachricht",
-                    body: req.params.chat_id
+            Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
+                if(err) {
+                    console.error(err);
+                    return;
                 }
+                var receiver_user_id;
+                if(result.owner_user_id == req.params.user_id) {
+                    receiver_user_id = result.partner_user_id;
+                } else if(result.partner_user_id == req.params.user_id) {
+                    receiver_user_id = result.owner_user_id;
+                }
+                Users.findById(receiver_user_id, 'token', function(err, result) {
+                    if(err) {
+                        console.error(err);
+                        return;
+                    }
+                    if(result.token) {
+                        console.log(result.token);
+                        var message = new gcm.Message({
+                            data: {
+                                chat_id: req.params.chat_id
+                            },
+                            notification: {
+                                title: "DTSharing",
+                                body: 'In einem deiner Chats wurde eine neue Nachricht geschrieben'
+                            }
+                        });
+                        var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                        sender.send(message, { registrationTokens: [result.token] }, function (err, response) {
+                            if(err) {
+                                console.error(err);
+                            }
+                        });
+                    }
+                });
             });
-            var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
-            sender.send(message, { registrationTokens: ['fdMB5Z8bc8I:APA91bH1SqecGsPuIvu__qhJyNNYZPO7m7Dp6hL2S6Md32Yf8yWltopW897FQBJVttdgK_kQjvyNvxSBZxJUD05rd_8tYclXmHUy8RQ_UYbEn6XGj1u6807OIPrpTncKsc8RXOBcEXGt'] }, function (err, response) {
-              if(err) console.error(err);
-              else    console.log(response);
-            });*/
         });
     });
 }
