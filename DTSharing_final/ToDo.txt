@@ -1,7 +1,8 @@
 must have:
 Chat
 Suchagenten => Deleten von Fahrten des Users bei Put
-Umkreissuche
+Bewerten
+Umkreissuche //Done
 Verlauf //Done
 
 Prozessassesment

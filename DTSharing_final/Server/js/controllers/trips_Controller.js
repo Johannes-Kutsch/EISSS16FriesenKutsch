@@ -80,12 +80,13 @@ module.exports.findTrips = function (req, res) {
 
     function findStationID(station_name, callback) {
         var regex_query = [new RegExp(station_name, 'i')];
-        Stops.findOne({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, result) {
+        Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, results) {
+            console.log(results);
             if(err) {
                 return callback(err);
-            } else if(result) {
-                console.log('Station ID für ' + station_name + ' ist ' + result.stop_id);
-                callback(err, result);
+            } else if(results.length == 1) {
+                console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
+                callback(err, results[0]);
             } else {
                 var station_name_fragments = station_name.split(' ');
                 station_name_fragments.forEach(function(result) {
