@@ -1,4 +1,5 @@
 var Users = require('../models/users'),
+    Chats = require('../models/chats'),
     Dt_trips = require('../models/dt_trips'),
     async = require('async'),
     mongoose = require('mongoose');
@@ -43,35 +44,54 @@ module.exports.offer = function (req, res) {
 
 
 module.exports.match = function (req,res) {
-    Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
-        partner_user_id: req.body.user_id,
-        partner_departure_time: req.body.departure_time,
-        partner_arrival_time: req.body.arrival_time,
-        partner_sequence_id_target_station: req.body.sequence_id_target_station,
-        partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
-        partner_departure_station_name: req.body.departure_station_name,
-        partner_target_station_name: req.body.target_station_name
-    }, function (err, result) {
-        if(err) {
-            res.status(500);
-            res.send({
-                error_message: 'Database Error'
+    //DT_trips.remove({$or:[{owner_user_id : req.params.user_id},{partner_user_id : req.params.user_id}]}, function (err, results) {
+        Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
+            partner_user_id: req.body.user_id,
+            partner_departure_time: req.body.departure_time,
+            partner_arrival_time: req.body.arrival_time,
+            partner_sequence_id_target_station: req.body.sequence_id_target_station,
+            partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
+            partner_departure_station_name: req.body.departure_station_name,
+            partner_target_station_name: req.body.target_station_name
+        }, function (err, result) {
+            console.log(result);
+            if(err) {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            if(!result) {
+                console.log('Trip not found | 404');
+                res.status(404);
+                res.send({
+                    error_message: 'Trip not found'
+                });
+                return;
+            }
+            var chat = new Chats({
+                owner_user_id: result.owner_user_id,
+                partner_user_id: req.body.user_id,
+                dt_trip_id: result._id,
+                key: null
             });
-            console.error(err);
-            return;
-        }
-        if(!result) {
-            console.log('Trip not found | 404');
-            res.status(404);
-            res.send({
-                error_message: 'Trip not found'
+            chat.save(function (err, result) {
+                if(err) {
+                    res.status(500);
+                    res.send({
+                        error_message: 'Database Error'
+                    });
+                    console.error(err);
+                    return;
+                }
+                res.send({
+                    success_message: 'successfully matched'
+                });
             });
-            return;
-        }
-        res.send({
-            success_message: 'successfully matched'
         });
-    });
+    //}
 }
 
 module.exports.findDtTrips = function (req, res) {

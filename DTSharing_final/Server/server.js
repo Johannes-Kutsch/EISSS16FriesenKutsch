@@ -28,7 +28,7 @@ app.get('/stops', stops_Controller.findStops);
 
 
 //Login
-//Querry: email, pass
+//Querry: email, pass, token
 app.post('/sessions', sessions_Controller.login);
 
 
@@ -74,7 +74,7 @@ app.delete('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.removeDtT
 
 //Chat
 //URI: User ID des Nutzers der den Chatraum erstellt
-//Body: partner_user_id, key
+//Body: partner_user_id, key, dt_trip_id
 app.post('/users/:user_id/chats', chats_Controller.createChat);
 
 //Uri: User ID des Nutzers

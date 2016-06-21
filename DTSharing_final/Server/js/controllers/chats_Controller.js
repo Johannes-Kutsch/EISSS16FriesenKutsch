@@ -1,4 +1,6 @@
 var Chats = require('../models/chats'),
+    Users = require('../models/users'),
+    Dt_trips = require('../models/dt_trips'),
     Messages = require('../models/messages'),
     async = require('async'),
     utils = require('../lib/utils'),
@@ -9,6 +11,7 @@ module.exports.createChat = function (req, res) {
     var chat = new Chats({
         owner_user_id: req.params.user_id,
         partner_user_id: req.body.partner_user_id,
+        dt_trip_id: req.body.dt_trip_id,
         key: req.body.key
     });
     chat.save(function (err, result) {
@@ -28,7 +31,7 @@ module.exports.createChat = function (req, res) {
 }
 
 module.exports.findChats = function (req, res) {
-    Chats.find( {$or: [{owner_user_id : req.query.user_id}, {partner_user_id : req.query.user_id}]}, '-__v -key', function (err, results) {
+    Chats.find( {$or: [{owner_user_id : req.params.user_id}, {partner_user_id : req.params.user_id}]}, '-__v -key', function (err, results) {
         if(err) {
             res.status(500);
             res.send({
@@ -45,7 +48,67 @@ module.exports.findChats = function (req, res) {
             });
             return;
         }
-        res.json(results);
+        var chats = [];
+        async.each(results, function(result, callback) {
+            async.parallel([
+                function(callback) {
+                    Dt_trips.findById(result.dt_trip_id, function(err, result) {
+                        callback(err, result);
+                    });
+                }, function(callback) {
+                    if(req.params.user_id == result.owner_user_id) {
+                        Users.findById(result.partner_user_id, function(err, result) {
+                            callback(err, result);
+                        });
+                    } else if (req.params.user_id == result.partner_user_id) {
+                        Users.findById(result.owner_user_id, function(err, result) {
+                            callback(err, result);
+                        });
+                    }
+                }, function(callback) {
+                    Messages.findOne({chat_id : req.params.chat_id}, 'sequence message_text', {sort:{sequence:-1}},function(err, result) {
+                        if(err) {
+                            callback(err);
+                        } else if (result) {
+                            callback(null, result.message_text);
+                        } else {
+                            callback(null, null);
+                        }
+                    });
+                }
+            ],function(err, results) {
+                if(err) {
+                    return callback(err);
+                }
+                var chat = {
+                    _id : result._id,
+                    date : results[0].date,
+                    first_name : results[1].first_name,
+                    last_name : results[1].last_name,
+                    last_message : results[2]
+                }
+                if(req.params.user_id == results[0].partner_user_id) {
+                    chat.departure_station_name = results[0].partner_departure_station_name;
+                    chat.target_station_name = results[0].partner_target_station_name;
+                } else if(req.params.user_id == results[0].owner_user_id) {
+                    chat.departure_station_name = results[0].owner_departure_station_name;
+                    chat.target_station_name = results[0].owner_target_station_name;
+                }
+                chats.push(chat);
+                callback(null);
+            });
+        },function(err) {
+            if(err) {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            res.json(chats);
+        });
+        
     });
 }
 
@@ -86,23 +149,22 @@ module.exports.createMessage = function (req, res) {
             res.send({
                 success_message: 'message created'
             });
-            var message = new gcm.Message({
+            
+            
+            /*var message = new gcm.Message({
                 data: {
-                    key1: 'message1',
-                    key2: 'message2'
+                    chat_id: req.params.chat_id
                 },
                 notification: {
-                    title: "Neuer Mitfahrer gefunden",
-                    body: "Es wurde blablubbla ok lol iksdeh"
+                    title: "Neue Nachricht",
+                    body: req.params.chat_id
                 }
             });
             var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
-            var registrationTokens = [];
-            registrationTokens.push('e7Nqcw-M0_Q:APA91bF-4suN1sAqw5s6hT-FJJnoQeBNqf1ekyQ4uN6uEOmgQRxLFjJW6V0TkXB8UniokaAasUrka6TyvGhKAC_9yIoM2_-gKb5ko_2ISTqSY4dsYU8VxJ5qZ7JwKpH_nqw-QSjaTjei');
-            sender.send(message, { registrationTokens: registrationTokens }, function (err, response) {
+            sender.send(message, { registrationTokens: ['fdMB5Z8bc8I:APA91bH1SqecGsPuIvu__qhJyNNYZPO7m7Dp6hL2S6Md32Yf8yWltopW897FQBJVttdgK_kQjvyNvxSBZxJUD05rd_8tYclXmHUy8RQ_UYbEn6XGj1u6807OIPrpTncKsc8RXOBcEXGt'] }, function (err, response) {
               if(err) console.error(err);
               else    console.log(response);
-            });
+            });*/
         });
     });
 }

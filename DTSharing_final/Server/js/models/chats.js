@@ -4,5 +4,6 @@ var mongoose = require('mongoose');
 module.exports = mongoose.model('chats', {
     owner_user_id: String,
     partner_user_id: String,
+    dt_trip_id: String,
     key: String
 });
