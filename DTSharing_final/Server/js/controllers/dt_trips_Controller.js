@@ -54,7 +54,6 @@ module.exports.match = function (req,res) {
             partner_departure_station_name: req.body.departure_station_name,
             partner_target_station_name: req.body.target_station_name
         }, function (err, result) {
-            console.log(result);
             if(err) {
                 res.status(500);
                 res.send({
@@ -87,7 +86,8 @@ module.exports.match = function (req,res) {
                     return;
                 }
                 res.send({
-                    success_message: 'successfully matched'
+                    success_message: 'successfully matched',
+                    chat_id: result._id
                 });
             });
         });
