@@ -60,7 +60,7 @@ module.exports.findTrips = function (req, res) {
         console.log('Es wurden ' + [end_time - total_start_time] + ' MS gebraucht um ' + unique_trips.length + ' Verbindungen zu ermitteln!');
         if(!unique_trips.length) {
             res.send({
-                error_message: 'Es wurde keine direckte Verbindung zwischen ' + req.query.departure_station_name + ' und ' + req.query.target_station_name + ' gefunden.'
+                error_message: 'Es wurde keine direkte Verbindung zwischen ' + req.query.departure_station_name + ' und ' + req.query.target_station_name + ' gefunden.'
             });
             console.error(err);
             return;
@@ -148,7 +148,7 @@ module.exports.findTrips = function (req, res) {
                         });
                     });
                     if(connecting_routes.length == 0) {
-                        return callback(new customError('200','Es konnte keine direckte Verbindung von '+ stops[0].stop_name + ' nach ' + stops[1].stop_name +' gefunden werden.'));
+                        return callback(new customError('200','Es wurde keine direkte Verbindung von '+ stops[0].stop_name + ' nach ' + stops[1].stop_name +' gefunden.'));
                     }
                     var end_time = (new Date()).getTime(); 
                     console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um die RouteIDs welche von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' fahren zu ermitteln: ' + connecting_routes);
