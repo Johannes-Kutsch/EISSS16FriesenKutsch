@@ -65,7 +65,7 @@ app.get('/users/:user_id/dt_trips', dt_trips_Controller.findDtTrips);
 app.get('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.findDtTrip);
 
 //URI: user_id des Benutzers der die Fahrt anbietet, dt_trip_id des Trips
-//Boddy: user_id,sequence_id_target_station,sequence_id_departure_station,destination_station_name,target_station_name
+//Boddy: user_id,sequence_id_target_station,sequence_id_departure_station,destination_station_name,target_station_name, key
 app.put('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.match);
 
 //URI: user_id des Benutzers, dt_trip_id des Trips (löscht gesamten Tripp wenn "Eigentümer" ausführt, nur den Partner wenn er ausführt)

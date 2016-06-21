@@ -74,7 +74,7 @@ module.exports.match = function (req,res) {
                 owner_user_id: result.owner_user_id,
                 partner_user_id: req.body.user_id,
                 dt_trip_id: result._id,
-                key: null
+                key: req.body.key
             });
             chat.save(function (err, result) {
                 if(err) {
