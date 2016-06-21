@@ -2,6 +2,7 @@ var Users = require('../models/users'),
     Chats = require('../models/chats'),
     Dt_trips = require('../models/dt_trips'),
     async = require('async'),
+    gcm = require('node-gcm'),
     mongoose = require('mongoose');
  
 module.exports.offer = function (req, res) {
@@ -39,21 +40,104 @@ module.exports.offer = function (req, res) {
         res.send({
             success_message: 'Offer sucessfull'
         });
+        var query;
+        if(req.body.has_season_ticket == 'true') {
+            query = {
+                owner_user_id : {$ne: req.params.user_id},
+                unique_trip_id : req.body.unique_trip_id, 
+                has_season_ticket : false, 
+                owner_sequence_id_departure_station : {$gte: req.body.sequence_id_departure_station}, 
+                owner_sequence_id_target_station : {$lte: req.body.sequence_id_target_station},
+                partner_user_id : null
+            }
+        } else {
+            query = {
+                owner_user_id : {$ne: req.params.user_id},
+                unique_trip_id : req.body.unique_trip_id, 
+                has_season_ticket : true, 
+                owner_sequence_id_departure_station : {$lte: req.body.sequence_id_departure_station}, 
+                owner_sequence_id_target_station : {$gte: req.body.sequence_id_target_station},
+                partner_user_id : null
+            }
+        }
+        console.log(query);
+        Dt_trips.find(query, '_id owner_user_id has_season_ticket sequence_id_departure_station sequence_id_target_station', function (err, results) {
+            console.log(results);
+            async.each(results, function(result, callback) {
+                Users.findById(result.owner_user_id, 'token', function(err, result) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    console.log(result);
+                    if(result.token) {
+                        var body;
+                        if(result.has_season_ticket == 'true') {
+                            body = 'Es gibt einen neuen potentiellen Mitfahrer für einen deiner Trips'
+                        } else {
+                            body = 'Es gibt eine neue potentielle Mitfahrgelegenheit für einen deiner Trips'
+                        }
+                        var message = new gcm.Message({
+                            data: {
+                                type: 'search_agent',
+                                unique_trip_id: req.body.unique_trip_id,
+                                sequence_id_departure_station: result.sequence_id_departure_station,
+                                sequence_id_target_station: result.sequence_id_target_station,
+                                user_id: result.owner_user_id,
+                                has_season_ticket: result.has_season_ticket
+                            },
+                            notification: {
+                                title: 'DTSharing - Suchagent',
+                                body: body
+                            }
+                        });
+                        var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                        sender.send(message, { registrationTokens: [result.token] }, function (err, response) {
+                            if(err) {
+                                console.error(err);
+                            }
+                        });
+                    }
+                });
+            });
+        });
     });
 }
 
 
 module.exports.match = function (req,res) {
-    //DT_trips.remove({$or:[{owner_user_id : req.params.user_id},{partner_user_id : req.params.user_id}]}, function (err, results) {
-        Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
+    Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
+        partner_user_id: req.body.user_id,
+        partner_departure_time: req.body.departure_time,
+        partner_arrival_time: req.body.arrival_time,
+        partner_sequence_id_target_station: req.body.sequence_id_target_station,
+        partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
+        partner_departure_station_name: req.body.departure_station_name,
+        partner_target_station_name: req.body.target_station_name
+    }, function (err, result) {
+        if(err) {
+            res.status(500);
+            res.send({
+                error_message: 'Database Error'
+            });
+            console.error(err);
+            return;
+        }
+        if(!result) {
+            console.log('Trip not found | 404');
+            res.status(404);
+            res.send({
+                error_message: 'Trip not found'
+            });
+            return;
+        }
+        var chat = new Chats({
+            owner_user_id: result.owner_user_id,
             partner_user_id: req.body.user_id,
-            partner_departure_time: req.body.departure_time,
-            partner_arrival_time: req.body.arrival_time,
-            partner_sequence_id_target_station: req.body.sequence_id_target_station,
-            partner_sequence_id_departure_station: req.body.sequence_id_departure_station,
-            partner_departure_station_name: req.body.departure_station_name,
-            partner_target_station_name: req.body.target_station_name
-        }, function (err, result) {
+            dt_trip_id: result._id,
+            key: req.body.key
+        });
+        chat.save(function (err, result) {
             if(err) {
                 res.status(500);
                 res.send({
@@ -62,36 +146,12 @@ module.exports.match = function (req,res) {
                 console.error(err);
                 return;
             }
-            if(!result) {
-                console.log('Trip not found | 404');
-                res.status(404);
-                res.send({
-                    error_message: 'Trip not found'
-                });
-                return;
-            }
-            var chat = new Chats({
-                owner_user_id: result.owner_user_id,
-                partner_user_id: req.body.user_id,
-                dt_trip_id: result._id,
-                key: req.body.key
-            });
-            chat.save(function (err, result) {
-                if(err) {
-                    res.status(500);
-                    res.send({
-                        error_message: 'Database Error'
-                    });
-                    console.error(err);
-                    return;
-                }
-                res.send({
-                    success_message: 'successfully matched',
-                    chat_id: result._id
-                });
+            res.send({
+                success_message: 'successfully matched',
+                chat_id: result._id
             });
         });
-    //}
+    });
 }
 
 module.exports.findDtTrips = function (req, res) {

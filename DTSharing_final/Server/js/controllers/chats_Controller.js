@@ -168,14 +168,14 @@ module.exports.createMessage = function (req, res) {
                         return;
                     }
                     if(result.token) {
-                        console.log(result.token);
                         var message = new gcm.Message({
                             data: {
+                                tape: 'chat_message',
                                 chat_id: req.params.chat_id
                             },
                             notification: {
-                                title: "DTSharing",
-                                body: 'In einem deiner Chats wurde eine neue Nachricht geschrieben'
+                                title: 'DTSharing - Chat',
+                                body: 'Einer deiner Mitfahrer hat dir etwas geschrieben.'
                             }
                         });
                         var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
@@ -260,7 +260,7 @@ module.exports.findKey = function (req, res) {
             return;
         }
         if(!result) {
-            console.log('No (new) Messages | 404');
+            console.log('No Key | 404');
             res.status(404);
             res.send({
                 error_message: 'No Key'
