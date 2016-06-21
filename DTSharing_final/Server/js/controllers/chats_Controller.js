@@ -192,6 +192,38 @@ module.exports.findMessages = function (req, res) {
             });
             return;
         }
-        res.json(results);
+        var messages = [];
+        async.each(results, function(result, callback) {
+            var message = {
+                author_id : result.author_id,
+                sequence : result.sequence,
+                message_text : result.message_text,
+                time : result.time,
+                date : result.date
+            }
+            Users.findById(result.author_id, 'first_name last_name', function(err, result) {
+                if(err) {
+                    return callback(err);
+                }
+                message.first_name = result.first_name;
+                message.last_name = result.last_name;
+                messages.push(message);
+                callback(null);
+            });
+        }, function (err) {
+            if(err) {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            messages.sort(
+                function (a, b) {
+                    return parseFloat(a.sequence) - parseFloat(b.sequence);
+            });
+            res.json(messages);
+        });
     });
 }
