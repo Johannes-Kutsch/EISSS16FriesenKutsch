@@ -248,3 +248,25 @@ module.exports.findMessages = function (req, res) {
         });
     });
 }
+
+module.exports.findKey = function (req, res) {
+    Chats.findById(req.params.chat_id, '-_id key', function(err, result) {
+        if(err) {
+            res.status(500);
+            res.send({
+                error_message: 'Database Error'
+            });
+            console.error(err);
+            return;
+        }
+        if(!result) {
+            console.log('No (new) Messages | 404');
+            res.status(404);
+            res.send({
+                error_message: 'No Key'
+            });
+            return;
+        }
+        res.send(result);
+    });
+}
