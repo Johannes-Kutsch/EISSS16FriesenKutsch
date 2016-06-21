@@ -52,12 +52,12 @@ module.exports.findChats = function (req, res) {
         async.each(results, function(result, callback) {
             async.parallel([
                 function(callback) {
-                    Dt_trips.findById(result.dt_trip_id, function(err, result) {
+                    Dt_trips.findById(result.dt_trip_id, 'date partner_user_id partner_departure_station_name partner_target_station_name owner_user_id owner_departure_station_name owner_target_station_name', function(err, result) {
                         callback(err, result);
                     });
                 }, function(callback) {
                     if(req.params.user_id == result.owner_user_id) {
-                        Users.findById(result.partner_user_id, function(err, result) {
+                        Users.findById(result.partner_user_id, 'first_name last_name picture', function(err, result) {
                             callback(err, result);
                         });
                     } else if (req.params.user_id == result.partner_user_id) {
@@ -85,6 +85,7 @@ module.exports.findChats = function (req, res) {
                     date : results[0].date,
                     first_name : results[1].first_name,
                     last_name : results[1].last_name,
+                    picture : results[1].picture,
                     last_message : results[2]
                 }
                 if(req.params.user_id == results[0].partner_user_id) {
