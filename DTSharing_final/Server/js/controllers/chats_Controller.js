@@ -196,7 +196,7 @@ module.exports.findMessages = function (req, res) {
         function(callback) {
             var query = {chat_id : req.params.chat_id};
             if(req.query.sequence) {
-                query.sequence = {$gt : req.query.sequence};
+                query.sequence = {$gte : req.query.sequence};
             }
             Messages.find(query, '-__v -_id -chat_id', {sort:{sequence:1}},function(err, results) {
                 if (err) {
