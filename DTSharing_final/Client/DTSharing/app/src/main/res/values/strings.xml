@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">DTSharing</string>
-    <!-- Heimnetz: 192.168.0.15   Emulator: 10.0.2.2-->
-    <string name="base_url">http://192.168.2.103:3000</string>
+    <!-- Thomas: 192.168.0.15   Emulator: 10.0.2.2    Johannes: 192.168.2.103-->
+    <string name="base_url">http://192.168.0.15:3000</string>
 
     <string name="notEmpty">Darf nicht leer sein</string>
 

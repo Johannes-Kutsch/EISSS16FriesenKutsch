@@ -71,14 +71,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Thread myThread2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new MyFirebaseInstanceIDService().onTokenRefresh();
-            }
-        });
-        myThread2.start();
-
         prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
 
         new SharedPrefsManager(getApplicationContext()).setLoggedOutSharedPrefs();
@@ -236,6 +228,25 @@ public class LoginActivity extends AppCompatActivity {
     public class MyStationStatusReceiver extends BroadcastReceiver {
 
         public static final String STATUS_RESPONSE = "de.dtsharing.dtsharing.intent.action.STATUS_RESPONSE";
+
+        public boolean isRegistered;
+
+        /*http://stackoverflow.com/a/29836639
+        * Da es keine andere Möglichkeit gibt zu überprüfen ob der receiver registriert ist
+        * und einen unregistrierten Receiver zu entfernen eine FATAL EXCEPTION wirft*/
+        public Intent register(Context context, IntentFilter filter) {
+            isRegistered = true;
+            return context.registerReceiver(this, filter);
+        }
+
+        public boolean unregister(Context context) {
+            if (isRegistered) {
+                context.unregisterReceiver(this);
+                isRegistered = false;
+                return true;
+            }
+            return false;
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {

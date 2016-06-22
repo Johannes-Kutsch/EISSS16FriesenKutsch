@@ -67,6 +67,12 @@ public class MatchingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
+        /*Erfassen der Views mit denen interagiert werden soll*/
+        lvMatches = (ListView) findViewById(R.id.lvMatches);
+        bSubmit = (Button) findViewById(R.id.bSubmit);
+        cvContainer = (CardView) findViewById(R.id.cvContainer);
+        tvNoMatch = (TextView) findViewById(R.id.tvNoMatch);
+
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -78,8 +84,9 @@ public class MatchingActivity extends AppCompatActivity {
         }
 
         /*Sichere die Empfangenen Daten in Variablen*/
-        Intent tripsIntent = getIntent();
-        if (tripsIntent != null) {
+
+        if(getIntent().getBooleanExtra("comesFromTrips", false)) {
+            Intent tripsIntent = getIntent();
             tripData.put("hasTicket", tripsIntent.getBooleanExtra("hasTicket", false));
             tripData.put("uniqueTripId", tripsIntent.getStringExtra("uniqueTripId"));
             tripData.put("tripId", tripsIntent.getStringExtra("tripId"));
@@ -92,17 +99,19 @@ public class MatchingActivity extends AppCompatActivity {
             tripData.put("departureSequenceId", tripsIntent.getIntExtra("departureSequenceId", 0));
             tripData.put("targetSequenceId", tripsIntent.getIntExtra("targetSequenceId", 0));
         }
+        if(getIntent().getBooleanExtra("comesFromNotification", false)){
+            Intent notificationIntent = getIntent();
+            tripData.put("uniqueTripId", notificationIntent.getStringExtra("uniqueTripId"));
+            tripData.put("hasTicket", notificationIntent.getBooleanExtra("hasSeasonTicket", false));
+            tripData.put("departureSequenceId", notificationIntent.getIntExtra("sequenceIdDepartureStation", 0));
+            tripData.put("targetSequenceId", notificationIntent.getIntExtra("sequenceIdTargetStation", 0));
+            bSubmit.setVisibility(View.GONE);
+        }
 
 
         if (mTitle != null) {
             mTitle.setText(tripData.getAsBoolean("hasTicket") ? "Mitfahrgelegenheit Suchende" : "Mitfahrgelegenheiten");
         }
-
-        /*Erfassen der Views mit denen interagiert werden soll*/
-        lvMatches = (ListView) findViewById(R.id.lvMatches);
-        bSubmit = (Button) findViewById(R.id.bSubmit);
-        cvContainer = (CardView) findViewById(R.id.cvContainer);
-        tvNoMatch = (TextView) findViewById(R.id.tvNoMatch);
 
         role = tripData.getAsBoolean("hasTicket") ? "Anbietend" : "Suchend";
         bSubmit.setText("ALS "+role.toUpperCase()+" EINTRAGEN");

@@ -22,7 +22,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         //It is optional
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
-        Log.d(TAG, "Notification Message Body: " + remoteMessage);
+        Log.d(TAG, "Notification Message Body: " + remoteMessage.getData().toString());
+
+        if (remoteMessage.getData() != null) {
+            if(remoteMessage.getData().get("type").equals("chat_message")) {
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction("newMessage");
+                broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                broadcastIntent.putExtra("chatId", remoteMessage.getData().get("chat_id"));
+                broadcastIntent.putExtra("messageId", remoteMessage.getData().get("message_id"));
+                sendBroadcast(broadcastIntent);
+            }
+        }
 
         //Calling method to generate notification
         sendNotification(remoteMessage);
@@ -31,20 +42,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     //This method is only generating push notification
     //It is same as we did in earlier posts
     private void sendNotification(RemoteMessage remoteMessage) {
-        Intent intent = new Intent(this, FCMTestActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("title", remoteMessage.getNotification().getTitle());
-        intent.putExtra("body", remoteMessage.getNotification().getBody());
-        intent.putExtra("tag", remoteMessage.getNotification().getTag());
-        intent.putExtra("type", remoteMessage.getMessageType());
-        intent.putExtra("collapseKey", remoteMessage.getCollapseKey());
-        intent.putExtra("data", remoteMessage.getData().toString());
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+        Intent intent = null;
+        if(remoteMessage.getData().get("type").equals("chat_message")) {
+            intent = new Intent(getApplicationContext(), ChatActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("comesFromNotification", true);
+            intent.putExtra("chatId", remoteMessage.getData().get("chat_id"));
+        }
+        if(remoteMessage.getData().get("type").equals("search_agent")) {
+            intent = new Intent(getApplicationContext(), MatchingActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("comesFromNotification", true);
+            intent.putExtra("uniqueTripId", remoteMessage.getData().get("unique_trip_id"));
+            intent.putExtra("sequenceIdDepartureStation", remoteMessage.getData().get("sequence_id_departure_station"));
+            intent.putExtra("sequenceIdTargetStation", remoteMessage.getData().get("sequence_id_target_station"));
+            intent.putExtra("hasSeasonTicket", remoteMessage.getData().get("has_season_ticket"));
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.dtsharing_icon)
                 .setContentTitle(remoteMessage.getNotification().getTitle())
                 .setContentText(remoteMessage.getNotification().getBody())
                 .setAutoCancel(true)

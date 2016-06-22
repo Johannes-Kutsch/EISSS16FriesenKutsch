@@ -1,5 +1,7 @@
 package de.dtsharing.dtsharing;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -19,17 +21,17 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
         //Displaying token on logcat
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-        setToken(refreshedToken);
+
+        if (refreshedToken != null) {
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction("OnTokenRefresh");
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra("token", refreshedToken);
+            sendBroadcast(broadcastIntent);
+        }
 
     }
 
-    private void setToken(String token){
-        this.token = token;
-    }
-
-    public String getToken(){
-        return this.token;
-    }
     private void sendRegistrationToServer(String token) {
         //You can implement this method to store the token on your server
         //Not required for current project

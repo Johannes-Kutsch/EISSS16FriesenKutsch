@@ -27,8 +27,9 @@ public class FahrtenDetailActivity extends AppCompatActivity {
     CoordinatorLayout _main_content;
     TableRow _tableRowDeparture2, _tableRowTarget1, _tableRowSpace2, _tableRowSpace3;
     TextView _departureTime1, _departureTime2, _arrivalTime1, _arrivalTime2, _departureStationName1, _departureStationName2,
-            _targetStationName1, _targetStationName2, _departureUserName1, _departureUserName2,_targetUserName1, _targetUserName2;
-    String userId, dtTripId, date, routeName;
+            _targetStationName1, _targetStationName2, _departureUserName1, _departureUserName2,_targetUserName1, _targetUserName2,
+            mTitle;
+    String userId, dtTripId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,9 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
+        mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
+
+        userId = new SharedPrefsManager(FahrtenDetailActivity.this).getUserIdSharedPrefs();
 
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -71,13 +74,9 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
         Intent mainIntent = getIntent();
         if(mainIntent != null){
-            userId = mainIntent.getStringExtra("userId");
             dtTripId = mainIntent.getStringExtra("dtTripId");
-            date = mainIntent.getStringExtra("date");
-            routeName = mainIntent.getStringExtra("routeName");
         }
 
-        mTitle.setText(routeName+" - "+date);
         getTripData(userId, dtTripId);
     }
 
@@ -100,6 +99,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
                             partner = response.getJSONObject("partner");
 
                     Log.d("FahrtenDetailActivity", "trip: "+trip.toString()+"\nuser: "+user.toString()+"\npartner: "+partner.toString());
+                    mTitle.setText(trip.getString("route_name")+" - "+trip.getString("date"));
 
                     if(!partner.getString("sequence_id_departure_station").equals("null")){
 
@@ -169,7 +169,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
                         _tableRowTarget1.setVisibility(View.GONE);
                         _tableRowSpace3.setVisibility(View.GONE);
-                        _targetUserName2.setText(user.getString("first_name")+" steigt ein");
+                        _targetUserName2.setText(user.getString("first_name")+" steigt aus");
                         _targetStationName2.setText(user.getString("target_station_name"));
                         _arrivalTime2.setText(user.getString("arrival_time"));
 

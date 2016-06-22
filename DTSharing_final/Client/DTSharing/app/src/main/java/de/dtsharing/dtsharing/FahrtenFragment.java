@@ -46,7 +46,7 @@ public class FahrtenFragment extends Fragment {
     private ArrayList<FahrtenEntry> fahrten = new ArrayList<>();
     public FahrtenAdapter mAdapter;
 
-    String userId;
+    private String userId;
 
     public FahrtenFragment() {
         // Required empty public constructor

@@ -40,7 +40,7 @@
             android:textSize="12sp"
             android:textColor="@color/grey"/>
 
-        <RelativeLayout
+        <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rlTransitContainer"
@@ -48,29 +48,30 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:id="@+id/tvDeparture"
+                android:text="Gummersbach, Bernberg Hesselbach Abzw."
+                android:textSize="12sp"
+                android:textColor="#000000"
+                android:maxEms="10"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvArrow"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:text="➔"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvTarget"
                 android:text="Gummersbach Bf"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:id="@+id/tvArrow"
-                android:textColor="@color/colorPrimary"
-                android:text="➔"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:id="@+id/tvTarget"
-                android:text="Köln Hbf"
-                android:textSize="12sp"
-                android:textColor="#000000"/>
-        </RelativeLayout>
+                android:textColor="#000000"
+                android:maxEms="10" />
+        </TableRow>
 
         <TextView
             android:layout_width="wrap_content"
@@ -80,7 +81,8 @@
             android:id="@+id/tvMessage"
             android:text="Bist du gerade an mir vorbei gefahren? :)"
             android:textSize="12sp"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey"
+            android:singleLine="true"/>
     </RelativeLayout>
 
 </RelativeLayout>

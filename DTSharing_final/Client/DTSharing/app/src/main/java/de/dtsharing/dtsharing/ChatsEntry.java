@@ -1,41 +1,48 @@
 package de.dtsharing.dtsharing;
 
+import android.content.ContentValues;
+
 public class ChatsEntry {
 
-    private String name, date, departure, target, message, picture;
+    ContentValues chat = new ContentValues();
 
     public ChatsEntry(){}
 
-    public ChatsEntry(String name, String date, String departure, String target, String message, String picture) {
-        this.name = name;
-        this.date = date;
-        this.departure = departure;
-        this.target = target;
-        this.message = message;
-        this.picture = picture;
+    public ChatsEntry(ContentValues chat) {
+        this.chat.put("chatId", chat.getAsString("chatId"));
+        this.chat.put("name", chat.getAsString("firstName")+" "+chat.getAsString("lastName"));
+        this.chat.put("date", chat.getAsString("date"));
+        this.chat.put("departureStationName", chat.getAsString("departureStationName"));
+        this.chat.put("targetStationName", chat.getAsString("targetStationName"));
+        this.chat.put("lastMessage", chat.getAsString("lastMessage"));
+        this.chat.put("picture", chat.getAsString("picture"));
+    }
+
+    public String getChatId(){
+        return chat.getAsString("chatId");
     }
 
     public String getName(){
-        return name;
+        return chat.getAsString("name");
     }
 
     public String getDate(){
-        return date;
+        return chat.getAsString("date");
     }
 
-    public String getDeparture(){
-        return departure;
+    public String getDepartureStationName(){
+        return chat.getAsString("departureStationName");
     }
 
-    public String getTarget(){
-        return target;
+    public String getTargetStationName(){
+        return chat.getAsString("targetStationName");
     }
 
     public String getMessage(){
-        return message;
+        return chat.getAsString("lastMessage");
     }
 
     public String getPicture(){
-        return picture;
+        return chat.getAsString("picture");
     }
 }

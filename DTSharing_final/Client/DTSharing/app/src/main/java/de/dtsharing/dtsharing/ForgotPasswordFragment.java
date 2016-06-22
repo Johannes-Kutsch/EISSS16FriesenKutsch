@@ -37,7 +37,7 @@ public class ForgotPasswordFragment extends Fragment {
         _submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String mail = _mail.getText().toString();
+                final String mail = _mail.getText().toString().trim();
                 if (!LoginFragment.isValidEmail(mail)){
                     _mail.setError("Keine gültige E-Mail Adresse");
                 }else{

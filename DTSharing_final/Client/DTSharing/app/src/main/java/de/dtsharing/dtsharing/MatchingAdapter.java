@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -26,9 +27,14 @@ import android.widget.TextView;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +44,7 @@ public class MatchingAdapter extends BaseAdapter{
     private ArrayList<MatchingEntry> matches;
     private ContentValues enteredTripDetails;
     private Context context_1;
+    private AesCbcWithIntegrity.SecretKeys key;
 
     public class ViewHolder {
         public TextView userName, departureTime, departureName, targetTime, targetName;
@@ -145,7 +152,14 @@ public class MatchingAdapter extends BaseAdapter{
 
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        commitMatch(matchesEntry);
+
+                        try {
+                            key = AesCbcWithIntegrity.generateKey();
+                        } catch (GeneralSecurityException e) {
+                            e.printStackTrace();
+                        }
+
+                        commitMatch(matchesEntry, AesCbcWithIntegrity.keyString(key));
                     }
 
                 });
@@ -158,23 +172,52 @@ public class MatchingAdapter extends BaseAdapter{
         return convertView;
     }
 
-    private void commitMatch(final MatchingEntry matchData){
-
+    private void commitMatch(final MatchingEntry matchData, final String key){
+        
         String base_url = context_1.getResources().getString(R.string.base_url);
         String url = base_url+"/users/"+matchData.getOwnerUserId()+"/dt_trips/"+matchData.getDtTripId();
-
+        final String userID = new SharedPrefsManager(context_1).getUserIdSharedPrefs();
 
         StringRequest postRequest = new StringRequest(Request.Method.PUT, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(response.contains("success")){
-                            Intent mainIntent = new Intent(context_1, MainActivity.class);
-                            mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                            mainIntent.putExtra("matching_success", true);
-                            mainIntent.putExtra("matchName", matchData.getUserName());
-                            context_1.startActivity(mainIntent);
+
+                        try {
+
+                            JSONObject jsonObject = new JSONObject(response);
+
+                            if(jsonObject.has("success_message")) {
+
+                                String chatID = "";
+                                try {
+                                    chatID = jsonObject.getString("chat_id");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                SQLiteDatabase db;
+                                db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+
+                                ContentValues values = new ContentValues();
+                                values.put("chat_id", chatID);
+                                values.put("key", key);
+
+                                db.insert("chats", null, values);
+                                db.close();
+
+                                Intent mainIntent = new Intent(context_1, MainActivity.class);
+                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                mainIntent.putExtra("matching_success", true);
+                                mainIntent.putExtra("matchName", matchData.getUserName());
+                                context_1.startActivity(mainIntent);
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
                     }
                 }, new Response.ErrorListener() {
 
@@ -192,13 +235,14 @@ public class MatchingAdapter extends BaseAdapter{
                 Map<String, String> params = new HashMap<>();
                 // the POST parameters:
                 //params.put("interests", _interests.getText().toString());
-                params.put("user_id", new SharedPrefsManager(context_1).getUserIdSharedPrefs());
+                params.put("user_id", userID);
                 params.put("departure_time", enteredTripDetails.getAsString("departureTime"));
                 params.put("arrival_time", enteredTripDetails.getAsString("arrivalTime"));
                 params.put("sequence_id_departure_station", enteredTripDetails.getAsString("departureSequenceId"));
                 params.put("sequence_id_target_station", enteredTripDetails.getAsString("targetSequenceId"));
                 params.put("departure_station_name", enteredTripDetails.getAsString("departureName"));
                 params.put("target_station_name", enteredTripDetails.getAsString("targetName"));
+                params.put("key", key);
                 Log.d("MatchingAdapter", "Params: "+params);
                 return params;
             }

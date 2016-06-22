@@ -3,6 +3,7 @@
     <color name="white">#fff</color>
     <color name="black">#000</color>
     <color name="colorPrimaryLight">#e57373</color>
+    <color name="chatBubbleUser">#fbe9e7</color>
     <color name="colorPrimary">#e06666</color>
     <color name="colorPrimaryDark">#c45858</color>
     <color name="colorAccent">#c45858</color>

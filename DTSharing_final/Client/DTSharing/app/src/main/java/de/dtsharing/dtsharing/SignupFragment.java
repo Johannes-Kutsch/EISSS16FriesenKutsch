@@ -98,11 +98,11 @@ public class SignupFragment extends Fragment {
                 final JSONObject data = new JSONObject();
 
                 try {
-                    data.put("mail", _mail.getText().toString());
+                    data.put("mail", _mail.getText().toString().trim());
                     data.put("password1", _password1.getText().toString());
                     data.put("password2", _password2.getText().toString());
-                    data.put("firstName", _firstName.getText().toString());
-                    data.put("lastName", _lastName.getText().toString());
+                    data.put("firstName", _firstName.getText().toString().trim());
+                    data.put("lastName", _lastName.getText().toString().trim());
                     data.put("birthYear", _birthYear.getText().toString());
                     data.put("gender", _gender.getCheckedRadioButtonId() == R.id.rbMale ? "Männlich" : "Weiblich");
                 } catch (JSONException e) {

@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(getIntent().getBooleanExtra("matching_success", false)){
 
-            viewPager.setCurrentItem(2, true);
+            viewPager.setCurrentItem(0, true);
 
             String matchName = getIntent().getStringExtra("matchName");
 

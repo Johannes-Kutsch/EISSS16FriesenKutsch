@@ -2,11 +2,14 @@ package de.dtsharing.dtsharing;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +18,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 
 public class ChatsAdapter extends BaseAdapter{
 
     private ArrayList<ChatsEntry> chats;
     private Context context_1;
+    private AesCbcWithIntegrity.SecretKeys key;
 
     public class ViewHolder {
         public TextView name;
@@ -76,20 +83,42 @@ public class ChatsAdapter extends BaseAdapter{
 
         viewHolder.name.setText(chatsEntry.getName());
         viewHolder.date.setText(chatsEntry.getDate());
-        viewHolder.departure.setText(chatsEntry.getDeparture());
-        viewHolder.target.setText(chatsEntry.getTarget());
-        viewHolder.message.setText(chatsEntry.getMessage());
+        viewHolder.departure.setText(chatsEntry.getDepartureStationName());
+        viewHolder.target.setText(chatsEntry.getTargetStationName());
 
-        RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), decodeBase64(chatsEntry.getPicture()));
-        roundDrawable.setCircular(true);
-        viewHolder.picture.setImageDrawable(roundDrawable);
+
+        if(!chatsEntry.getMessage().equals("null")) {
+            String message = null;
+
+            SQLiteDatabase db;
+            db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+            Cursor cursor = db.rawQuery("SELECT key FROM chats WHERE chat_id=?", new String[]{chatsEntry.getChatId()});
+            if (cursor.moveToFirst()) {
+                String keystring = cursor.getString(0);
+
+                ToznyHelper toznyHelper = new ToznyHelper(keystring);
+                toznyHelper.decryptString(chatsEntry.getMessage());
+
+                viewHolder.message.setText(toznyHelper.getDecryptedString());
+
+            } else {
+                viewHolder.message.setText("");
+            }
+            cursor.close();
+            db.close();
+        } else {
+            viewHolder.message.setText("Neuer Chat");
+        }
+
+        if(chatsEntry.getPicture().equals("null")) {
+            int placeholder = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
+            viewHolder.picture.setImageResource(placeholder);
+        }else {
+            RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(context_1.getResources(), EncodeDecodeBase64.decodeBase64(chatsEntry.getPicture()));
+            roundDrawable.setCircular(true);
+            viewHolder.picture.setImageDrawable(roundDrawable);
+        }
 
         return convertView;
-    }
-
-    public static Bitmap decodeBase64(String input)
-    {
-        byte[] decodedBytes = Base64.decode(input, 0);
-        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 }

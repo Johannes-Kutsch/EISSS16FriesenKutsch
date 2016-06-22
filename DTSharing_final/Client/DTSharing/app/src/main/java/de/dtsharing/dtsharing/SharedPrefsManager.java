@@ -56,6 +56,12 @@ public class SharedPrefsManager {
         return data;
     }
 
+    public String getUserNameSharedPrefs(){
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+
+        return prefs.getString("firstName", null)+" "+prefs.getString("lastName", null);
+    }
+
     public String getUserIdSharedPrefs(){
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getString("user_id", null);

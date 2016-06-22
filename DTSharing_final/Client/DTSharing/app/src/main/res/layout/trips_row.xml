@@ -26,7 +26,7 @@
             android:layout_toRightOf="@+id/tvDepartureTime"
             android:textSize="12sp"
             android:textColor="#000000"
-            android:text="Gummersbach Bf"/>
+            android:text="Gummersbach, Bernberg Hesselbach Abzw." />
 
         <TextView
             android:id="@+id/tvDepartureDate"

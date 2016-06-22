@@ -33,10 +33,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -111,6 +113,7 @@ public class TripsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 /*Erzeuge die Matching Activity und füge Daten hinzu*/
                 Intent matchingIntent = new Intent(TripsActivity.this, MatchingActivity.class);
+                matchingIntent.putExtra("comesFromTrips", true);
                 matchingIntent.putExtra("hasTicket", hasTicket);
                 matchingIntent.putExtra("uniqueTripId", trips.get(position).getUniqueTripID());
                 matchingIntent.putExtra("tripId", trips.get(position).getTripID());
@@ -152,35 +155,43 @@ public class TripsActivity extends AppCompatActivity {
 
         trips.clear();
 
-        final JsonArrayRequest jsonRequest = new JsonArrayRequest(
-                Request.Method.GET, uri, null, new Response.Listener<JSONArray>() {
+        final StringRequest jsonRequest = new StringRequest(
+                Request.Method.GET, uri, new Response.Listener<String>() {
 
             @Override
-            public void onResponse(JSONArray response) {
-                if(response.length() == 0){
-                    Intent message = new Intent();
-                    message.putExtra("message", "Es konnten keine Verbindungen gefunden werden. Bitte überprüfe deine Eingaben.");
-                    setResult(Activity.RESULT_CANCELED, message);
-                    finish();
-                }else {
+            public void onResponse(String response) {
+                if(response.contains("error_message")){
                     try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String message = jsonResponse.getString("error_message");
+                        progressDialog.dismiss();
+                        Intent messageIntent = new Intent();
+                        messageIntent.putExtra("message", message);
+                        setResult(Activity.RESULT_CANCELED, messageIntent);
+                        finish();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        JSONArray jsonResponse = new JSONArray(response);
                         /*Fülle den Adapter mit den Station Namen*/
-                        for (int i = 0; i < response.length(); i++) {
+                        for (int i = 0; i < jsonResponse.length(); i++) {
 
-                            String tripID = response.getJSONObject(i).getString("trip_id"),
-                                    uniqueTripID = response.getJSONObject(i).getString("unique_trip_id"),
-                                    departureTime = response.getJSONObject(i).getString("departure_time"),
-                                    arrivalTime = response.getJSONObject(i).getString("arrival_time"),
-                                    departureDate = response.getJSONObject(i).getString("departure_date"),
-                                    routeName = response.getJSONObject(i).getString("route_name"),
-                                    departureName = response.getJSONObject(i).getString("departure_station_name"),
-                                    targetName = response.getJSONObject(i).getString("target_station_name");
+                            String tripID = jsonResponse.getJSONObject(i).getString("trip_id"),
+                                    uniqueTripID = jsonResponse.getJSONObject(i).getString("unique_trip_id"),
+                                    departureTime = jsonResponse.getJSONObject(i).getString("departure_time"),
+                                    arrivalTime = jsonResponse.getJSONObject(i).getString("arrival_time"),
+                                    departureDate = jsonResponse.getJSONObject(i).getString("departure_date"),
+                                    routeName = jsonResponse.getJSONObject(i).getString("route_name"),
+                                    departureName = jsonResponse.getJSONObject(i).getString("departure_station_name"),
+                                    targetName = jsonResponse.getJSONObject(i).getString("target_station_name");
 
                             String travelDuration = new CalculateTravelDuration().getHoursMinutes(departureTime, arrivalTime);
 
-                            int departureSequence = response.getJSONObject(i).getInt("sequence_id_departure_station"),
-                                    targetSequence = response.getJSONObject(i).getInt("sequence_id_target_station"),
-                                    numberMatches = response.getJSONObject(i).getInt("number_matches");
+                            int departureSequence = jsonResponse.getJSONObject(i).getInt("sequence_id_departure_station"),
+                                    targetSequence = jsonResponse.getJSONObject(i).getInt("sequence_id_target_station"),
+                                    numberMatches = jsonResponse.getJSONObject(i).getInt("number_matches");
 
                             trips.add(new TripsEntry(tripID, uniqueTripID, departureSequence, departureTime, departureDate, departureName, targetSequence, arrivalTime, targetName, travelDuration, routeName, numberMatches));
                         }

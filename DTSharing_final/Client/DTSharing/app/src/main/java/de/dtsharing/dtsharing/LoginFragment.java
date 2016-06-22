@@ -2,13 +2,16 @@ package de.dtsharing.dtsharing;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,13 +43,15 @@ public class LoginFragment extends Fragment {
 
     RelativeLayout v;
 
+    String token = null;
+
     public ProgressDialog progressDialog;
 
     Button _signin;
     TextView _forgotPassword, _signup, toolbar_title;
     EditText _mail, _password;
 
-    MyFirebaseInstanceIDService myFirebaseInstanceIDService;
+    private MyTokenReceiver receiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,9 +65,6 @@ public class LoginFragment extends Fragment {
         _signin = (Button) v.findViewById(R.id.bSignin);
         _mail = (EditText) v.findViewById(R.id.etMail);
         _password = (EditText) v.findViewById(R.id.etPassword);
-
-        myFirebaseInstanceIDService = new MyFirebaseInstanceIDService();
-        myFirebaseInstanceIDService.onTokenRefresh();
 
         _signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +86,7 @@ public class LoginFragment extends Fragment {
 
                 hideSoftKeyboard(getActivity(), view);
 
-                final String mail = _mail.getText().toString(),
+                final String mail = _mail.getText().toString().trim(),
                         password = _password.getText().toString();
 
                 if(verifyInput(mail, password)){
@@ -92,6 +94,11 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
+
+        IntentFilter filter = new IntentFilter("OnTokenRefresh");
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new MyTokenReceiver();
+        getActivity().registerReceiver(receiver, filter);
 
         return v;
 
@@ -126,6 +133,8 @@ public class LoginFragment extends Fragment {
         progressDialog.setMessage("Es wird ein Preis für deine Daten ermittelt...");
         progressDialog.show();
 
+        token = new SharedPrefsManager(v.getContext()).getFCMToken();
+
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -138,6 +147,8 @@ public class LoginFragment extends Fragment {
                                     lastName = jsonObject.getString("last_name"),
                                     more = jsonObject.getString("more"),
                                     interests = jsonObject.getString("interests");
+
+                            getActivity().unregisterReceiver(receiver);
 
                             Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
                             mainIntent.putExtra("cameFromLogin", true);
@@ -193,7 +204,7 @@ public class LoginFragment extends Fragment {
                 // the POST parameters:
                 params.put("email", mail);
                 params.put("pass", password);
-                params.put("token", myFirebaseInstanceIDService.getToken());
+                params.put("token", token);
 
                 Log.d("LoginFragment", "FCM TOKEN: "+params.toString());
 
@@ -214,8 +225,20 @@ public class LoginFragment extends Fragment {
     public final static boolean isValidEmail(CharSequence target) {
         return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
+
     public final static boolean isValidPassword(CharSequence target) {
         return !TextUtils.isEmpty(target) && target.length() >= 6;
+    }
+
+    public class MyTokenReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals("OnTokenRefresh")) {
+                token = intent.getStringExtra("token");
+                new SharedPrefsManager(v.getContext()).setFCMToken(token);
+            }
+        }
     }
 
 }
