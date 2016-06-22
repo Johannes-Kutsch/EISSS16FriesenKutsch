@@ -170,7 +170,7 @@ module.exports.createMessage = function (req, res) {
                     if(result.token) {
                         var message = new gcm.Message({
                             data: {
-                                tape: 'chat_message',
+                                type: 'chat_message',
                                 chat_id: req.params.chat_id
                             },
                             notification: {
