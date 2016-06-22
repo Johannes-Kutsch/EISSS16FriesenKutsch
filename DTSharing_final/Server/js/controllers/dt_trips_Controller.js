@@ -60,9 +60,7 @@ module.exports.offer = function (req, res) {
                 partner_user_id : null
             }
         }
-        console.log(query);
-        Dt_trips.find(query, '_id owner_user_id has_season_ticket sequence_id_departure_station sequence_id_target_station', function (err, results) {
-            console.log(results);
+        Dt_trips.find(query, '_id owner_user_id has_season_ticket owner_sequence_id_departure_station owner_sequence_id_target_station owner_departure_time owner_arrival_time owner_departure_station_name owner_target_station_name', function (err, results) {
             async.each(results, function(result, callback) {
                 Users.findById(result.owner_user_id, 'token', function(err, result) {
                     if (err) {
@@ -81,10 +79,14 @@ module.exports.offer = function (req, res) {
                             data: {
                                 type: 'search_agent',
                                 unique_trip_id: req.body.unique_trip_id,
-                                sequence_id_departure_station: result.sequence_id_departure_station,
-                                sequence_id_target_station: result.sequence_id_target_station,
+                                sequence_id_departure_station: result.owner_sequence_id_departure_station,
+                                sequence_id_target_station: result.owner_sequence_id_target_station,
                                 user_id: result.owner_user_id,
-                                has_season_ticket: result.has_season_ticket
+                                has_season_ticket: result.has_season_ticket,
+                                departure_time: result.owner_departure_time,
+                                arrival_time: result.owner_arrival_time,
+                                departure_station_name: result.owner_departure_station_name,
+                                target_station_name: result.owner_target_station_name
                             },
                             notification: {
                                 title: 'DTSharing - Suchagent',
@@ -106,6 +108,10 @@ module.exports.offer = function (req, res) {
 
 
 module.exports.match = function (req,res) {
+    // dupes löschen
+    // message an Partner
+    //type: new_partner
+//payload: dt_trip_id
     Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
         partner_user_id: req.body.user_id,
         partner_departure_time: req.body.departure_time,
@@ -308,6 +314,10 @@ module.exports.findDtTrip = function (req, res) {
 }
 
 module.exports.removeDtTrip = function (req, res) {
+    // chat löschen
+    // message an Partner
+    //type: delete
+//payload: unique_trip_id, sequence_ids, has_season_ticket
     Dt_trips.findById(req.params.dt_trip_id, '-__v', function (err, result) {
         if(err) {
             res.status(500);
