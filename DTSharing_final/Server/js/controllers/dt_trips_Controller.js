@@ -62,13 +62,12 @@ module.exports.offer = function (req, res) {
         }
         Dt_trips.find(query, '_id owner_user_id has_season_ticket owner_sequence_id_departure_station owner_sequence_id_target_station owner_departure_time owner_arrival_time owner_departure_station_name owner_target_station_name', function (err, results) {
             async.each(results, function(result, callback) {
-                Users.findById(result.owner_user_id, 'token', function(err, result) {
+                Users.findById(result.owner_user_id, 'token', function(err, user) {
                     if (err) {
                         console.error(err);
                         return;
                     }
-                    console.log(result);
-                    if(result.token) {
+                    if(user.token) {
                         var body;
                         if(result.has_season_ticket == 'true') {
                             body = 'Es gibt einen neuen potentiellen Mitfahrer für einen deiner Trips'
@@ -94,7 +93,7 @@ module.exports.offer = function (req, res) {
                             }
                         });
                         var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
-                        sender.send(message, { registrationTokens: [result.token] }, function (err, response) {
+                        sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
                             if(err) {
                                 console.error(err);
                             }
@@ -109,9 +108,6 @@ module.exports.offer = function (req, res) {
 
 module.exports.match = function (req,res) {
     // dupes löschen
-    // message an Partner
-    //type: new_partner
-//payload: dt_trip_id
     Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
         partner_user_id: req.body.user_id,
         partner_departure_time: req.body.departure_time,
@@ -155,6 +151,30 @@ module.exports.match = function (req,res) {
             res.send({
                 success_message: 'successfully matched',
                 chat_id: result._id
+            });
+            Users.findById(result.owner_user_id, 'token', function(err, result) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                if(result.token) {
+                    var message = new gcm.Message({
+                        data: {
+                            type: 'new_partner',
+                            chat_id: result._id
+                        },
+                        notification: {
+                            title: 'DTSharing - Neuer Partner gefunden',
+                            body: 'Es wurde ein Partner für eine deiner Fahrten gefunden, spreche jetzt die Fahrtdetails mit ihm ab!'
+                        }
+                    });
+                    var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                    sender.send(message, { registrationTokens: [result.token] }, function (err, response) {
+                        if(err) {
+                            console.error(err);
+                        }
+                    });
+                }
             });
         });
     });
@@ -315,9 +335,7 @@ module.exports.findDtTrip = function (req, res) {
 
 module.exports.removeDtTrip = function (req, res) {
     // chat löschen
-    // message an Partner
-    //type: delete
-//payload: unique_trip_id, sequence_ids, has_season_ticket
+    // owner ändern
     Dt_trips.findById(req.params.dt_trip_id, '-__v', function (err, result) {
         if(err) {
             res.status(500);
@@ -349,6 +367,39 @@ module.exports.removeDtTrip = function (req, res) {
                     success_message: 'successfully removed'
                 });
             });
+            Users.findById(result.owner_user_id, 'token', function(err, user) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                if(user.token) {
+                    var message = new gcm.Message({
+                        data: {
+                            type: 'delete',
+                            unique_trip_id: req.body.unique_trip_id,
+                            sequence_id_departure_station: result.owner_sequence_id_departure_station,
+                            sequence_id_target_station: result.owner_sequence_id_target_station,
+                            user_id: result.owner_user_id,
+                            has_season_ticket: result.has_season_ticket,
+                            departure_time: result.owner_departure_time,
+                            arrival_time: result.owner_arrival_time,
+                            departure_station_name: result.owner_departure_station_name,
+                            target_station_name: result.owner_target_station_name
+                        },
+                        notification: {
+                            title: 'DTSharing - Ein Partner hat sich ausgetragen',
+                            body: 'Einer deiner Partner hat sich aus einen Trip von dir ausgetragen. Suche jetzt nach einem neuen Partner.'
+                        }
+                    });
+                    console.log(message);
+                    var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                    sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
+                        if(err) {
+                            console.error(err);
+                        }
+                    });
+                }
+            });
         } else if(req.params.user_id == result.partner_user_id) {
             Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
                 partner_user_id: null,
@@ -357,6 +408,7 @@ module.exports.removeDtTrip = function (req, res) {
                 partner_departure_station_name: null,
                 partner_target_station_name: null
             }, function (err, result) {
+                console.log(result);
                 if(err) {
                     res.status(500);
                     res.send({
@@ -374,8 +426,47 @@ module.exports.removeDtTrip = function (req, res) {
                     return;
                 }
                 res.send({
-                        success_message: 'successfully unmatched'
-                    });
+                    success_message: 'successfully unmatched'
+                });
+                Users.findById(result.owner_user_id, 'token', function(err, user) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    if(user.token) {
+                        var has_season_ticket;
+                        if(result.has_season_ticket) {
+                            has_season_ticket = false;
+                        } else {
+                            has_season_ticket = true;
+                        }
+                        var message = new gcm.Message({
+                            data: {
+                                type: 'delete',
+                                unique_trip_id: result.unique_trip_id,
+                                sequence_id_departure_station: result.partner_sequence_id_departure_station,
+                                sequence_id_target_station: result.partner_sequence_id_target_station,
+                                user_id: result.partner_user_id,
+                                has_season_ticket: has_season_ticket,
+                                departure_time: result.partner_departure_time,
+                                arrival_time: result.partner_arrival_time,
+                                departure_station_name: result.partner_departure_station_name,
+                                target_station_name: result.partner_target_station_name
+                            },
+                            notification: {
+                                title: 'DTSharing - Ein Partner hat sich ausgetragen',
+                                body: 'Einer deiner Partner hat sich aus einen Trip von dir ausgetragen. Suche jetzt nach einen neuen Partner.'
+                            }
+                        });
+                        console.log(message);
+                        var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                        sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
+                            if(err) {
+                                console.error(err);
+                            }
+                        });
+                    }
+                });
             });
         }
         else {
