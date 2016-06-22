@@ -222,12 +222,13 @@ module.exports.findMessages = function (req, res) {
                 time : result.time,
                 date : result.date
             }
-            Users.findById(result.author_id, 'first_name last_name', function(err, result) {
+            Users.findById(result.author_id, 'first_name last_name picture', function(err, result) {
                 if(err) {
                     return callback(err);
                 }
                 message.first_name = result.first_name;
                 message.last_name = result.last_name;
+                message.picture = result.picture;
                 messages.push(message);
                 callback(null);
             });
