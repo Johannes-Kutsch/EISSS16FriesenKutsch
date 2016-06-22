@@ -113,6 +113,38 @@ module.exports.findChats = function (req, res) {
     });
 }
 
+module.exports.findChat = function (req, res) {
+    Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
+        if(err) {
+            res.status(500);
+            res.send({
+                error_message: 'Database Error'
+            });
+            console.error(err);
+            return;
+        }
+        var query;
+        if(result.owner_user_id == req.params.user_id) {
+            query = result.partner_user_id
+        } else {
+            query = result.owner_user_id
+        }
+        Users.findById(query, 'first_name last_name picture', function(err, result) {
+            if(err) {
+                res.status(500);
+                res.send({
+                    error_message: 'Database Error'
+                });
+                console.error(err);
+                return;
+            }
+            res.json({
+                partner: result
+            });
+        });
+    });
+}
+
 module.exports.createMessage = function (req, res) {
     var sequence = 0;
     Messages.findOne({chat_id : req.params.chat_id}, 'sequence', {sort:{sequence:-1}},function(err, result) {
