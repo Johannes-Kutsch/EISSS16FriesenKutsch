@@ -152,12 +152,12 @@ module.exports.match = function (req,res) {
                 success_message: 'successfully matched',
                 chat_id: result._id
             });
-            Users.findById(result.owner_user_id, 'token', function(err, result) {
+            Users.findById(result.owner_user_id, 'token', function(err, user) {
                 if (err) {
                     console.error(err);
                     return;
                 }
-                if(result.token) {
+                if(user.token) {
                     var message = new gcm.Message({
                         data: {
                             type: 'new_partner',
@@ -169,7 +169,7 @@ module.exports.match = function (req,res) {
                         }
                     });
                     var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
-                    sender.send(message, { registrationTokens: [result.token] }, function (err, response) {
+                    sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
                         if(err) {
                             console.error(err);
                         }
