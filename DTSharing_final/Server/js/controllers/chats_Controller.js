@@ -192,11 +192,38 @@ module.exports.createMessage = function (req, res) {
 }
 
 module.exports.findMessages = function (req, res) {
-    var query = {chat_id : req.params.chat_id};
-    if(req.query.sequence) {
-        query.sequence = {$gt : req.query.sequence};
-    }
-    Messages.find(query, '-__v -_id -chat_id', {sort:{sequence:1}},function(err, results) {
+    async.parallel([
+        function(callback) {
+            var query = {chat_id : req.params.chat_id};
+            if(req.query.sequence) {
+                query.sequence = {$gt : req.query.sequence};
+            }
+            Messages.find(query, '-__v -_id -chat_id', {sort:{sequence:1}},function(err, results) {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, results);
+            });
+        }, function(callback) {
+            Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
+                if(err) {
+                    return callback(err);
+                }
+                var query;
+                if(result.owner_user_id == req.params.user_id) {
+                    query = result.partner_user_id
+                } else {
+                    query = result.owner_user_id
+                }
+                Users.findById(query, 'first_name last_name picture', function(err, result) {
+                    if(err) {
+                        return callback(err);
+                    }
+                    callback(null, result);
+                });
+            });
+        }
+    ], function(err, results) {
         if(err) {
             res.status(500);
             res.send({
@@ -205,7 +232,7 @@ module.exports.findMessages = function (req, res) {
             console.error(err);
             return;
         }
-        if(!results.length) {
+        if(!results[0].length) {
             console.log('No (new) Messages | 404');
             res.status(404);
             res.send({
@@ -213,39 +240,11 @@ module.exports.findMessages = function (req, res) {
             });
             return;
         }
-        var messages = [];
-        async.each(results, function(result, callback) {
-            var message = {
-                author_id : result.author_id,
-                sequence : result.sequence,
-                message_text : result.message_text,
-                time : result.time,
-                date : result.date
-            }
-            Users.findById(result.author_id, 'first_name last_name picture', function(err, result) {
-                if(err) {
-                    return callback(err);
-                }
-                message.first_name = result.first_name;
-                message.last_name = result.last_name;
-                message.picture = result.picture;
-                messages.push(message);
-                callback(null);
-            });
-        }, function (err) {
-            if(err) {
-                res.status(500);
-                res.send({
-                    error_message: 'Database Error'
-                });
-                console.error(err);
-                return;
-            }
-            messages.sort(
-                function (a, b) {
-                    return parseFloat(a.sequence) - parseFloat(b.sequence);
-            });
-            res.json(messages);
+        var partner = results[1];
+        var messages = results[0];
+        res.json({
+            partner: partner,
+            messages: messages
         });
     });
 }
