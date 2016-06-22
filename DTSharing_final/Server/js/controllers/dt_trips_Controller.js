@@ -388,7 +388,7 @@ module.exports.removeDtTrip = function (req, res) {
                         },
                         notification: {
                             title: 'DTSharing - Ein Partner hat sich ausgetragen',
-                            body: 'Einer deiner Partner hat sich aus einen Trip von dir ausgetragen. Suche jetzt nach einem neuen Partner.'
+                            body: 'Der Besitzer einer Fahrt hat sich ausgetragen. Du bist jetzt der neue Besitzer. Suche jetzt nach einem neuen Partner.'
                         }
                     });
                     console.log(message);
@@ -455,7 +455,7 @@ module.exports.removeDtTrip = function (req, res) {
                             },
                             notification: {
                                 title: 'DTSharing - Ein Partner hat sich ausgetragen',
-                                body: 'Einer deiner Partner hat sich aus einen Trip von dir ausgetragen. Suche jetzt nach einen neuen Partner.'
+                                body: 'Einer deiner Partner hat sich aus eine Fahrt ausgetragen. Suche jetzt nach einem neuen Partner.'
                             }
                         });
                         console.log(message);
