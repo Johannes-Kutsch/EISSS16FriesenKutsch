@@ -88,6 +88,9 @@ app.post('/users/:user_id/chats/:chat_id/messages', chats_Controller.createMessa
 //Query: sequence der letzten bekannten Nachricht (optional)
 app.get('/users/:user_id/chats/:chat_id/messages', chats_Controller.findMessages);
 
+//Uri: User ID des Nutzers, Chat ID des Chats, Message ID der Message
+app.get('/users/:user_id/chats/:chat_id/messages/:message_id', chats_Controller.findMessage);
+
 //Uri: User ID des Nutzers, Chat ID des Chats
 app.get('/users/:user_id/chats/:chat_id/key', chats_Controller.findKey);
 

@@ -150,7 +150,7 @@ module.exports.createMessage = function (req, res) {
             res.send({
                 success_message: 'message created'
             });
-            
+            var message_id = result._id;
             Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
                 if(err) {
                     console.error(err);
@@ -168,10 +168,12 @@ module.exports.createMessage = function (req, res) {
                         return;
                     }
                     if(result.token) {
+                        console.log(message_id);
                         var message = new gcm.Message({
                             data: {
                                 type: 'chat_message',
-                                chat_id: req.params.chat_id
+                                chat_id: req.params.chat_id,
+                                message_id : message_id
                             },
                             notification: {
                                 title: 'DTSharing - Chat',
@@ -246,6 +248,28 @@ module.exports.findMessages = function (req, res) {
             partner: partner,
             messages: messages
         });
+    });
+}
+
+module.exports.findMessage = function (req, res) {
+    Messages.findById(req.params.message_id, '-_id -__v', function(err, result) {
+        if(err) {
+            res.status(500);
+            res.send({
+                error_message: 'Database Error'
+            });
+            console.error(err);
+            return;
+        }
+        if(!result) {
+            console.log('No Key | 404');
+            res.status(404);
+            res.send({
+                error_message: 'No Message'
+            });
+            return;
+        }
+        res.send(result);
     });
 }
 
