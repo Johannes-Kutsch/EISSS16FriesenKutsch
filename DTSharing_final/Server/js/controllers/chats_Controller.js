@@ -66,7 +66,7 @@ module.exports.findChats = function (req, res) {
                         });
                     }
                 }, function(callback) {
-                    Messages.findOne({chat_id : req.params.chat_id}, 'sequence message_text', {sort:{sequence:-1}},function(err, result) {
+                    Messages.findOne({chat_id : result._id}, 'sequence message_text', {sort:{sequence:-1}},function(err, result) {
                         if(err) {
                             callback(err);
                         } else if (result) {
