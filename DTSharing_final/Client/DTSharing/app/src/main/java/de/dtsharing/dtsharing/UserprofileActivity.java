@@ -118,8 +118,8 @@ public class UserProfileActivity extends AppCompatActivity {
                     profileData.put("interests",        response.getString("interests"));
                     profileData.put("more",             response.getString("more"));
                     profileData.put("picture",          response.getString("picture"));
-                    profileData.put("countOfferer",     0);
-                    profileData.put("countPassenger",   0);
+                    profileData.put("countOfferer",     response.getInt("count_offerer"));
+                    profileData.put("countPassenger",   response.getInt("count_passenger"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -154,7 +154,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         mTitle              .setText(profileData.getAsString("name"));
         tvUserBirth         .setText(profileData.getAsString("birthYear"));
-        tvUserInterests        .setText(profileData.getAsString("interests"));
+        tvUserInterests     .setText(profileData.getAsString("interests"));
         tvUserDescription   .setText(profileData.getAsString("more"));
         tvCountOfferer      .setText(profileData.getAsString("countOfferer"));
         tvCountPassenger    .setText(profileData.getAsString("countPassenger"));
@@ -189,7 +189,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     JSONArray ratings = response.getJSONArray("ratings");
 
                     container.put("averageRating", userData.getDouble("average_rating"));
-                    container.put("countRatings", userData.length());
+                    container.put("countRatings", ratings.length());
 
                     for(int i = 0; i < ratings.length(); i++){
 
@@ -213,7 +213,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 mainContent.setVisibility(View.VISIBLE);
                 lvRatings.setVisibility(View.VISIBLE);
                 tvAverageRating.setText(container.getAsString("averageRating"));
-                tvCountRating.setText(container.getAsString("countRatings"));
+                tvCountRating.setText("("+container.getAsString("countRatings")+")");
                 if(container.getAsDouble("averageRating") != 0)
                     setRating(container.getAsDouble("averageRating"));
 
