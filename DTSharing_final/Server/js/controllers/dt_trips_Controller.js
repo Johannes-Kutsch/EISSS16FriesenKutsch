@@ -477,12 +477,12 @@ module.exports.removeDtTrip = function (req, res) {
                             return callback(err)
                         }
                         if(result) {
-                            Messages.remove({chat_id: result._id}, '_id', function(err, results) {
+                            Messages.remove({chat_id: result._id}, function(err, results) {
                                 if(err) {
-                                    console.error(err);
+                                    return callback(err);
                                 }
+                                callback(null);
                             });
-                            callback(null);
                         } else {
                             callback(null);
                         }
