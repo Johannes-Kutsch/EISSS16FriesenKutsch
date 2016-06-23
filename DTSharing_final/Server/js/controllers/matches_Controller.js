@@ -59,7 +59,7 @@ module.exports.findMatches = function (req, res) {
                         }
                         var average_rating = 0;
                         ratings.forEach(function(rating) {
-                            average_rating += rating;
+                            average_rating += rating.stars;
                         });
                         if(average_rating.length) {
                             average_rating/=average_rating.length;
