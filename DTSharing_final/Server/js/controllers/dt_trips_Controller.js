@@ -1,6 +1,7 @@
 var Users = require('../models/users'),
     Chats = require('../models/chats'),
     Dt_trips = require('../models/dt_trips'),
+    Messages = require('../models/messages'),
     async = require('async'),
     gcm = require('node-gcm'),
     mongoose = require('mongoose');
@@ -334,8 +335,6 @@ module.exports.findDtTrip = function (req, res) {
 }
 
 module.exports.removeDtTrip = function (req, res) {
-    // chat löschen
-    // owner ändern
     Dt_trips.findById(req.params.dt_trip_id, '-__v', function (err, result) {
         if(err) {
             res.status(500);
@@ -353,8 +352,151 @@ module.exports.removeDtTrip = function (req, res) {
             });
             return;
         }
-        if(req.params.user_id == result.owner_user_id) {
-            Dt_trips.findByIdAndRemove(req.params.dt_trip_id, function (err, result) {
+        async.parallel([
+            function(callback) {
+                if(req.params.user_id == result.owner_user_id && result.partner_user_id == null) {
+                    Dt_trips.findByIdAndRemove(req.params.dt_trip_id, function (err, result) {
+                        if(err) {
+                            return callback(err)
+                        }
+                        callback(null, 'successfully removed');
+                    });
+                } else if(req.params.user_id == result.owner_user_id && result.partner_user_id != null) {
+                    Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, {
+                        owner_user_id: result.partner_user_id,
+                        owner_sequence_id_target_station: result.partner_sequence_id_target_station,
+                        owner_sequence_id_departure_station: result.partner_sequence_id_departure_station,
+                        owner_departure_station_name: result.partner_departure_station_name,
+                        owner_target_station_name: result.partner_target_station_name,
+                        owner_departure_time: result.partner_departure_time,
+                        owner_arrival_time: result.partner_arrival_time,
+                        has_season_ticket: !result.has_season_ticket,
+                        partner_user_id: null,
+                        partner_sequence_id_target_station: null,
+                        partner_sequence_id_departure_station: null,
+                        partner_departure_station_name: null,
+                        partner_target_station_name: null,
+                        partner_departure_time: null,
+                        partner_arrival_time: null
+                    }, function (err, result) {
+                        if(err) {
+                            return callback(err)
+                        }
+                        callback(null, 'successfully unmatched');
+                        Users.findById(result.partner_user_id, 'token', function(err, user) {
+                            if (err) {
+                                console.error(err);
+                                return;
+                            }
+                            if(user.token) {
+                                var message = new gcm.Message({
+                                    data: {
+                                        type: 'delete',
+                                        unique_trip_id: req.body.unique_trip_id,
+                                        sequence_id_departure_station: result.owner_sequence_id_departure_station,
+                                        sequence_id_target_station: result.owner_sequence_id_target_station,
+                                        user_id: result.owner_user_id,
+                                        has_season_ticket: result.has_season_ticket,
+                                        departure_time: result.owner_departure_time,
+                                        arrival_time: result.owner_arrival_time,
+                                        departure_station_name: result.owner_departure_station_name,
+                                        target_station_name: result.owner_target_station_name
+                                    },
+                                    notification: {
+                                        title: 'DTSharing - Ein Partner hat sich ausgetragen',
+                                        body: 'Der Besitzer einer Fahrt hat sich ausgetragen. Du bist jetzt der neue Besitzer. Suche jetzt nach einem neuen Partner.'
+                                    }
+                                });
+                                var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                                sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
+                                    if(err) {
+                                        console.error(err);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                } else if(req.params.user_id == result.partner_user_id) {
+                    Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
+                        partner_user_id: null,
+                        partner_sequence_id_target_station: null,
+                        partner_sequence_id_departure_station: null,
+                        partner_departure_station_name: null,
+                        partner_target_station_name: null,
+                        partner_departure_time: null,
+                        partner_arrival_time: null
+                    }, function (err, result) {
+                        if(err) {
+                            return callback(err)
+                        }
+                        callback(null, 'successfully unmatched');
+                        Users.findById(result.owner_user_id, 'token', function(err, user) {
+                            if (err) {
+                                console.error(err);
+                                return;
+                            }
+                            if(user.token) {
+                                var has_season_ticket;
+                                if(result.has_season_ticket) {
+                                    has_season_ticket = false;
+                                } else {
+                                    has_season_ticket = true;
+                                }
+                                var message = new gcm.Message({
+                                    data: {
+                                        type: 'delete',
+                                        unique_trip_id: result.unique_trip_id,
+                                        sequence_id_departure_station: result.partner_sequence_id_departure_station,
+                                        sequence_id_target_station: result.partner_sequence_id_target_station,
+                                        user_id: result.partner_user_id,
+                                        has_season_ticket: has_season_ticket,
+                                        departure_time: result.partner_departure_time,
+                                        arrival_time: result.partner_arrival_time,
+                                        departure_station_name: result.partner_departure_station_name,
+                                        target_station_name: result.partner_target_station_name
+                                    },
+                                    notification: {
+                                        title: 'DTSharing - Ein Partner hat sich ausgetragen',
+                                        body: 'Einer deiner Partner hat sich aus eine Fahrt ausgetragen. Suche jetzt nach einem neuen Partner.'
+                                    }
+                                });
+                                var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                                sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
+                                    if(err) {
+                                        console.error(err);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+            }, function(callback) {
+                if(result.owner_user_id && result.partner_user_id) {
+                    Chats.findOneAndRemove({dt_trip_id: req.params.dt_trip_id}, '_id', function (err, result) {
+                        if(err) {
+                            return callback(err)
+                        }
+                        if(result) {
+                            Messages.remove({chat_id: result._id}, '_id', function(err, results) {
+                                if(err) {
+                                    res.status(500);
+                                    res.send({
+                                        error_message: 'Database Error'
+                                    });
+                                    console.error(err);
+                                    return;
+                                }
+                                callback(null);
+                            });
+                        } else{
+                            callback(null);
+                        }
+                    });
+                } else {
+                    callback(null);
+                }
+            }
+        ], function(err, results) {
             if(err) {
                 res.status(500);
                 res.send({
@@ -363,119 +505,7 @@ module.exports.removeDtTrip = function (req, res) {
                 console.error(err);
                 return;
             }
-            res.send({
-                    success_message: 'successfully removed'
-                });
-            });
-            Users.findById(result.owner_user_id, 'token', function(err, user) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                if(user.token) {
-                    var message = new gcm.Message({
-                        data: {
-                            type: 'delete',
-                            unique_trip_id: req.body.unique_trip_id,
-                            sequence_id_departure_station: result.owner_sequence_id_departure_station,
-                            sequence_id_target_station: result.owner_sequence_id_target_station,
-                            user_id: result.owner_user_id,
-                            has_season_ticket: result.has_season_ticket,
-                            departure_time: result.owner_departure_time,
-                            arrival_time: result.owner_arrival_time,
-                            departure_station_name: result.owner_departure_station_name,
-                            target_station_name: result.owner_target_station_name
-                        },
-                        notification: {
-                            title: 'DTSharing - Ein Partner hat sich ausgetragen',
-                            body: 'Der Besitzer einer Fahrt hat sich ausgetragen. Du bist jetzt der neue Besitzer. Suche jetzt nach einem neuen Partner.'
-                        }
-                    });
-                    console.log(message);
-                    var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
-                    sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
-                        if(err) {
-                            console.error(err);
-                        }
-                    });
-                }
-            });
-        } else if(req.params.user_id == result.partner_user_id) {
-            Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
-                partner_user_id: null,
-                partner_sequence_id_target_station: null,
-                partner_sequence_id_departure_station: null,
-                partner_departure_station_name: null,
-                partner_target_station_name: null
-            }, function (err, result) {
-                console.log(result);
-                if(err) {
-                    res.status(500);
-                    res.send({
-                        errorMessage: 'Database Error'
-                    });
-                    console.error(err);
-                    return;
-                }
-                if(!result) {
-                    console.log('Trip not found | 404');
-                    res.status(404);
-                    res.send({
-                        errorMessage: 'Trip not found'
-                    });
-                    return;
-                }
-                res.send({
-                    success_message: 'successfully unmatched'
-                });
-                Users.findById(result.owner_user_id, 'token', function(err, user) {
-                    if (err) {
-                        console.error(err);
-                        return;
-                    }
-                    if(user.token) {
-                        var has_season_ticket;
-                        if(result.has_season_ticket) {
-                            has_season_ticket = false;
-                        } else {
-                            has_season_ticket = true;
-                        }
-                        var message = new gcm.Message({
-                            data: {
-                                type: 'delete',
-                                unique_trip_id: result.unique_trip_id,
-                                sequence_id_departure_station: result.partner_sequence_id_departure_station,
-                                sequence_id_target_station: result.partner_sequence_id_target_station,
-                                user_id: result.partner_user_id,
-                                has_season_ticket: has_season_ticket,
-                                departure_time: result.partner_departure_time,
-                                arrival_time: result.partner_arrival_time,
-                                departure_station_name: result.partner_departure_station_name,
-                                target_station_name: result.partner_target_station_name
-                            },
-                            notification: {
-                                title: 'DTSharing - Ein Partner hat sich ausgetragen',
-                                body: 'Einer deiner Partner hat sich aus eine Fahrt ausgetragen. Suche jetzt nach einem neuen Partner.'
-                            }
-                        });
-                        console.log(message);
-                        var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
-                        sender.send(message, { registrationTokens: [user.token] }, function (err, response) {
-                            if(err) {
-                                console.error(err);
-                            }
-                        });
-                    }
-                });
-            });
-        }
-        else {
-            console.log('User is not part of that Trip | 403');
-            res.status(403);
-            res.send({
-                errorMessage: 'User is not part of that Trip'
-            });
-            return;
-        }
+            res.json({sucess_message: results[0]});
+        })
     });
 }

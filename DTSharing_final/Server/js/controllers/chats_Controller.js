@@ -294,10 +294,10 @@ module.exports.findMessage = function (req, res) {
             return;
         }
         if(!result) {
-            console.log('No Key | 404');
+            console.log('Message not found | 404');
             res.status(404);
             res.send({
-                error_message: 'No Message'
+                error_message: 'Message not found'
             });
             return;
         }
@@ -316,10 +316,10 @@ module.exports.findKey = function (req, res) {
             return;
         }
         if(!result) {
-            console.log('No Key | 404');
+            console.log('Key not found | 404');
             res.status(404);
             res.send({
-                error_message: 'No Key'
+                error_message: 'Key not found'
             });
             return;
         }
