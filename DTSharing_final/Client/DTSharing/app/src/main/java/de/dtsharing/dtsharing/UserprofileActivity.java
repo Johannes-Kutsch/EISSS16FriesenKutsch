@@ -8,6 +8,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -181,9 +182,11 @@ public class UserProfileActivity extends AppCompatActivity {
 
                 final ContentValues container = new ContentValues();
 
+                Log.d("UserProfileActivity", "RATING RESPONSE: "+response);
+
                 try {
                     JSONObject userData = response.getJSONObject("user_data");
-                    JSONArray ratings = new JSONArray(response.getJSONObject("rating"));
+                    JSONArray ratings = response.getJSONArray("ratings");
 
                     container.put("averageRating", userData.getDouble("average_rating"));
                     container.put("countRatings", userData.length());

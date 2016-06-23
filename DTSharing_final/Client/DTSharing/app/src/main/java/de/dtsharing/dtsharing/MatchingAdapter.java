@@ -197,6 +197,22 @@ public class MatchingAdapter extends BaseAdapter{
 
                                 if(enteredTripDetails.containsKey("dtTripId")) {
                                     deleteOwnTrip(enteredTripDetails.getAsString("dtTripId"), userID, chatID, matchData, key);
+                                } else {
+                                    SQLiteDatabase db;
+                                    db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+
+                                    ContentValues values = new ContentValues();
+                                    values.put("chat_id", chatID);
+                                    values.put("key", key);
+
+                                    db.insert("chats", null, values);
+                                    db.close();
+
+                                    Intent mainIntent = new Intent(context_1, MainActivity.class);
+                                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    mainIntent.putExtra("matching_success", true);
+                                    mainIntent.putExtra("matchName", matchData.getUserName());
+                                    context_1.startActivity(mainIntent);
                                 }
 
                             }

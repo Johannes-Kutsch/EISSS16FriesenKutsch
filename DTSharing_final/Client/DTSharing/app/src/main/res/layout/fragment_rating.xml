@@ -16,21 +16,21 @@
             android:id="@+id/ivStar1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_star_border_48dp"
+            android:src="@drawable/ic_star_full_48dp"
             android:background="@color/transparent"/>
 
         <ImageButton
             android:id="@+id/ivStar2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_star_border_48dp"
+            android:src="@drawable/ic_star_full_48dp"
             android:background="@color/transparent"/>
 
         <ImageButton
             android:id="@+id/ivStar3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_star_border_48dp"
+            android:src="@drawable/ic_star_full_48dp"
             android:background="@color/transparent"/>
 
         <ImageButton

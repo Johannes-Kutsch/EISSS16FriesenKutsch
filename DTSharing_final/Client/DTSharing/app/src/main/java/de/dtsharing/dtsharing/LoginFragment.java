@@ -98,7 +98,7 @@ public class LoginFragment extends Fragment {
         IntentFilter filter = new IntentFilter("OnTokenRefresh");
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new MyTokenReceiver();
-        getActivity().registerReceiver(receiver, filter);
+        receiver.register(v.getContext(), filter);
 
         return v;
 
@@ -147,8 +147,6 @@ public class LoginFragment extends Fragment {
                                     lastName = jsonObject.getString("last_name"),
                                     more = jsonObject.getString("more"),
                                     interests = jsonObject.getString("interests");
-
-                            getActivity().unregisterReceiver(receiver);
 
                             Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
                             mainIntent.putExtra("cameFromLogin", true);
@@ -230,7 +228,31 @@ public class LoginFragment extends Fragment {
         return !TextUtils.isEmpty(target) && target.length() >= 6;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        receiver.unregister(v.getContext());
+    }
+
     public class MyTokenReceiver extends BroadcastReceiver {
+        public boolean isRegistered;
+
+        /*http://stackoverflow.com/a/29836639
+        * Da es keine andere Möglichkeit gibt zu überprüfen ob der receiver registriert ist
+        * und einen unregistrierten Receiver zu entfernen eine FATAL EXCEPTION wirft*/
+        public Intent register(Context context, IntentFilter filter) {
+            isRegistered = true;
+            return context.registerReceiver(this, filter);
+        }
+
+        public boolean unregister(Context context) {
+            if (isRegistered) {
+                context.unregisterReceiver(this);
+                isRegistered = false;
+                return true;
+            }
+            return false;
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {

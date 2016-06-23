@@ -15,6 +15,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,8 +63,9 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton bSubmit;
     public MessagesAdapter mAdapter;
     public ListView lvMessages;
+    private CardView cvRatingsContainer;
     Toolbar toolbar;
-    TextView mTitle;
+    TextView mTitle, ratingsContainerText;
     ImageView toolbar_avatar;
 
     String key;
@@ -118,6 +120,8 @@ public class ChatActivity extends AppCompatActivity {
         lvMessages = (ListView) findViewById(R.id.lvMessages);
         inputMessage = (EditText) findViewById(R.id.inputMessage);
         bSubmit = (ImageButton) findViewById(R.id.bSubmit);
+        cvRatingsContainer = (CardView) findViewById(R.id.cvRatingContainer);
+        ratingsContainerText = (TextView) findViewById(R.id.ratingContainerText);
 
         SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(ChatActivity.this);
         userId = sharedPrefsManager.getUserIdSharedPrefs();
@@ -169,38 +173,11 @@ public class ChatActivity extends AppCompatActivity {
         toolbar_user_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Erzeuge die Userprofile Activity und füge Daten hinzu*//*
+                /*Erzeuge die Userprofile Activity und füge Daten hinzu*/
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                 userProfileIntent.putExtra("userId", partnerUserId);
-                *//*Starte Matching Activity*//*
-                startActivity(userProfileIntent);*/
-
-                final int starFull = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_full_48dp", null, null);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this, R.style.AppTheme_Dialog_Alert);
-                LayoutInflater inflater = (ChatActivity.this).getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.fragment_rating, null);
-                builder.setView(dialogView)
-                        .setPositiveButton("BEWERTEN", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .setNegativeButton("ABBRECHEN", null);
-
-                final ImageButton star1 = (ImageButton) dialogView.findViewById(R.id.ivStar1);
-                star1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        star1.setImageResource(starFull);
-                    }
-                });
-
-                builder.create();
-                builder.show();
-
-
+                /*Starte Matching Activity*/
+                startActivity(userProfileIntent);
             }
         });
 
@@ -208,6 +185,131 @@ public class ChatActivity extends AppCompatActivity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         myReceiver = new MyMessageReceiver();
         myReceiver.register(ChatActivity.this, filter);
+
+    }
+
+    private void setRatingsContainer(boolean hasVoted){
+
+        if(hasVoted){
+            ratingsContainerText.setText("Vielen Dank für die Bewertung!");
+            cvRatingsContainer.setVisibility(View.VISIBLE);
+        } else {
+            cvRatingsContainer.setVisibility(View.VISIBLE);
+            cvRatingsContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final int starFull = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_full_48dp", null, null),
+                            starBorder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_border_48dp", null, null);
+                    final int[] finalRating = new int[1];
+                    finalRating[0] = 3;
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this, R.style.AppTheme_Dialog_Alert);
+                    LayoutInflater inflater = (ChatActivity.this).getLayoutInflater();
+                    View dialogView = inflater.inflate(R.layout.fragment_rating, null);
+
+                    final ImageButton star1 = (ImageButton) dialogView.findViewById(R.id.ivStar1),
+                            star2 = (ImageButton) dialogView.findViewById(R.id.ivStar2),
+                            star3 = (ImageButton) dialogView.findViewById(R.id.ivStar3),
+                            star4 = (ImageButton) dialogView.findViewById(R.id.ivStar4),
+                            star5 = (ImageButton) dialogView.findViewById(R.id.ivStar5);
+                    final EditText etComment = (EditText) dialogView.findViewById(R.id.etComment);
+
+                    builder.setView(dialogView)
+                            .setPositiveButton("Bewerten", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    String comment = etComment.getText().toString().trim();
+                                    submitRating(finalRating[0], comment);
+                                }
+                            })
+                            .setNegativeButton("Abbruch", null);
+
+                    View.OnClickListener starsOnClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            int rating = 0;
+                            star5.setImageResource(starBorder);
+                            star4.setImageResource(starBorder);
+                            star3.setImageResource(starBorder);
+                            star2.setImageResource(starBorder);
+                            star1.setImageResource(starBorder);
+
+                            switch (view.getId()){
+                                case R.id.ivStar5:
+                                    star5.setImageResource(starFull);
+                                    ++rating;
+                                case R.id.ivStar4:
+                                    star4.setImageResource(starFull);
+                                    ++rating;
+                                case R.id.ivStar3:
+                                    star3.setImageResource(starFull);
+                                    ++rating;
+                                case R.id.ivStar2:
+                                    star2.setImageResource(starFull);
+                                    ++rating;
+                                case R.id.ivStar1:
+                                    star1.setImageResource(starFull);
+                                    finalRating[0] = ++rating;
+                            }
+                        }
+                    };
+
+                    star1.setOnClickListener(starsOnClickListener);
+                    star2.setOnClickListener(starsOnClickListener);
+                    star3.setOnClickListener(starsOnClickListener);
+                    star4.setOnClickListener(starsOnClickListener);
+                    star5.setOnClickListener(starsOnClickListener);
+
+                    builder.create();
+                    builder.show();
+                }
+            });
+        }
+
+    }
+
+    private void submitRating(final int rating, final String comment){
+
+        String base_url = getResources().getString(R.string.base_url);
+        final String URI = base_url+"/users/"+partnerUserId+"/ratings";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if(response.contains("success_message")){
+                            ratingsContainerText.setText("Vielen Dank für die Bewertung!");
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+            }
+        })
+        {
+            /*Daten welche der Post-Request mitgegeben werden*/
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String> params = new HashMap<>();
+                // the POST parameters:
+                params.put("author_id", userId);
+                params.put("stars", Integer.toString(rating));
+                params.put("comment", comment);
+                params.put("chat_id", chatId);
+
+                Log.d("MatchingAdapter", "Params: "+params);
+                return params;
+            }
+
+        };
+
+        Volley.newRequestQueue(ChatActivity.this).add(postRequest);
 
     }
 
@@ -433,6 +535,11 @@ public class ChatActivity extends AppCompatActivity {
             Log.d("ChatActivity", "GET_ALL_MESSAGES: "+stringResponse);
 
             JSONObject response = new JSONObject(stringResponse);
+
+            if(response.has("has_voted")){
+                boolean hasVoted = response.getBoolean("has_voted");
+                setRatingsContainer(hasVoted);
+            }
 
             JSONObject partner = response.getJSONObject("partner");
             JSONArray messagesArray = response.getJSONArray("messages");
