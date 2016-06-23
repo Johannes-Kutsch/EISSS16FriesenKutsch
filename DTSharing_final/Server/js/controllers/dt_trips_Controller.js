@@ -108,7 +108,6 @@ module.exports.offer = function (req, res) {
 
 
 module.exports.match = function (req,res) {
-    // dupes löschen
     Dt_trips.findByIdAndUpdate(req.params.dt_trip_id, { 
         partner_user_id: req.body.user_id,
         partner_departure_time: req.body.departure_time,
@@ -354,7 +353,8 @@ module.exports.removeDtTrip = function (req, res) {
         }
         async.parallel([
             function(callback) {
-                if(req.params.user_id == result.owner_user_id && result.partner_user_id == null) {
+                console.log(result.partner_user_id);
+                if(req.params.user_id == result.owner_user_id && !result.partner_user_id) {
                     Dt_trips.findByIdAndRemove(req.params.dt_trip_id, function (err, result) {
                         if(err) {
                             return callback(err)
@@ -404,7 +404,7 @@ module.exports.removeDtTrip = function (req, res) {
                                     },
                                     notification: {
                                         title: 'DTSharing - Ein Partner hat sich ausgetragen',
-                                        body: 'Der Besitzer einer Fahrt hat sich ausgetragen. Du bist jetzt der neue Besitzer. Suche jetzt nach einem neuen Partner.'
+                                        body: 'Einer deiner Partner hat sich ausgetragen. Suche jetzt nach einem neuen Partner.'
                                     }
                                 });
                                 var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
@@ -457,7 +457,7 @@ module.exports.removeDtTrip = function (req, res) {
                                     },
                                     notification: {
                                         title: 'DTSharing - Ein Partner hat sich ausgetragen',
-                                        body: 'Einer deiner Partner hat sich aus eine Fahrt ausgetragen. Suche jetzt nach einem neuen Partner.'
+                                        body: 'Einer deiner Partner hat sich ausgetragen. Suche jetzt nach einem neuen Partner.'
                                     }
                                 });
                                 var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
@@ -471,7 +471,7 @@ module.exports.removeDtTrip = function (req, res) {
                     });
                 }
             }, function(callback) {
-                if(result.owner_user_id && result.partner_user_id) {
+                if(result.owner_user_id && result.partner_user_id ) {
                     Chats.findOneAndRemove({dt_trip_id: req.params.dt_trip_id}, '_id', function (err, result) {
                         if(err) {
                             return callback(err)
@@ -479,16 +479,11 @@ module.exports.removeDtTrip = function (req, res) {
                         if(result) {
                             Messages.remove({chat_id: result._id}, '_id', function(err, results) {
                                 if(err) {
-                                    res.status(500);
-                                    res.send({
-                                        error_message: 'Database Error'
-                                    });
                                     console.error(err);
-                                    return;
                                 }
-                                callback(null);
                             });
-                        } else{
+                            callback(null);
+                        } else {
                             callback(null);
                         }
                     });
