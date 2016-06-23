@@ -9,7 +9,8 @@ module.exports.rate = function (req, res) {
         author_id: req.body.author_id,
         stars: req.body.stars,
         comment: req.body.comment,
-        date: req.body.date
+        date: req.body.date,
+        chat_id: req.body.chat_id
     });
     rating.save(function (err, result) {
         if(err) {

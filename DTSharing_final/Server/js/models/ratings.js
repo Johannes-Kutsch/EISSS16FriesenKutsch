@@ -6,5 +6,6 @@ module.exports = mongoose.model('ratings', {
     author_id: String,
     stars: Number,
     comment: String,
-    date: String
+    date: String,
+    chat_id: String
 });
