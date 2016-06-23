@@ -78,6 +78,7 @@ module.exports.offer = function (req, res) {
                         var message = new gcm.Message({
                             data: {
                                 type: 'search_agent',
+                                dt_trip_id: result._id,
                                 unique_trip_id: req.body.unique_trip_id,
                                 sequence_id_departure_station: result.owner_sequence_id_departure_station,
                                 sequence_id_target_station: result.owner_sequence_id_target_station,
