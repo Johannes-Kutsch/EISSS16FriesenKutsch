@@ -500,7 +500,7 @@ module.exports.removeDtTrip = function (req, res) {
                 console.error(err);
                 return;
             }
-            res.json({sucess_message: results[0]});
+            res.json({success_message: results[0]});
         })
     });
 }
