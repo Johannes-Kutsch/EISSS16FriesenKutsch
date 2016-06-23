@@ -46,7 +46,7 @@ app.put('/users/:user_id', users_Controller.updateUser);
 
 //Ratings
 //URI: User ID des Nutzers der bewertet wird
-//Boddy: author_id, stars, comment, date
+//Boddy: author_id, stars, comment, date, dt_trip_id
 app.post('/users/:user_id/ratings', ratings_Controller.rate);
 
 //URI: User ID des Nutzers

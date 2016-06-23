@@ -1,4 +1,5 @@
 var Chats = require('../models/chats'),
+    Ratings = require('../models/ratings'),
     Users = require('../models/users'),
     Dt_trips = require('../models/dt_trips'),
     Messages = require('../models/messages'),
@@ -167,7 +168,7 @@ module.exports.createMessage = function (req, res) {
             sequence : sequence,
             message_text: req.body.message_text,
             time: date.toJSON().slice(11,16),
-            date: utils.formatDay(new Date())
+            date: utils.formatDay(date)
         });
         message.save(function (err, result) {
             if(err) {
@@ -256,6 +257,39 @@ module.exports.findMessages = function (req, res) {
                     callback(null, result);
                 });
             });
+        }, function(callback) {
+            Chats.findById(req.params.chat_id, 'dt_trip_id', function(err, result) {
+                if(err) {
+                    return callback(err);
+                }
+                Dt_trips.findById(result.dt_trip_id, 'date owner_arrival_time partner_arrival_time', function(err, result) {
+                    if(err) {
+                        return callback(err);
+                    }
+                    var arrival_time;
+                    if(utils.timeToSeconds(result.owner_arrival_time) >= utils.timeToSeconds(result.partner_arrival_time)) {
+                        arrival_time = utils.timeToSeconds(result.owner_arrival_time);
+                    } else {
+                        arrival_time = utils.timeToSeconds(result.partner_arrival_time)
+                    }
+                    var date = utils.formatDate(result.date);
+                    date.setSeconds(arrival_time);
+                    if(date < new Date()) {
+                        Ratings.findOne({chat_id: req.params.chat_id, author_id: req.params.user_id}, function(err, result) {
+                            if(err) {
+                                return callback(err);
+                            }
+                            if(result) {
+                                callback(null, true);
+                            } else {
+                                callback(null, false);
+                            }
+                        });
+                    } else {
+                        callback(null);
+                    }
+                });
+            });
         }
     ], function(err, results) {
         if(err) {
@@ -274,10 +308,12 @@ module.exports.findMessages = function (req, res) {
             });
             return;
         }
+        var has_voted = results[2]
         var partner = results[1];
         var messages = results[0];
         res.json({
             partner: partner,
+            has_voted: has_voted,
             messages: messages
         });
     });

@@ -306,9 +306,8 @@ module.exports.findDtTrip = function (req, res) {
             } else {
                 res.json({
                     trip: {
-                        _id : result._id,
-                        unique_trip_id : result.unique_trip_id,
                         date : result.date,
+                        route_name : result.route_name
                     },
                     user: {
                         first_name : results[1],

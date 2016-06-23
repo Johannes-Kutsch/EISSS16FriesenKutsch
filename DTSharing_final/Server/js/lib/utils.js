@@ -1,4 +1,5 @@
-//Aus dem gtfs Modul übernommen und abgeändert
+//Quelle: https://github.com/brendannee/node-gtfs/blob/master/lib/gtfs.js
+//Wurde teilweise angepasst!
 
 var _ = require('lodash');
 
