@@ -46,7 +46,7 @@ app.put('/users/:user_id', users_Controller.updateUser);
 
 //Ratings
 //URI: User ID des Nutzers der bewertet wird
-//Boddy: author_id, stars, comment, date, chat_id
+//Boddy: author_id, stars, comment, chat_id
 app.post('/users/:user_id/ratings', ratings_Controller.rate);
 
 //URI: User ID des Nutzers
@@ -112,7 +112,6 @@ app.get('/matches', matches_Controller.findMatches);
 app.use(function(req, res, next) {
     res.status(404);
     res.send({ errorMessage: 'URI not found' });
-    //return;
 });
 
 app.listen(3000, function() {

@@ -4,12 +4,15 @@ var Ratings = require('../models/ratings'),
     mongoose = require('mongoose');
     
 module.exports.rate = function (req, res) {
+    var date = new Date();
+    //Zeitzone anpassen, 2 Stunden in Ms Hinzufügen
+    date.setTime(date.getTime()+7200000);
     var rating = new Ratings({
         user_id: req.params.user_id,
         author_id: req.body.author_id,
         stars: req.body.stars,
         comment: req.body.comment,
-        date: req.body.date,
+        date: utils.formatDay(date),
         chat_id: req.body.chat_id
     });
     rating.save(function (err, result) {

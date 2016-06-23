@@ -1,6 +1,6 @@
 must have:
-Chat
-Suchagenten => Deleten von Fahrten des Users bei Put
+Chat //Done
+Suchagenten //Done
 Bewerten
 Umkreissuche //Done
 Verlauf //Done
@@ -11,5 +11,5 @@ Code kommentieren
 
 nice to have:
 Chats auch offline ansehen
-Chat-Verschlüsselung
+Chat-Verschlüsselung //Done
 https/sessions
