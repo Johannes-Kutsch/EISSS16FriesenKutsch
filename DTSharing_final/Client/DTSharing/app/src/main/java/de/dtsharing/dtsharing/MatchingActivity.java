@@ -101,10 +101,15 @@ public class MatchingActivity extends AppCompatActivity {
         }
         if(getIntent().getBooleanExtra("comesFromNotification", false)){
             Intent notificationIntent = getIntent();
+            tripData.put("dtTripId", notificationIntent.getStringExtra("dtTripId"));
             tripData.put("uniqueTripId", notificationIntent.getStringExtra("uniqueTripId"));
-            tripData.put("hasTicket", notificationIntent.getBooleanExtra("hasSeasonTicket", false));
-            tripData.put("departureSequenceId", notificationIntent.getIntExtra("sequenceIdDepartureStation", 0));
-            tripData.put("targetSequenceId", notificationIntent.getIntExtra("sequenceIdTargetStation", 0));
+            tripData.put("hasTicket", notificationIntent.getStringExtra("hasSeasonTicket"));
+            tripData.put("departureSequenceId", notificationIntent.getStringExtra("sequenceIdDepartureStation"));
+            tripData.put("targetSequenceId", notificationIntent.getStringExtra("sequenceIdTargetStation"));
+            tripData.put("departureTime", notificationIntent.getStringExtra("departureTime"));
+            tripData.put("arrivalTime", notificationIntent.getStringExtra("arrivalTime"));
+            tripData.put("departureName", notificationIntent.getStringExtra("departureStationName"));
+            tripData.put("targetName", notificationIntent.getStringExtra("targetStationName"));
             bSubmit.setVisibility(View.GONE);
         }
 

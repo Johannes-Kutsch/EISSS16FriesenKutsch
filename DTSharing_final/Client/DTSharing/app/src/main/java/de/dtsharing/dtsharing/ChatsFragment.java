@@ -1,13 +1,16 @@
 package de.dtsharing.dtsharing;
 
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
@@ -25,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -50,6 +54,41 @@ public class ChatsFragment extends Fragment {
     private ChatsAdapter mAdapter;
 
     private String userId;
+
+    private MyMessageReceiver myReceiver;
+
+
+    public class MyMessageReceiver extends BroadcastReceiver {
+        public boolean isRegistered;
+
+        /*http://stackoverflow.com/a/29836639
+        * Da es keine andere Möglichkeit gibt zu überprüfen ob der receiver registriert ist
+        * und einen unregistrierten Receiver zu entfernen eine FATAL EXCEPTION wirft*/
+        public Intent register(Context context, IntentFilter filter) {
+            isRegistered = true;
+            return context.registerReceiver(this, filter);
+        }
+
+        public boolean unregister(Context context) {
+            if (isRegistered) {
+                context.unregisterReceiver(this);
+                isRegistered = false;
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals("newMessage")) {
+                String receivedChatId = intent.getStringExtra("chatId");
+                String receivedMessageId = intent.getStringExtra("messageId");
+                getMessage(receivedChatId, receivedMessageId);
+            }
+        }
+    }
+
+
     public ChatsFragment() {
         // Required empty public constructor
     }
@@ -68,16 +107,9 @@ public class ChatsFragment extends Fragment {
 
         userId = new SharedPrefsManager(this.getContext()).getUserIdSharedPrefs();
 
-
-        /*Abkapseln des Adapters vom UI-Thread -> Kein Freeze bei längeren Operationen*/
-        new android.os.Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                /*Erzeuge und verbinde Adapter mit der ChatsFragment ListView*/
-                mAdapter = new ChatsAdapter(getContext(), chats);
-                lvChats.setAdapter(mAdapter);
-            }
-        });
+        /*Erzeuge und verbinde Adapter mit der ChatsFragment ListView*/
+        mAdapter = new ChatsAdapter(getContext(), chats);
+        lvChats.setAdapter(mAdapter);
 
         /*Fülle Array mit Beispieldaten*/
         getChatData();
@@ -97,7 +129,60 @@ public class ChatsFragment extends Fragment {
             }
         });
 
+        IntentFilter filter = new IntentFilter("newMessage");
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        myReceiver = new MyMessageReceiver();
+        myReceiver.register(v.getContext(), filter);
+
         return v;
+    }
+
+    private void getMessage(final String chatID, final String messageID){
+
+        String base_url = getResources().getString(R.string.base_url);
+
+        String URI = base_url+"/users/"+userId+"/chats/"+chatID+"/messages/"+messageID;
+
+        Log.d("ChatsFragment", "URI: "+URI);
+
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(
+                Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+
+                    String newDate = response.getString("date");
+                    String newMessage = response.getString("message_text");
+
+                    for (ChatsEntry str : chats){
+                        if(str.getChatId().equals(chatID)){
+                            str.setLastMessageAndDate(newMessage, newDate);
+                            break;
+                        }
+                    }
+                    mAdapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        },
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+
+                });
+
+        Volley.newRequestQueue(v.getContext()).add(jsonRequest);
+
     }
 
     private void getChatData(){
@@ -230,4 +315,10 @@ public class ChatsFragment extends Fragment {
 
     }
 
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        myReceiver.unregister(v.getContext());
+    }
 }

@@ -45,4 +45,9 @@ public class ChatsEntry {
     public String getPicture(){
         return chat.getAsString("picture");
     }
+
+    public void setLastMessageAndDate(String newMessage, String newDate){
+        chat.put("lastMessage", newMessage);
+        chat.put("date", newDate);
+    }
 }

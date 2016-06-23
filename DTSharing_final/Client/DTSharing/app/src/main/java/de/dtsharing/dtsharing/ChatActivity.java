@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -11,10 +12,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -133,23 +137,23 @@ public class ChatActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-
         if(getIntent().getBooleanExtra("comesFromMain", false)){
             Intent chatsIntent = getIntent();
             partnerName = chatsIntent.getStringExtra("name");
             partnerPicture = chatsIntent.getStringExtra("picture");
             chatId = chatsIntent.getStringExtra("chatId");
-            getMessages(userId, chatId, null);
+            key = getKey();
+            toznyHelper = new ToznyHelper(key);
         }
         if(getIntent().getBooleanExtra("comesFromNotification", false)){
             Intent chatsIntent = getIntent();
             chatId = chatsIntent.getStringExtra("chatId");
-            getMessages(userId, chatId, null);
+            requestChatKey(userId, chatId);
         }
 
-        key = getKey();
-        Log.d("ChatActivity", "KEY: "+key);
-        toznyHelper = new ToznyHelper(key);
+
+        getPartnerDetails();
+        getMessages(userId, chatId, null);
 
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,11 +169,38 @@ public class ChatActivity extends AppCompatActivity {
         toolbar_user_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Erzeuge die Userprofile Activity und füge Daten hinzu*/
+                /*Erzeuge die Userprofile Activity und füge Daten hinzu*//*
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                 userProfileIntent.putExtra("userId", partnerUserId);
-                /*Starte Matching Activity*/
-                startActivity(userProfileIntent);
+                *//*Starte Matching Activity*//*
+                startActivity(userProfileIntent);*/
+
+                final int starFull = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_full_48dp", null, null);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this, R.style.AppTheme_Dialog_Alert);
+                LayoutInflater inflater = (ChatActivity.this).getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.fragment_rating, null);
+                builder.setView(dialogView)
+                        .setPositiveButton("BEWERTEN", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .setNegativeButton("ABBRECHEN", null);
+
+                final ImageButton star1 = (ImageButton) dialogView.findViewById(R.id.ivStar1);
+                star1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        star1.setImageResource(starFull);
+                    }
+                });
+
+                builder.create();
+                builder.show();
+
+
             }
         });
 
@@ -178,12 +209,6 @@ public class ChatActivity extends AppCompatActivity {
         myReceiver = new MyMessageReceiver();
         myReceiver.register(ChatActivity.this, filter);
 
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        Log.d("ChatActivity", "ON NEW INTENT CALLING!!: ");
     }
 
     private String getKey(){
@@ -205,12 +230,63 @@ public class ChatActivity extends AppCompatActivity {
         return keyString;
     }
 
+    public void requestChatKey(String userId, final String chatID){
+
+        String base_url = getResources().getString(R.string.base_url);
+        final String URI = base_url+"/users/"+userId+"/chats/"+chatID+"/key";
+
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(
+                Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+
+                Log.d("ChatActivity", "RESPONSE: "+response);
+                String key = null;
+                try {
+                    key = response.getString("key");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(key != null) {
+
+                    SQLiteDatabase db;
+                    db = openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+
+                    ContentValues values = new ContentValues();
+                    values.put("chat_id", chatID);
+                    values.put("key", key);
+
+                    db.insert("chats", null, values);
+
+                    db.close();
+
+                    toznyHelper = new ToznyHelper(key);
+                }
+
+            }
+
+        },
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+
+                });
+
+        Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+    }
+
     private void sendMessage(final String message){
 
         String base_url = getResources().getString(R.string.base_url);
-        String url = base_url+"/users/"+userId+"/chats/"+chatId+"/messages";
+        String URI = base_url+"/users/"+userId+"/chats/"+chatId+"/messages";
 
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -255,6 +331,54 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    private void getPartnerDetails(){
+
+        String base_url = getResources().getString(R.string.base_url);
+        String URI = base_url+"/users/"+userId+"/chats/"+chatId;
+
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(
+                Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+                    JSONObject partner = response.getJSONObject("partner");
+                    partnerName = partner.getString("first_name")+" "+partner.getString("last_name");
+                    partnerPicture = partner.getString("picture");
+                    partnerUserId = partner.getString("_id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mTitle.setText(partnerName);
+
+                if(partnerPicture.equals("null") || partnerPicture == null){
+                    int placeholder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
+                    toolbar_avatar.setImageResource(placeholder);
+                }else{
+                    RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), EncodeDecodeBase64.decodeBase64(partnerPicture));
+                    roundDrawable.setCircular(true);
+                    toolbar_avatar.setImageDrawable(roundDrawable);
+                }
+
+            }
+
+        },
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+
+                });
+
+        Volley.newRequestQueue(ChatActivity.this).add(jsonRequest);
+
+    }
+
     private void getMessages(final String userId, final String chatId, final String messageId){
 
         String base_url = getResources().getString(R.string.base_url);
@@ -281,17 +405,6 @@ public class ChatActivity extends AppCompatActivity {
                     getAllMessages(stringResponse);
                 } else {
                     getSingleMessage(stringResponse);
-                }
-
-                mTitle.setText(partnerName);
-
-                if(partnerPicture.equals("null") || partnerPicture == null){
-                    int placeholder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
-                    toolbar_avatar.setImageResource(placeholder);
-                }else{
-                    RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), EncodeDecodeBase64.decodeBase64(partnerPicture));
-                    roundDrawable.setCircular(true);
-                    toolbar_avatar.setImageDrawable(roundDrawable);
                 }
 
                 mAdapter.notifyDataSetChanged();

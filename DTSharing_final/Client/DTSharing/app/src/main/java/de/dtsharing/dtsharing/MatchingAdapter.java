@@ -175,13 +175,17 @@ public class MatchingAdapter extends BaseAdapter{
     private void commitMatch(final MatchingEntry matchData, final String key){
         
         String base_url = context_1.getResources().getString(R.string.base_url);
-        String url = base_url+"/users/"+matchData.getOwnerUserId()+"/dt_trips/"+matchData.getDtTripId();
+        String URI = base_url+"/users/"+matchData.getOwnerUserId()+"/dt_trips/"+matchData.getDtTripId();
         final String userID = new SharedPrefsManager(context_1).getUserIdSharedPrefs();
 
-        StringRequest postRequest = new StringRequest(Request.Method.PUT, url,
+        Log.d("MatchingAdapter", URI);
+
+        StringRequest postRequest = new StringRequest(Request.Method.PUT, URI,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+
+                        Log.d("MatchingActivity", "commitMatch RESPONSE: "+response);
 
                         try {
 
@@ -189,28 +193,11 @@ public class MatchingAdapter extends BaseAdapter{
 
                             if(jsonObject.has("success_message")) {
 
-                                String chatID = "";
-                                try {
-                                    chatID = jsonObject.getString("chat_id");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                String chatID = jsonObject.getString("chat_id");
+
+                                if(enteredTripDetails.containsKey("dtTripId")) {
+                                    deleteOwnTrip(enteredTripDetails.getAsString("dtTripId"), userID, chatID, matchData, key);
                                 }
-
-                                SQLiteDatabase db;
-                                db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
-
-                                ContentValues values = new ContentValues();
-                                values.put("chat_id", chatID);
-                                values.put("key", key);
-
-                                db.insert("chats", null, values);
-                                db.close();
-
-                                Intent mainIntent = new Intent(context_1, MainActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                mainIntent.putExtra("matching_success", true);
-                                mainIntent.putExtra("matchName", matchData.getUserName());
-                                context_1.startActivity(mainIntent);
 
                             }
 
@@ -248,6 +235,53 @@ public class MatchingAdapter extends BaseAdapter{
             }
 
         };
+
+        Volley.newRequestQueue(context_1).add(postRequest);
+
+    }
+
+    private void deleteOwnTrip(String dtTripId, String userId, final String chatId, final MatchingEntry matchData, final String key){
+
+        String base_url = context_1.getResources().getString(R.string.base_url);
+        String URI = base_url+"/users/"+userId+"/dt_trips/"+dtTripId;
+
+        Log.d("MatchingAdapter", URI);
+
+        StringRequest postRequest = new StringRequest(Request.Method.DELETE, URI,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.d("MatchingActivity", "deleteOwnTrip RESPONSE: "+response);
+
+                        if (response.contains("success_message")){
+
+                            SQLiteDatabase db;
+                            db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
+
+                            ContentValues values = new ContentValues();
+                            values.put("chat_id", chatId);
+                            values.put("key", key);
+
+                            db.insert("chats", null, values);
+                            db.close();
+
+                            Intent mainIntent = new Intent(context_1, MainActivity.class);
+                            mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mainIntent.putExtra("matching_success", true);
+                            mainIntent.putExtra("matchName", matchData.getUserName());
+                            context_1.startActivity(mainIntent);
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+            }
+        });
 
         Volley.newRequestQueue(context_1).add(postRequest);
 

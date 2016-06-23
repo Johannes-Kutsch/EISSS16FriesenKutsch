@@ -35,6 +35,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ImageView userAvatar, ivStar1, ivStar2, ivStar3, ivStar4, ivStar5;
     private ListView lvRatings;
     private FrameLayout noRatingsContainer;
+    private RelativeLayout mainContent;
 
     private ArrayList<RatingsEntry> ratingsList = new ArrayList<>();
     private RatingsAdapter mAdapter = null;
@@ -71,6 +72,7 @@ public class UserProfileActivity extends AppCompatActivity {
         tvCountRating = (TextView) findViewById(R.id.tvCountRatings);
         tvAverageRating = (TextView) findViewById(R.id.tvAverageRating);
         noRatingsContainer = (FrameLayout) findViewById(R.id.noRatingsContainer);
+        mainContent = (RelativeLayout) findViewById(R.id.main_content);
 
         ivStar1 = (ImageView) findViewById(R.id.ivStar1);
         ivStar2 = (ImageView) findViewById(R.id.ivStar2);
@@ -80,6 +82,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         lvRatings = (ListView) findViewById(R.id.lvRatings);
 
+        mainContent.setVisibility(View.GONE);
 
         /*Sichere die Empfangenen Daten in Variablen*/
         Intent userProfileIntent = getIntent();
@@ -204,6 +207,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                mainContent.setVisibility(View.VISIBLE);
                 lvRatings.setVisibility(View.VISIBLE);
                 tvAverageRating.setText(container.getAsString("averageRating"));
                 tvCountRating.setText(container.getAsString("countRatings"));
@@ -223,6 +227,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         error.printStackTrace();
                         switch (error.networkResponse.statusCode){
                             case 404:
+                                mainContent.setVisibility(View.VISIBLE);
                                 noRatingsContainer.setVisibility(View.VISIBLE);
                                 tvAverageRating.setText("0");
                                 tvCountRating.setText("(0)");

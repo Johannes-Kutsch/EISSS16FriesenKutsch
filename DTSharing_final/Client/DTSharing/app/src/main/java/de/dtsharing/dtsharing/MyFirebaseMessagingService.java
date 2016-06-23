@@ -43,7 +43,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     //It is same as we did in earlier posts
     private void sendNotification(RemoteMessage remoteMessage) {
         Intent intent = null;
-        if(remoteMessage.getData().get("type").equals("chat_message")) {
+        if(remoteMessage.getData().get("type").equals("chat_message") || remoteMessage.getData().get("type").equals("new_partner")) {
             intent = new Intent(getApplicationContext(), ChatActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("comesFromNotification", true);
@@ -53,10 +53,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             intent = new Intent(getApplicationContext(), MatchingActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("comesFromNotification", true);
+            intent.putExtra("dtTripId", remoteMessage.getData().get("dt_trip_id"));
             intent.putExtra("uniqueTripId", remoteMessage.getData().get("unique_trip_id"));
+            intent.putExtra("departureTime", remoteMessage.getData().get("departure_time"));
+            intent.putExtra("arrivalTime", remoteMessage.getData().get("arrival_time"));
+            intent.putExtra("departureStationName", remoteMessage.getData().get("departure_station_name"));
+            intent.putExtra("targetStationName", remoteMessage.getData().get("target_station_name"));
             intent.putExtra("sequenceIdDepartureStation", remoteMessage.getData().get("sequence_id_departure_station"));
             intent.putExtra("sequenceIdTargetStation", remoteMessage.getData().get("sequence_id_target_station"));
             intent.putExtra("hasSeasonTicket", remoteMessage.getData().get("has_season_ticket"));
+        }
+        if(remoteMessage.getData().get("type").equals("delete")) {
+            intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
