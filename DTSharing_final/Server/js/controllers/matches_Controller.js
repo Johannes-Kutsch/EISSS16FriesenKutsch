@@ -1,7 +1,6 @@
 var Users = require('../models/users'),
     Dt_trips = require('../models/dt_trips'),
     Ratings = require('../models/ratings'),
-    utils = require('../lib/utils'),
     async = require('async'),
     mongoose = require('mongoose');
  

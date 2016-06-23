@@ -1,6 +1,7 @@
 var Ratings = require('../models/ratings'),
     Users = require('../models/users'),
     async = require('async'),
+    utils = require('../lib/utils'),
     mongoose = require('mongoose');
     
 module.exports.rate = function (req, res) {
