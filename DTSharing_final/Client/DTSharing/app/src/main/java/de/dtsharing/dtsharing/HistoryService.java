@@ -88,7 +88,7 @@ public class HistoryService extends IntentService {
 
                 if (daysBetween > 0) {
 
-                    rating = rating * Math.pow(0.95, daysBetween);
+                    rating = rating * Math.pow(0.925, daysBetween);
 
                     ContentValues values = new ContentValues();
                     values.put("rating", rating);
@@ -124,9 +124,7 @@ public class HistoryService extends IntentService {
             double rating = cursor.getDouble(2);
             int count = cursor.getInt(4);
 
-            int daysBetween = daysBetween(stringToDate(last_calculated), stringToDate(currentDate));
-
-            rating = Math.log(count+3)+1;
+            rating++;
 
             ContentValues values = new ContentValues();
             values.put("rating", rating);
@@ -135,7 +133,6 @@ public class HistoryService extends IntentService {
 
             db.update("history", values, "departure_station_name=? AND target_station_name= ?", new String[] {departureStationName, targetStationName});
 
-            Log.d("SuchmaskeFragment", "DaysBetween: "+daysBetween);
             Log.d("SuchmaskeFragment", values.toString());
 
         }else{
