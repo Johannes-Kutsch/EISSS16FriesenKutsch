@@ -45,7 +45,7 @@ import java.util.Map;
 public class EditProfileActivity extends AppCompatActivity {
 
     private final static int RESULT_LOAD_IMG = 1;
-    String imgDecodableString;
+    String imgDecodableString, base_url;
 
     EditText _interests, _more;
     ImageView _profilePicture;
@@ -61,6 +61,8 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+
+        base_url = new SharedPrefsManager(EditProfileActivity.this).getBaseUrl();
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -153,7 +155,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void updateProfile(final boolean interestsChanged, final boolean moreChanged, final boolean pictureChanged){
 
-        String base_url = getResources().getString(R.string.base_url);
         String url = base_url+"/users/"+profileData.getAsString("user_id");
 
 

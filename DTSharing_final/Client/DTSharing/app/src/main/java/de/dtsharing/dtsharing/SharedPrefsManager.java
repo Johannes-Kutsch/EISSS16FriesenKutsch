@@ -31,6 +31,23 @@ public class SharedPrefsManager {
         editor.apply();
     }
 
+    public void setBaseUrl(String baseIP){
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString("baseUrl", "http://"+baseIP+":3000");
+        editor.putString("baseIP", baseIP);
+        editor.apply();
+    }
+
+    public String getBaseIP(){
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getString("baseIP", "192.168.0.15");
+    }
+
+    public String getBaseUrl(){
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getString("baseUrl", "http://192.168.0.15:3000");
+    }
+
     public String getFCMToken(){
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getString("token", null);

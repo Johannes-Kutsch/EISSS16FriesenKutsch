@@ -53,7 +53,7 @@ public class ChatsFragment extends Fragment {
     private ArrayList<ChatsEntry> chats = new ArrayList<>();
     private ChatsAdapter mAdapter;
 
-    private String userId;
+    private String userId, base_url;
 
     private MyMessageReceiver myReceiver;
 
@@ -101,6 +101,8 @@ public class ChatsFragment extends Fragment {
         /*Lade fragment_database Layout*/
         v = (RelativeLayout) inflater.inflate(R.layout.fragment_chats, container, false);
 
+        base_url = new SharedPrefsManager(v.getContext()).getBaseUrl();
+
         /*Erfassen der Views mit denen interagiert werden soll*/
         lvChats = (ListView) v.findViewById(R.id.lvChats);
         noChatsContainer = (TextView) v.findViewById(R.id.noChatsContainer);
@@ -138,8 +140,6 @@ public class ChatsFragment extends Fragment {
     }
 
     private void getMessage(final String chatID, final String messageID){
-
-        String base_url = getResources().getString(R.string.base_url);
 
         String URI = base_url+"/users/"+userId+"/chats/"+chatID+"/messages/"+messageID;
 
@@ -187,7 +187,6 @@ public class ChatsFragment extends Fragment {
 
     private void getChatData(){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/chats";
         chats.clear();
 
@@ -269,7 +268,6 @@ public class ChatsFragment extends Fragment {
 
     public void getChatKey(String userId, final String chatID){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/chats/"+chatID+"/key";
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(

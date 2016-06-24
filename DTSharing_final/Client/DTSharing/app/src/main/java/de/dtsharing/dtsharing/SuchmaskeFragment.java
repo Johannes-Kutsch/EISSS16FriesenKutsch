@@ -212,8 +212,8 @@ public class SuchmaskeFragment extends Fragment {
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String departureName = etDeparture.getText().toString(),
-                        targetName = etTarget.getText().toString(),
+                final String departureName = etDeparture.getText().toString().trim(),
+                        targetName = etTarget.getText().toString().trim(),
                         time = etTime.getText().toString(),
                         date = etDate.getText().toString();
 

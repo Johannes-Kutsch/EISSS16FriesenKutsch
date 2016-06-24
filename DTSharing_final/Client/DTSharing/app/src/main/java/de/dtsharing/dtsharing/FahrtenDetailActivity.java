@@ -29,12 +29,14 @@ public class FahrtenDetailActivity extends AppCompatActivity {
     TextView _departureTime1, _departureTime2, _arrivalTime1, _arrivalTime2, _departureStationName1, _departureStationName2,
             _targetStationName1, _targetStationName2, _departureUserName1, _departureUserName2,_targetUserName1, _targetUserName2,
             mTitle;
-    String userId, dtTripId;
+    String userId, dtTripId, base_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fahrten_detail);
+
+        base_url = new SharedPrefsManager(FahrtenDetailActivity.this).getBaseUrl();
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -82,7 +84,6 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
     private void getTripData(final String userId, final String dtTripId){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/dt_trips/"+dtTripId;
 
         Log.d("FahrtenDetailActivity", URI);

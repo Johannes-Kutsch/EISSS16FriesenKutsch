@@ -32,7 +32,7 @@ public class FahrtenAdapter extends BaseAdapter{
     private ArrayList<FahrtenEntry> fahrten;
     private Context context_1;
     private FahrtenFragment fahrtenFragment;
-    private String userId;
+    private String userId, base_url;
 
     public class ViewHolder {
         public TextView departureTime, departureName, targetTime, targetName, transitDuration, lineName, badgeCount;
@@ -121,7 +121,8 @@ public class FahrtenAdapter extends BaseAdapter{
 
     public void deleteTrip(String dtTripId, String userId, final int position){
 
-        String base_url = context_1.getResources().getString(R.string.base_url);
+        base_url = new SharedPrefsManager(context_1).getBaseUrl();
+
         final String URI = base_url+"/users/"+userId+"/dt_trips/"+dtTripId;
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(

@@ -43,13 +43,13 @@ public class LoginFragment extends Fragment {
 
     RelativeLayout v;
 
-    String token = null;
+    String token = null, base_url;
 
     public ProgressDialog progressDialog;
 
-    Button _signin;
+    Button _signin, _submitBaseUrl;
     TextView _forgotPassword, _signup, toolbar_title;
-    EditText _mail, _password;
+    EditText _mail, _password, _inputBaseUrl;
 
     private MyTokenReceiver receiver;
 
@@ -60,11 +60,16 @@ public class LoginFragment extends Fragment {
         /*Lade fragment_database Layout*/
         v = (RelativeLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
+        final SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(v.getContext());
+        base_url = sharedPrefsManager.getBaseUrl();
+
         _signup = (TextView) v.findViewById(R.id.tvSignup);
         _forgotPassword = (TextView) v.findViewById(R.id.tvForgotPassword);
         _signin = (Button) v.findViewById(R.id.bSignin);
         _mail = (EditText) v.findViewById(R.id.etMail);
         _password = (EditText) v.findViewById(R.id.etPassword);
+        _inputBaseUrl = (EditText) v.findViewById(R.id.inputBaseUrl);
+        _submitBaseUrl = (Button) v.findViewById(R.id.submitBaseUrl);
 
         _signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +96,29 @@ public class LoginFragment extends Fragment {
 
                 if(verifyInput(mail, password)){
                     submitData(mail, HashString.md5(password));
+                }
+            }
+        });
+
+        _inputBaseUrl.setText(sharedPrefsManager.getBaseIP());
+
+        _submitBaseUrl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!_inputBaseUrl.getText().toString().trim().equals("")){
+
+                    sharedPrefsManager.setBaseUrl(_inputBaseUrl.getText().toString().trim());
+
+                    hideSoftKeyboard(getActivity(), view);
+
+                    Snackbar snackbar = Snackbar.make(v, "IP-Adresse geändert\nBitte Applikation neustarten", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null);
+                    View snackBarView = snackbar.getView();
+                    snackBarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.positive));
+                    TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                    snackbar.show();
+
                 }
             }
         });
@@ -122,7 +150,6 @@ public class LoginFragment extends Fragment {
 
     private void submitData(final String mail, final String password){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String url = base_url+"/sessions";
 
         progressDialog = new ProgressDialog(v.getContext(),
@@ -171,7 +198,9 @@ public class LoginFragment extends Fragment {
 
                 error.printStackTrace();
 
-                int  statusCode = error.networkResponse.statusCode;
+                int  statusCode = 0;
+                if(error.networkResponse != null)
+                    statusCode = error.networkResponse.statusCode;
 
                 if(progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();

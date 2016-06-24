@@ -58,7 +58,7 @@ public class TripsActivity extends AppCompatActivity {
     private ArrayList<TripsEntry> trips = new ArrayList<>();
     private TripsAdapter mAdapter;
 
-    private String departureName, targetName, departureDate, departureTime, userId;
+    private String departureName, targetName, departureDate, departureTime, userId, base_url;
     private Boolean hasTicket;
 
     @Override
@@ -66,7 +66,9 @@ public class TripsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_trips);
 
-        userId = new SharedPrefsManager(getApplicationContext()).getUserIdSharedPrefs();
+        SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(TripsActivity.this);
+        base_url = sharedPrefsManager.getBaseUrl();
+        userId = sharedPrefsManager.getUserIdSharedPrefs();
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -141,7 +143,6 @@ public class TripsActivity extends AppCompatActivity {
         progressDialog.setMessage("Trips werden ermittelt...");
         progressDialog.show();
 
-        String base_url = getResources().getString(R.string.base_url);
         final String uri = Uri.parse(base_url+"/trips")
                 .buildUpon()
                 .appendQueryParameter("departure_station_name", departureName)

@@ -41,12 +41,14 @@ public class UserProfileActivity extends AppCompatActivity {
     private ArrayList<RatingsEntry> ratingsList = new ArrayList<>();
     private RatingsAdapter mAdapter = null;
 
-    private String userId;
+    private String userId, base_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprofile);
+
+        base_url = new SharedPrefsManager(UserProfileActivity.this).getBaseUrl();
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -102,7 +104,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public void getUserProfileData(){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId;
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(
@@ -171,7 +172,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void getRatingData(){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/ratings";
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(

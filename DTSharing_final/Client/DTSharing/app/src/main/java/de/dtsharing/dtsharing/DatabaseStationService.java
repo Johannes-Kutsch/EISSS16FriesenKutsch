@@ -49,7 +49,8 @@ public class DatabaseStationService extends IntentService {
     public boolean setupStopsDatabase(){
 
 
-        String base_url = getResources().getString(R.string.base_url);
+        String base_url = new SharedPrefsManager(DatabaseStationService.this).getBaseUrl();
+
         String uri = Uri.parse(base_url+"/stops")
                 .buildUpon()
                 .appendQueryParameter("stops_version", Integer.toString(getStopsVersion()))

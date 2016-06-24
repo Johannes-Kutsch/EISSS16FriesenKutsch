@@ -52,7 +52,7 @@ public class MatchingActivity extends AppCompatActivity {
     private ArrayList<MatchingEntry> matches = new ArrayList<>();
     private MatchingAdapter mAdapter;
 
-    String role, userId;
+    String role, userId, base_url;
     ContentValues tripData = new ContentValues();
 
 
@@ -61,7 +61,9 @@ public class MatchingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_matching);
 
-        userId = new SharedPrefsManager(getApplicationContext()).getUserIdSharedPrefs();
+        SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(MatchingActivity.this);
+        base_url = sharedPrefsManager.getBaseUrl();
+        userId = sharedPrefsManager.getUserIdSharedPrefs();
 
         /*Adding Toolbar to Main screen*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -170,7 +172,6 @@ public class MatchingActivity extends AppCompatActivity {
 
     private void addDtTrip(final ContentValues tripData){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/dt_trips";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
@@ -231,8 +232,6 @@ public class MatchingActivity extends AppCompatActivity {
     }
 
     private void getMatchingData(ContentValues tripData){
-
-        String base_url = getResources().getString(R.string.base_url);
 
         final String uri = Uri.parse(base_url+"/matches")
                 .buildUpon()

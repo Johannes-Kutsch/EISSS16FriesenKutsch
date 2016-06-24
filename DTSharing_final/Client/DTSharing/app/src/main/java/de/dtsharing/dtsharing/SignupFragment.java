@@ -56,6 +56,7 @@ public class SignupFragment extends Fragment {
 
     List<String> birthYears = new ArrayList<String>();
     int currentTicketIndex = -1;
+    String base_url;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,6 +64,8 @@ public class SignupFragment extends Fragment {
 
         /*Lade fragment_database Layout*/
         v = (ScrollView) inflater.inflate(R.layout.fragment_signup, container, false);
+
+        base_url = new SharedPrefsManager(v.getContext()).getBaseUrl();
 
         _mail = (EditText) v.findViewById(R.id.etMail);
         _password1 = (EditText) v.findViewById(R.id.etPassword);
@@ -196,7 +199,6 @@ public class SignupFragment extends Fragment {
 
     private void submitData(final JSONObject data){
 
-        String base_url = getResources().getString(R.string.base_url);
         String url = base_url+"/users";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,

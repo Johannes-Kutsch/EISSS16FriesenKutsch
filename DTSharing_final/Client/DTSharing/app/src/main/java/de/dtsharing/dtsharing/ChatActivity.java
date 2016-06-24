@@ -56,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
 
     Context context;
 
-    private String partnerName, partnerPicture, partnerUserId, chatId, userId, userName;
+    private String partnerName, partnerPicture, partnerUserId, chatId, userId, userName, base_url;
     private ArrayList<MessagesEntry> messages = new ArrayList<>();
     private EditText inputMessage;
     private LinearLayout toolbar_user_container;
@@ -110,6 +110,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         context = ChatActivity.this;
+        base_url = new SharedPrefsManager(context).getBaseUrl();
 
         /*Adding Toolbar to Main screen*/
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -270,7 +271,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void submitRating(final int rating, final String comment){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+partnerUserId+"/ratings";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
@@ -334,7 +334,6 @@ public class ChatActivity extends AppCompatActivity {
 
     public void requestChatKey(String userId, final String chatID){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/chats/"+chatID+"/key";
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(
@@ -385,7 +384,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage(final String message){
 
-        String base_url = getResources().getString(R.string.base_url);
         String URI = base_url+"/users/"+userId+"/chats/"+chatId+"/messages";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
@@ -435,8 +433,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void getPartnerDetails(){
 
-        String base_url = getResources().getString(R.string.base_url);
-        String URI = base_url+"/users/"+userId+"/chats/"+chatId;
+        String URI = base_url+"/users/"+userId+"/chats/"+chatId+"/partner";
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(
                 Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
@@ -483,7 +480,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void getMessages(final String userId, final String chatId, final String messageId){
 
-        String base_url = getResources().getString(R.string.base_url);
         String URI;
 
         if(messageId == null) {

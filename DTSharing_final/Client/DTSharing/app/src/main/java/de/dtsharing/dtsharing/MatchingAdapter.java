@@ -45,6 +45,7 @@ public class MatchingAdapter extends BaseAdapter{
     private ContentValues enteredTripDetails;
     private Context context_1;
     private AesCbcWithIntegrity.SecretKeys key;
+    private String base_url;
 
     public class ViewHolder {
         public TextView userName, departureTime, departureName, targetTime, targetName;
@@ -173,8 +174,8 @@ public class MatchingAdapter extends BaseAdapter{
     }
 
     private void commitMatch(final MatchingEntry matchData, final String key){
-        
-        String base_url = context_1.getResources().getString(R.string.base_url);
+
+        base_url = new SharedPrefsManager(context_1).getBaseUrl();
         String URI = base_url+"/users/"+matchData.getOwnerUserId()+"/dt_trips/"+matchData.getDtTripId();
         final String userID = new SharedPrefsManager(context_1).getUserIdSharedPrefs();
 
@@ -258,7 +259,6 @@ public class MatchingAdapter extends BaseAdapter{
 
     private void deleteOwnTrip(String dtTripId, String userId, final String chatId, final MatchingEntry matchData, final String key){
 
-        String base_url = context_1.getResources().getString(R.string.base_url);
         String URI = base_url+"/users/"+userId+"/dt_trips/"+dtTripId;
 
         Log.d("MatchingAdapter", URI);

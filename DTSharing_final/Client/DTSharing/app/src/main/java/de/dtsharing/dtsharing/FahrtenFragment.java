@@ -46,7 +46,7 @@ public class FahrtenFragment extends Fragment {
     private ArrayList<FahrtenEntry> fahrten = new ArrayList<>();
     public FahrtenAdapter mAdapter;
 
-    private String userId;
+    private String userId, base_url;
 
     public FahrtenFragment() {
         // Required empty public constructor
@@ -64,7 +64,9 @@ public class FahrtenFragment extends Fragment {
         lvFahrten = (ListView) v.findViewById(R.id.lvFahrten);
         noTripsContainer = (TextView) v.findViewById(R.id.noTripsContainer);
 
-        userId = new SharedPrefsManager(this.getContext()).getUserIdSharedPrefs();
+        SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(v.getContext());
+        base_url = sharedPrefsManager.getBaseUrl();
+        userId = sharedPrefsManager.getUserIdSharedPrefs();
 
         /*Erzeuge und verbinde Adapter mit der FahrtenFragment ListView*/
         mAdapter = new FahrtenAdapter(getContext(), fahrten, userId, FahrtenFragment.this);
@@ -93,7 +95,6 @@ public class FahrtenFragment extends Fragment {
 
     private void getDtTrips(){
 
-        String base_url = getResources().getString(R.string.base_url);
         final String URI = base_url+"/users/"+userId+"/dt_trips";
         fahrten.clear();
 
