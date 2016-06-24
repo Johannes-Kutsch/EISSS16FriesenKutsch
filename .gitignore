@@ -15,6 +15,7 @@ MS3/DTSharing/Server/mongo/db/*
 # Built application files
 *.apk
 *.ap_
+!MS3/*.apk
 
 # Files for the Dalvik VM
 *.dex
