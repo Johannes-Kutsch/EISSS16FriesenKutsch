@@ -14,6 +14,20 @@ teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits
 vorhandenen Dauertickets ermöglicht. Außerdem soll es durch das System
 vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 
+####Installation
+1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
+2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
+3. Den Git Ordner [MS3/DTSharing](https://github.com/netrox91/EISSS16FriesenKutsch/tree/master/MS3/DTSharing) herunterladen und entpacken.
+4. Terminal öffnen und in den Ordner ```DTSharing/Server``` wechseln.
+5. Die benötigten Module durch ```npm install``` installieren.
+6. Ein 2. Terminal öffnen, da MongoDB und NodeJS ausgeführt werden müssen.
+7. Um die MongoDB zu starten in den Ordner ```DTSharing/Server``` wechseln und ```mongod --dbpath mongo/db``` ausführen.
+ * Um die MongoDB mit den GTFS Daten zu füllen:
+ * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
+ * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` die Daten einlesen (Achtung! - Dauert ca 30 Sekunden).
+8. Um den NodeJS Server zu starten mit dem erstem Terminal in den Ordner ```DTSharing/Server``` wechseln und ```node server.js```ausführen.
+
+
 ###Rapid Prototype
 ####Beschreibung
 Der Rapid Prototype wurde in Android Studio entwickelt, für den Server wurde NodeJS gewählt und als Datenbank findet MongoDB verwendung. Es wurden im Prototypen für das Projekt wichtige Funktionalitäten umgesetzt.
@@ -24,19 +38,6 @@ Der Rapid Prototype wurde in Android Studio entwickelt, für den Server wurde No
 * Matching zwischen Ticket-Anbietend und -Suchend anhand der eingetragenen Daten (PoC 11.1)
 * Abrufen der GPS Informationen Latitude und Longitude on demand (PoC 11.4)
 * Ausgabe von Haltestellen, welche sich in einem Umkreis von 2km befinden (Radius kann variiert werden) (PoC 11.5)
-
-####Installation
-1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
-2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
-3. Den Git Ordner ```MS3/DTSharing``` herunterladen und entpacken.
-4. Terminal öffnen und in den Ordner ```DTSharing/Server``` wechseln.
-5. Die benötigten Module durch ```npm install``` installieren.
-6. Ein 2. Terminal in dem Ordner öffnen, da MongoDB und NodeJS ausgeführt werden müssen.
-7. Um die MongoDB zu starten in den Ordner ```DTSharing/Server``` wechseln und ```mongod --dbpath mongo/db``` ausführen.
- * Um die MongoDB mit den GTFS Daten zu füllen:
- * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
- * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` die Daten einlesen (Achtung! - Dauert ca 30 Sekunden).
-8. Um den NodeJS Server zu starten mit dem erstem Terminal in den Ordner ```DTSharing/Server``` wechseln und ```node server.js```ausführen.
 
 ####Screenshots
 ![alt text](https://github.com/netrox91/EISSS16FriesenKutsch/blob/master/MS1/Rapid%20Prototype%20Screenshots/All.png "Screenshot")
