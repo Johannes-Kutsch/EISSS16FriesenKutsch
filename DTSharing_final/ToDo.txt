@@ -19,6 +19,7 @@ Prozessassesment
 => Verlauf Algo noch nicht zufriedenstellend
 => detailierte Fahrtenscreen, evaluation während Implementation
 => chat Key übermitteln => evtl Key aus vorhandenen Daten bilden
+=> Server ist noch nicht sicher (sessions/nullpointer bei Anfragen mit fehlenden Attriputen) => fehler im Client oder kid spielt in der Console rum
 Fazit
 => Gruppenfahrten
 => Regelmäßig Fahrten einstellen

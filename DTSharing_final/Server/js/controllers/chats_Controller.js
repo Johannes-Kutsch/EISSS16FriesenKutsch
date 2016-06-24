@@ -5,7 +5,7 @@ var Chats = require('../models/chats'),
     Messages = require('../models/messages'),
     async = require('async'),
     utils = require('../lib/utils'),
-    gcm = require('node-gcm'),
+    fcm = require('node-gcm'),
     mongoose = require('mongoose');
 
 
@@ -49,7 +49,7 @@ module.exports.findChats = function (req, res) {
     Chats.find( {$or: [{owner_user_id : req.params.user_id}, {partner_user_id : req.params.user_id}]}, '-__v -key', function (err, results) {
         
         if(err) {
-            //Es gab einen Fehler während der Datenbankabfrage
+            //Es gab einen Fehler bei der Datenbankabfrage
             res.status(500);
             res.send({
                 error_message: 'Database Error'
@@ -104,7 +104,7 @@ module.exports.findChats = function (req, res) {
                 }, function(callback) {
                     Messages.findOne({chat_id : result._id}, 'sequence message_text', {sort:{sequence:-1}},function(err, result) {
                         if(err) {
-                            //Es gab einen Fehler während der Datenbankabfrage
+                            //Es gab einen Fehler bei der Datenbankabfrage
                             //Das Errorobject wird weitergegeben
                             callback(err);
                         } else if (result) {
@@ -185,7 +185,7 @@ module.exports.findPartner = function (req, res) {
     Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
         
         if(err) {
-            //Fehler während der Datenbankabfrage
+            //Fehler bei der Datenbankabfrage
             res.status(500);
             res.send({
                 error_message: 'Database Error'
@@ -210,7 +210,7 @@ module.exports.findPartner = function (req, res) {
         Users.findById(query, 'first_name last_name picture', function(err, result) {
             
             if(err) {
-                //Fehler während der Datenbankabfrage
+                //Fehler bei der Datenbankabfrage
                 res.status(500);
                 res.send({
                     error_message: 'Database Error'
@@ -238,7 +238,7 @@ module.exports.createMessage = function (req, res) {
     Messages.findOne({chat_id : req.params.chat_id}, 'sequence', {sort:{sequence:-1}},function(err, result) {
         
         if(err) {
-            //Fehler während der Datenbankabfrage
+            //Fehler bei der Datenbankabfrage
             res.status(500);
             res.send({
                 error_message: 'Database Error'
@@ -269,7 +269,7 @@ module.exports.createMessage = function (req, res) {
         message.save(function (err, result) {
             
             if(err) {
-                //Fehler während der Datenbankabfrage
+                //Fehler bei der Datenbankabfrage
                 res.status(500);
                 res.send({
                     error_message: 'Database Error'
@@ -277,30 +277,50 @@ module.exports.createMessage = function (req, res) {
                 console.error(err);
                 return;
             }
+            
+            //Die Nachricht wurde erfolgreich gespeichert, es wird eine success response gesendet
             res.status(201);
             res.send({
                 success_message: 'message created'
             });
+            
+            //Der Chatpartner wird über fcm darüber Informiert das es eine neue Nachricht gibt
+            //Die _id der grade erstellten Nachricht wird gespeichert
             var message_id = result._id;
+            
+            //Die user_id des Chatpartners wird ermittelt
             Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
+                
                 if(err) {
+                    //Fehler bei der Datenbankabfrage
                     console.error(err);
                     return;
                 }
+                
+                //Die user_id des Chatpartners wird hier gespeichert
                 var receiver_user_id;
                 if(result.owner_user_id == req.params.user_id) {
+                    //Chatpartner ist der partner des Chatraumes
                     receiver_user_id = result.partner_user_id;
                 } else if(result.partner_user_id == req.params.user_id) {
+                    //Chatpartner ist der owner des Chatraumes
                     receiver_user_id = result.owner_user_id;
                 }
+                
+                //Das fcm-token des Chatpartners wird ermittelt
                 Users.findById(receiver_user_id, 'token', function(err, result) {
+                    
                     if(err) {
+                        //Fehler bei der Datenbankabfrage
                         console.error(err);
                         return;
                     }
+                    
                     if(result.token) {
-                        console.log(message_id);
-                        var message = new gcm.Message({
+                        //Für den Chatpartner wurde ein fcm-token gefunden
+                        //Es wird eine neue message erstellt
+                        //Vorlage: https://github.com/ToothlessGear/node-gcm#usage
+                        var message = new fcm.Message({
                             data: {
                                 type: 'chat_message',
                                 chat_id: req.params.chat_id,
@@ -311,9 +331,14 @@ module.exports.createMessage = function (req, res) {
                                 body: 'Einer deiner Mitfahrer hat dir etwas geschrieben.'
                             }
                         });
-                        var sender = new gcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                        
+                        //Der sender wird mit dem fcm API key eingerichtet
+                        var sender = new fcm.Sender('AIzaSyCutkpnGoS-TAk5wWDzxRPR9ARBR6lm38E');
+                        
+                        //Die Nachricht wird abgeschickt
                         sender.send(message, { registrationTokens: [result.token] }, function (err, response) {
                             if(err) {
+                                //Fehler bei dem Sendevorgang
                                 console.error(err);
                             }
                         });
@@ -324,73 +349,125 @@ module.exports.createMessage = function (req, res) {
     });
 }
 
+//Nachrichten und Details für einen Chatraum abrufen
 module.exports.findMessages = function (req, res) {
+    
+    //Es können mehrere Datenbankabfragen parallel durchgeführt werden
     async.parallel([
+        
+        //Ermitteln aller Nachrichten eines Chatraumes
         function(callback) {
+            
+            //query für die Datenbankabfrage erstellen
             var query = {chat_id : req.params.chat_id};
+            
+            //Es kann eine sequence im query der Uri angegeben werden
             if(req.query.sequence) {
+                //Es wurde eine sequence angegeben, es sollen nur Nachrichten >= dieser Sequence ermittelt werden
+                //Die neue Bedingung wird zum query der Datenbankabfrage hinzugefügt
                 query.sequence = {$gte : req.query.sequence};
             }
+            
+            //Alle relevanten Nachrichten in der Messages Collection ermitteln
             Messages.find(query, '-__v -_id -chat_id', {sort:{sequence:1}},function(err, results) {
-                if (err) {
-                    return callback(err);
-                }
-                callback(null, results);
+                //Das Errorobject und/oder das result werden weitergegeben, err ist null wenn kein Fehler aufgetreten ist
+                callback(err, results);
             });
+            
+        //Benutzerdaten des Chatpartners ermitteln
         }, function(callback) {
+            
+            //user_id's der beiden Chatbenutzer ermitteln
             Chats.findById(req.params.chat_id, 'owner_user_id partner_user_id', function(err, result) {
+                
                 if(err) {
+                    //Fehler bei der Datenbankabfrage
                     return callback(err);
                 }
+                
+                //query für die Datenbankabfrage der Users collection
                 var query;
+                //user_id des Chatpartners ermitteln
                 if(result.owner_user_id == req.params.user_id) {
+                    //Chatpartner ist der partner des Chatraumes
                     query = result.partner_user_id
                 } else {
+                    //Chatpartner ist der owner des Chatraumes
                     query = result.owner_user_id
                 }
                 Users.findById(query, 'first_name last_name picture', function(err, result) {
-                    if(err) {
-                        return callback(err);
-                    }
-                    callback(null, result);
+                    //Das Errorobject und/oder das result werden weitergegeben, err ist null wenn kein Fehler aufgetreten ist
+                    callback(err, result);
                 });
             });
+            
+        //Ermitteln ob der Chat das Popup zum bewerten einblenden soll
         }, function(callback) {
+            
+            //dt_trip_id des zum Chat gehörenden dt_trips ermitteln
             Chats.findById(req.params.chat_id, 'dt_trip_id', function(err, result) {
+                
                 if(err) {
+                    //Fehler bei der Datenbankabfrage
                     return callback(err);
                 }
+                
+                //Ankunftszeiten der Benutzer ermitteln
                 Dt_trips.findById(result.dt_trip_id, 'date owner_arrival_time partner_arrival_time', function(err, result) {
+                    
                     if(err) {
+                        //Fehler bei der Datenbankabfrage
                         return callback(err);
                     }
+                    
+                    //Variable in der die spätere Ankunftszeit gespeichert werden soll
                     var arrival_time;
+                    
+                    //Ermitteln welche arrival_time später ist
                     if(utils.timeToSeconds(result.owner_arrival_time) >= utils.timeToSeconds(result.partner_arrival_time)) {
+                        //arrival_time des owners ist später
                         arrival_time = utils.timeToSeconds(result.owner_arrival_time);
                     } else {
+                        //arrival_time des partners ist später
                         arrival_time = utils.timeToSeconds(result.partner_arrival_time)
                     }
-                    var date = utils.formatDate(result.date);
+                    
+                    //Ein Dateobject mit dem Datum des dt_trips erstellen
+                    var arrival_date = utils.formatDate(result.date);
+                    //Die Uhrzeit auf die ermittelte arrival_time setzen
                     date.setSeconds(arrival_time);
-                    if(date < new Date()) {
+                    
+                    //Überprüfen ob die Ankunftszeit in der Vergangenheit liegt
+                    if(arrival_date < new Date()) {
+                        
+                        //Überprüfen ob der Benutzer schon bewertet hat
                         Ratings.findOne({chat_id: req.params.chat_id, author_id: req.params.user_id}, function(err, result) {
+                            
                             if(err) {
+                                //Fehler bei der Datenbankabfrage
                                 return callback(err);
                             }
                             if(result) {
+                                //Der Benutzer hat schon bewertet
                                 callback(null, true);
                             } else {
+                                //Der Benutzer hat noch nicht bewertet
                                 callback(null, false);
                             }
                         });
                     } else {
+                        //Die Ankunftszeit ist noch nicht in der Vergangenheit
                         callback(null);
                     }
                 });
             });
         }
+        
+    //wird aufgerufen nachdem alle Datenbankabfragen durchgeführt wurden
     ], function(err, results) {
+        
         if(err) {
+            //Es gabe einen Fehler bei der Datenbankabfrage
             res.status(500);
             res.send({
                 error_message: 'Database Error'
@@ -398,7 +475,9 @@ module.exports.findMessages = function (req, res) {
             console.error(err);
             return;
         }
+        
         if(!results[0].length) {
+            //Es wurden noch keine Nachrichten ausgetauscht
             console.log('No (new) Messages | 404');
             res.status(404);
             res.send({
@@ -406,6 +485,8 @@ module.exports.findMessages = function (req, res) {
             });
             return;
         }
+        
+        //Responseobject erstellen
         var has_voted = results[2]
         var partner = results[1];
         var messages = results[0];
@@ -417,9 +498,14 @@ module.exports.findMessages = function (req, res) {
     });
 }
 
+//eine bestimmte Nachricht in einem Chatraum finden
 module.exports.findMessage = function (req, res) {
+    
+    //Die Nachricht in der Messages Collection finden
     Messages.findById(req.params.message_id, '-_id -__v', function(err, result) {
+        
         if(err) {
+            //Fehler bei der Datenbankabfrage
             res.status(500);
             res.send({
                 error_message: 'Database Error'
@@ -427,7 +513,9 @@ module.exports.findMessage = function (req, res) {
             console.error(err);
             return;
         }
+        
         if(!result) {
+            //Es wurde keine Nachricht gefunden
             console.log('Message not found | 404');
             res.status(404);
             res.send({
@@ -435,13 +523,20 @@ module.exports.findMessage = function (req, res) {
             });
             return;
         }
+        
+        //Nachricht als response übergeben
         res.send(result);
     });
 }
 
+//den Verschlüsselungskey eines Chatraumes finden
 module.exports.findKey = function (req, res) {
+    
+    //Den Chatraum in der Chatcollection finden, result enthält nur den Key
     Chats.findById(req.params.chat_id, '-_id key', function(err, result) {
+        
         if(err) {
+            //Fehler bei der Datenbankabfrage
             res.status(500);
             res.send({
                 error_message: 'Database Error'
@@ -449,7 +544,9 @@ module.exports.findKey = function (req, res) {
             console.error(err);
             return;
         }
+        
         if(!result) {
+            //Es wurde kein Key gefunden
             console.log('Key not found | 404');
             res.status(404);
             res.send({
@@ -457,6 +554,8 @@ module.exports.findKey = function (req, res) {
             });
             return;
         }
+        
+        //Key als response übergeben
         res.send(result);
     });
 }

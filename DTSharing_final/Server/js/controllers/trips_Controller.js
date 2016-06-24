@@ -10,13 +10,19 @@ var async = require('async'),
     CalendarDates = require('../models/calendar_dates');
 
 module.exports.findTrips = function (req, res) {
+    //"Define"
+    //Sekunden die ein Tag hat
+    var seconds_per_day = 86400;
+    //Die Anzahl an Trips die wenigstens ermittelt werden sollen
+	var min_number_trips = 10;
+    
     //Querydaten in Formate umwandeln mit denen gearbeitet werden kann
     //Abfahrtszeit wird vom Format SS:HH:MM in Sekunden umgewandelt
     var departure_time = utils.timeToSeconds(req.query.departure_time);
     //Abfahrtsdatum vom Format DD.MM.YY in ein Date objekt geschrieben
 	var	departure_date = utils.formatDate(req.query.departure_date);
     
-    //Arrays zum speichern
+    //Arrays zum zwischenspeichern
     //Trips die am Startbahnhof halten
 	var departure_trips = [];
     //Trips die am Zielbahnhof halten
@@ -25,29 +31,37 @@ module.exports.findTrips = function (req, res) {
     var connecting_routes = [];
     //Trips die an beiden Bahnhöfen halten
     var connecting_trips = [];
-    //Die auf den Abfahrtstag und die Abfahrtszeit zugeschnittenen Trips
+    //Die auf den Abfahrtstag und die Abfahrtszeit zugeschnittenen Trips, welche als response übermittelt werden
     var unique_trips = [];
     
-    //"Define"
-    //Sekunden die ein Tag hat
-    var seconds_per_day = 86400;
-    //Die Anzahl an Trips die wenigstens ermittelt werden sollen
-	var min_number_trips = 10;
-    
+    //wird für die Zeitangaben in der Konsole benötigt
     var total_start_time = (new Date()).getTime();
+    
+    //Die im waterfall aufgelisteten asynchronen Funktionen werden der Reihe nach durchgearbeitet
     async.waterfall([
+        //Die ID's welche zu den übergebenen Bahnhofsnamen passen werden ermittelt
         async.apply(findStationIDs, req.query.departure_station_name, req.query.target_station_name),
+        
+        //trips die von Bahnhof a zu Bahnhof b fahren werden ermittelt
         findConectingTrips,
-        findTrips,
+        
+        //die trips mit konkreten Abfahrtsdaten anreichern
+        findUniqueTrips,
     ], function (err, result) {
         if(err) {
+            //Es gab einen Fehler während der Ermittlung der trips
             if(err.type == '200') {
+                //Es gab einen custom Fehler, etwa weil einem Bahnhofsnamen keine ID zugeordnert werden konnte
+                //weil der Fehler auf falsche Eingaben des Benutzers zurückzuführen ist der Server also wie gewollt gearbeitet hat, wird die error_message mit einem 200er Statuscoode übermittelt
+                //die Nutzung eines Statuscode welcher nicht dem 2xx muster entspricht würde "dreckigen" Code zum verarbeiten des Bodys Clientseitig voraussetzen
+                //die Nutzung des 204er Statuscodes wurde in Erwägung gezogen, jedoch schnell verworfen, da die Nachricht eine error_message beinhaltet
                 res.send({
                     error_message: err.message
                 });
                 console.error(err);
                 return;
             } else {
+                //Es gab einen Datenbankfehler
                 res.status(500);
                 res.send({
                     error_message: 'Database Error'
@@ -56,18 +70,25 @@ module.exports.findTrips = function (req, res) {
                 return;
             }
         } 
-        var end_time = (new Date()).getTime(); 
-        console.log('Es wurden ' + [end_time - total_start_time] + ' MS gebraucht um ' + unique_trips.length + ' Verbindungen zu ermitteln!');
+
+        //Überprüfen ob unique_trips ermittelt wurden
         if(!unique_trips.length) {
+            //es wurden keine unique_trips ermittelt
             res.send({
                 error_message: 'Es wurde keine direkte Verbindung zwischen ' + req.query.departure_station_name + ' und ' + req.query.target_station_name + ' gefunden.'
             });
             console.error(err);
             return;
         }
+        
+        //die unique_trips werden als response übermittelt
         res.json(unique_trips);
+        
+        console.log('Es wurden insgesamt ' + [(new Date()).getTime() - total_start_time] + ' MS gebraucht um ' + unique_trips.length + ' Verbindungen zu ermitteln!');
+        
     });
 
+    //ruft die function findStationID zwei mal parallel auf um die zum departue_station_name und target_station_name passenden stop_id's zu ermitteln
     function findStationIDs(departue_station_name, target_station_name, callback) {
         async.parallel([
             async.apply(findStationID, departue_station_name),
@@ -78,29 +99,51 @@ module.exports.findTrips = function (req, res) {
         });
     }
 
+    //ermittelt die zu einem station_name gehöhrende stop_id und seinen stop_name
     function findStationID(station_name, callback) {
-        var regex_query = [new RegExp(station_name, 'i')];
-        Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, results) {
-            console.log(results);
+        
+        //Es werden Stops gesucht die exakt mit dem station_name übereinstimmen
+        Stops.find({stop_name : station_name}, '-_id stop_id stop_name', function (err, results) {
+            
             if(err) {
+                //Es gabe einen Datenbankfehler
                 return callback(err);
+                
             } else if(results.length == 1) {
+                //Es wurde genau ein Bahnhof gefunden
                 console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
                 callback(err, results[0]);
             } else {
+                //Es konnte kein Bahnhof ermittelt werden, die Suche wird etwas aufgelockert
+                
+                //Der einzelnen Wörte im station_name werden voneinander getrennt
                 var station_name_fragments = station_name.split(' ');
+                
+                //query für die Datenbankabfrage
+                var regex_query = [];
+                
+                //jedes Wort in station_name_fragments wird so formatiert das es caseinsensitive ist und an einer beliebiegen Stelle im Bahnhofsnamen stehen darf
                 station_name_fragments.forEach(function(result) {
                     regex_query.push(new RegExp('.*'+result+'.*', 'i'));
                 });
+                
+                //Es wird versucht einen Bahnhof zu finden dessen Namen alle Fragemente beinhaltet
+                //so wird z.b. der Bahnhof Köln, Hansaring bei einem station_name von Hansaring, Hansaring Köln oder Hansaring, Köln gefunden
                 Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, results) {
                     if(err) {
+                        //Es gab einen Datebankfehler
                         return callback(err);
                     } else if (results.length > 1) {
+                        //es wurde mehr als ein Bahnhof gefunden
                         return callback(new customError('200','Es wurde mehr als ein Bahnhof mit dem Namen '+station_name+' gefunden.'));
                     } else if (results.length == 0) {
+                        //es wurde kein Bahnhof gefunden
                         return callback(new customError('200','Es wurde kein Bahnhof mit dem Namen '+station_name+' gefunden.'));
                     }
+                    
                     console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
+                    
+                    //Die ermittelten Bahofsdaten werden weitergegeben
                     callback(err, results[0]); 
                 });
             }
@@ -214,7 +257,7 @@ module.exports.findTrips = function (req, res) {
         });
     }
 
-    function findTrips(stops, callback) {
+    function findUniqueTrips(stops, callback) {
         var current_departure_date = departure_date;
         current_departure_date.setDate(current_departure_date.getDate() - 1);
         var current_departure_time = departure_time + seconds_per_day;
