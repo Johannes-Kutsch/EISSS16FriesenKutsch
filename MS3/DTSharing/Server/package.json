@@ -5,12 +5,9 @@
   "main": "server.js",
   "dependencies": {
     "async": "^2.0.0-rc.6",
-    "body-parser": "~1.15.0",
+    "body-parser": "^1.15.2",
     "express": "~4.13.4",
-    "geocoder": "^0.2.2",
-    "geolib": "^2.0.20",
     "gtfs": "^0.4.6",
-    "lodash": "^4.13.1",
     "mongoose": "^4.4.12",
     "node-gcm": "^0.14.3"
   },

@@ -1,8 +1,6 @@
 //Quelle: https://github.com/brendannee/node-gtfs/blob/master/lib/gtfs.js
 //Wurde teilweise angepasst!
 
-var _ = require('lodash');
-
 module.exports = {
     
     //gibt den Wochentag eines Date-Objects zurück

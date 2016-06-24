@@ -23,7 +23,7 @@ module.exports = {
 
     {
       agency_key: 'VRS',
-      path: '../../gtfs_data/google_transit_DB.zip'
+      path: '../../gtfs/google_transit_DB.zip'
     }
   ]
 };

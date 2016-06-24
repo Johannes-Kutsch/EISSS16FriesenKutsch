@@ -435,7 +435,7 @@ module.exports.findMessages = function (req, res) {
                     //Ein Dateobject mit dem Datum des dt_trips erstellen
                     var arrival_date = utils.formatDate(result.date);
                     //Die Uhrzeit auf die ermittelte arrival_time setzen
-                    date.setSeconds(arrival_time);
+                    arrival_date.setSeconds(arrival_time);
                     
                     //Überprüfen ob die Ankunftszeit in der Vergangenheit liegt
                     if(arrival_date < new Date()) {
