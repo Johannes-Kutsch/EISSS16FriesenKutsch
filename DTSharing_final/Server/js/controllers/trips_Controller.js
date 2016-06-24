@@ -13,7 +13,7 @@ module.exports.findTrips = function (req, res) {
     //"Define"
     //Sekunden die ein Tag hat
     var seconds_per_day = 86400;
-    //Die Anzahl an Trips die wenigstens ermittelt werden sollen
+    //Die Anzahl an Trips (Fahrten) die wenigstens ermittelt werden sollen
 	var min_number_trips = 10;
     
     //Querydaten in Formate umwandeln mit denen gearbeitet werden kann
@@ -27,7 +27,7 @@ module.exports.findTrips = function (req, res) {
 	var departure_trips = [];
     //Trips die am Zielbahnhof halten
     var target_trips = [];
-    //Routen die an beiden Bahnhöfen halten
+    //Routen (Linien) die an beiden Bahnhöfen halten
     var connecting_routes = [];
     //Trips die an beiden Bahnhöfen halten
     var connecting_trips = [];
@@ -110,9 +110,12 @@ module.exports.findTrips = function (req, res) {
                 return callback(err);
                 
             } else if(results.length == 1) {
-                //Es wurde genau ein Bahnhof gefunden
+                
                 console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
+                
+                //Es wurde genau ein Bahnhof gefunden
                 callback(err, results[0]);
+                
             } else {
                 //Es konnte kein Bahnhof ermittelt werden, die Suche wird etwas aufgelockert
                 
@@ -128,7 +131,7 @@ module.exports.findTrips = function (req, res) {
                 });
                 
                 //Es wird versucht einen Bahnhof zu finden dessen Namen alle Fragemente beinhaltet
-                //so wird z.b. der Bahnhof Köln, Hansaring bei einem station_name von Hansaring, Hansaring Köln oder Hansaring, Köln gefunden
+                //so wird z.b. der Bahnhof Köln, Hansaring bei einem station_name von Hansaring oder Hansaring Köln gefunden
                 Stops.find({stop_name : {$all: regex_query}}, '-_id stop_id stop_name', function (err, results) {
                     if(err) {
                         //Es gab einen Datebankfehler
@@ -140,7 +143,7 @@ module.exports.findTrips = function (req, res) {
                         //es wurde kein Bahnhof gefunden
                         return callback(new customError('200','Es wurde kein Bahnhof mit dem Namen '+station_name+' gefunden.'));
                     }
-                    
+                       
                     console.log('Station ID für ' + station_name + ' ist ' + results[0].stop_id);
                     
                     //Die ermittelten Bahofsdaten werden weitergegeben
@@ -150,17 +153,27 @@ module.exports.findTrips = function (req, res) {
         });  
     }
 
+    //Es werden alle trips ermittelt die von Bahnhof stops[0] nach stops[1] fahren
     function findConectingTrips(stops, callback) {
         var start_time = (new Date()).getTime();
+        
+        //Die Funktionen werden nacheinander aufgerufen
         async.waterfall([
+            
+            //Es werden alle trips die an den stops halten ermittelt 
             function(callback) {
+                
+                //Als erstes werden die Trips an beiden Haltestellen ermittelt
                 async.parallel([
                     async.apply(findTripsAtStop, stops[0].stop_id),
                     async.apply(findTripsAtStop, stops[1].stop_id)
                 ],
                 function(err, results){
+                    //Die Trips werden gespeichert, sie werden später erneut gebraucht.
                     departure_trips = results[0];
                     target_trips = results[1];
+                    
+                    //Die trip_id's werden in zwei Arrays gespeichert
                     var departure_trip_ids = [];
                     var target_trip_ids = [];
                     departure_trips.forEach(function (result) {
@@ -169,21 +182,30 @@ module.exports.findTrips = function (req, res) {
                     target_trips.forEach(function (result) {
                         target_trip_ids.push(result.trip_id);
                     });
+                    
                     var end_time = (new Date()).getTime();
                     console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + departure_trip_ids.length + '|' + target_trip_ids.length + ' Trip IDs für die Stops ' + stops[0].stop_name + '|' + stops[1].stop_name + ' zu ermitteln ');
                     start_time = (new Date()).getTime();
+                    
+                    //Die trip_id's werden weitergegeben
                     callback(err, departure_trip_ids, target_trip_ids); 
                 });
             }, 
+            
+            //Um nicht vergleichen zu müssen welche trips an beiden Bahnhöfen halten (im Schnitt ca 2500 * 2500 Vergleiche) werden die Routen (Linien) auf denen diese trips fahren miteinander verglichen (im Schnitt ca 6*6 Vergleiche)
             function(departure_trip_ids, target_trip_ids, callback) {
+                //Nachdem die trip_ids ermittelt wurden können die Routen auf denen diese Trips fahren ermittelt werden
                 async.parallel([
                     async.apply(findDistinctRouteIDs, departure_trip_ids),
                     async.apply(findDistinctRouteIDs, target_trip_ids)
                 ],
                 function(err, results){
+                    
                     var end_time = (new Date()).getTime(); 
                     console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results[0].length + '|' + results[1].length + ' RouteIDs für ' + departure_trip_ids.length + '|' + target_trip_ids.length + ' Trip IDs zu ermitteln ');
                     start_time = (new Date()).getTime();
+                    
+                    //Es wird ermittelt welche Routen an beiden Bahnhöfen halten
                     results[0].forEach(function (departureRouteID) {
                         results[1].forEach(function (targetRouteID) {
                             if(departureRouteID == targetRouteID) {
@@ -191,72 +213,114 @@ module.exports.findTrips = function (req, res) {
                             }
                         });
                     });
+                    
                     if(connecting_routes.length == 0) {
+                        //es gibt keine Routen die an beiden Bahnhöfen halten
                         return callback(new customError('200','Es wurde keine direkte Verbindung von '+ stops[0].stop_name + ' nach ' + stops[1].stop_name +' gefunden.'));
                     }
+
                     var end_time = (new Date()).getTime(); 
                     console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um die RouteIDs welche von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' fahren zu ermitteln: ' + connecting_routes);
                     start_time = (new Date()).getTime();
-                    callback(err); 
+                                        
+                    //Die Routen wurden ermittelt und gespeichert
+                    callback(err);
+                    
                 });
-            }, 
-            findTripsOnRoute,
+                
+            //Es werden alle Trips ermittelt die auf den ermittelten Routen fahren
+            }, function(callback) {
+                var start_time = (new Date()).getTime();
+                
+                
+                Trips.find({ route_id: { $in: connecting_routes } }, '-_id service_id trip_id route_id', function (err, results) {
+                    if(err) {
+                        //Es gabe einen Datenbankfehler
+                        return callback(err);
+                    }
+
+                    var end_time = (new Date()).getTime();
+                    console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results.length + ' Trips auf den Routen ' + connecting_routes + ' zu finden.');
+                                        
+                    //Die ermittelten Trips werden weitergegeben
+                    callback(null, results);
+                                        
+                });
+            },
+        
+        //Es wurden jetzt alle Trips ermittelt welche auf Routen liegen die an beiden Bahnhöfen halten
+        //Dies beinhaltet jedoch auch Trips welche in die falsche Richtung fahren
+        //In einigen seltenen fällen sind auch Trips enthalten welche nicht an einem Bahnhof halten, da die Route zwar normalerweise an diesem Bahnhof hält, 
+        //der Bahnhof jedoch für diesen Trip übersprungen wird oder dieser Trip nicht bis zur Endhaltestelle fährt
+        
+        //Es sollen nun alle Trips ermittelt werden die an beiden Bahnhöfen halten, zu der Route gehöhren und zuerst an der departure_station und danach an der target_station halten
+        //Für die Ermittlung dieser Trips wurden zwei Varianten getestet:
+        //Bei der ersten Variante wurden diese Trips aus der Collection stop_times ausgelesen
+        //Bei der zweiten Vatiante wurden die trips welche auf einer Route fahren mit vorher gespeicherten departure_trips und target_trips verglichen
+        //Die zweite Variante hat sich als deutlich schneller erwiesen und wurde deshalb genommen
         ], function (err, results) {
             if(err) {
+                //Es gabe einen Fehler
                 return callback(err);
             }
+            
             var start_time = (new Date()).getTime();
+            
+            //Es werden alle trips die auf der Route sind durchlaufen
             results.forEach( function(trip) {
+                
+                //Es werden alle departure_trips durchlaufen
                 departure_trips.forEach( function (departure_trip) {
+                    
+                    //Es wird verglichen ob die trip_id beider trips identisch ist
                     if(trip.trip_id == departure_trip.trip_id) {
+                        //Die trip ID ist identisch
+                        
+                        //Es werden alle target_trips durchlaufen
                         target_trips.forEach(function (target_trip) {
+                            
+                            //Es wird verglichen ob die trip_id beider trips identisch ist und die Abfahrtszeit am Startbahnhof geringer als die Ankunftszeit am Zielbahnhof ist
                             if(trip.trip_id == target_trip.trip_id && departure_trip.departure_time <= target_trip.arrival_time) {
+                                //Es wurde ein Trip gefunden der an beiden Bahnhöfen hält und in die richtige Richtung fährt
+                                
+                                //Es wird ein Array mit den Informationen über den trip sowie Abfahrtszeit, Ankunftszeit usw erstellt
                                 var connecting_trip = [];
                                 connecting_trip[0] = trip;
                                 connecting_trip[1] = departure_trip;
                                 connecting_trip[2] = target_trip;
+                                
+                                //Das Array wird in connecting_trips gespeichert
                                 connecting_trips.push(connecting_trip);
                             }
                         });
                     }
                 });
             });
+
             var end_time = (new Date()).getTime();
             console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + connecting_trips.length + ' Fahrten von ' + stops[0].stop_name + ' nach ' + stops[1].stop_name + ' zu ermitteln');
+                        
+            //Die connecting_trips wurden ermittelt
             callback(err, stops);
+            
         });
     }
 
+    //Es werden alle Trips die an einer Haltestelle halten ermittelt 
     function findTripsAtStop(stop_id, callback) {
         StopTimes.find({stop_id: stop_id}, '-_id trip_id departure_time arrival_time stop_sequence', function(err, results) {
-            if(err) {
-                return callback(err);
-            }
-            callback(null, results);      
+            callback(err, results);      
         });
     }
         
+    //Es werden alle Routes die zu den trip_ids gehöhren ermittelt 
     function findDistinctRouteIDs(trip_ids, callback) {
         Trips.distinct('route_id', {trip_id : {$in: trip_ids}}, function (err, results) {
-            if(err) {
-                return callback(err);
-            }
-            callback(null, results);
+            callback(err, results);
         });
     }
 
-    function findTripsOnRoute(callback) {
-        var start_time = (new Date()).getTime();
-        Trips.find({ route_id: { $in: connecting_routes } }, '-_id service_id trip_id route_id', function (err, results) {
-            if(err) {
-                return callback(err);
-            }
-            var end_time = (new Date()).getTime();
-            console.log('Es wurden ' + [end_time - start_time] + ' MS gebraucht um ' + results.length + ' Trips auf den Routen ' + connecting_routes + ' zu finden.');
-            callback(null, results);
-        });
-    }
-
+    //
     function findUniqueTrips(stops, callback) {
         var current_departure_date = departure_date;
         current_departure_date.setDate(current_departure_date.getDate() - 1);
@@ -437,11 +501,5 @@ module.exports.findTrips = function (req, res) {
     function customError(type, message) {
         this.type = type;
         this.message = message;
-    }
-
-    //wird zur besseren Lesbarkeite der Console beim Testen benötigt
-    function sleepFor( sleepDuration ){
-        var now = new Date().getTime();
-        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
     }
 }
