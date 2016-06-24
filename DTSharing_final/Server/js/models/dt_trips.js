@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-/*Datenbank Schema der Collection "dt_trips" */
+//Datenbankschema der Collection dt_trips
 module.exports = mongoose.model('dt_trips', {
     unique_trip_id: String,
     trip_id: String,

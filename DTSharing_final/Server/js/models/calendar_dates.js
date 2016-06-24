@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 
+//Datenbank Schema der Collection calendar_dates
+//https://github.com/brendannee/node-gtfs/blob/master/models/CalendarDate.js
+//wurde als Vorlage verwendet
 module.exports = mongoose.model('calendarDates', {
   agency_key: {
     type: String,

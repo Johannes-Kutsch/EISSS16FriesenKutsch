@@ -7,7 +7,7 @@ im Wiki verlinken
 Montag:
 Präsi?
 Prozessassesment
-=> Fahrtenfindungsalgo verbessert
+=> Fahrtenfindungsalgo verbessert => node-gtfs nicht performant genug
 => Matching klappte wie in der Doku beschrieben
 => etwas von Ressourcen abgewichen, machte dadurch mehr Sinn
 => einige Uris noch nicht gebraucht

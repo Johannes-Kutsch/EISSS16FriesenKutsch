@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var utils = require('../lib/utils');
 
-/*Datenbank Schema der Collection "stop_times" */
+//Datenbank Schema der Collection stop_times
+//https://github.com/brendannee/node-gtfs/blob/master/models/StopTime.js
+//wurde als Vorlage verwendet
 module.exports = mongoose.model('stoptimes', {
   agency_key: {
     type: String,

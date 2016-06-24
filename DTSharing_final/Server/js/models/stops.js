@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-/*Datenbank Schema der Collection "stops" */
+//Datenbank Schema der Collection stops
 module.exports = mongoose.model('stops', {
   agency_key: {
     type: String,

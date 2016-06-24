@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-/*Datenbank Schema der Collection "users" */
+//Datenbank Schema der Collection users
 module.exports = mongoose.model('users', {
     user_version: Number,
     birth_year: Number,

@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 
+//Datenbank Schema der Collection routes
+//https://github.com/brendannee/node-gtfs/blob/master/models/Route.js
+//wurde als Vorlage verwendet
 module.exports = mongoose.model('routes', {
   agency_key: {
     type: String,

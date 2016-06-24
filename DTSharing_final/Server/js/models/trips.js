@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 
+//Datenbank Schema der Collection trips
+//https://github.com/brendannee/node-gtfs/blob/master/models/Trip.js
+//wurde als Vorlage verwendet
 module.exports = mongoose.model('trips', {
   agency_key: {
     type: String,
