@@ -72,4 +72,8 @@ public class ToznyHelper {
         return decryptedString;
     }
 
+    public AesCbcWithIntegrity.SecretKeys getKeys(){
+        return keys;
+    }
+
 }

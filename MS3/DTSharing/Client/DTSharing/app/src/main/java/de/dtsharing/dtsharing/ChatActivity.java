@@ -73,6 +73,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private MyMessageReceiver myReceiver;
 
+    /* Der receiver zum Empfangen neuer Nachrichten */
     public class MyMessageReceiver extends BroadcastReceiver {
         public boolean isRegistered;
 
@@ -93,6 +94,10 @@ public class ChatActivity extends AppCompatActivity {
             return false;
         }
 
+        /* Wird ein Broadcast mit der Action "newMessage" empfangen werde chatId und messageId aus diesem
+        * gezogen. Entspricht die chatId der des aktuellen Chats handelt es sich um eine Nachricht aus diesem Chat.
+        * Daraufhin wird die Methode getMessages aufgerufen. Da der dritte Parameter nicht null ist, weiß die Methode
+        * dass es sich lediglich um den Empfang einer einzelnen Nachricht handelt. */
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("newMessage")) {
@@ -110,7 +115,6 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         context = ChatActivity.this;
-        base_url = new SharedPrefsManager(context).getBaseUrl();
 
         /*Adding Toolbar to Main screen*/
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -118,13 +122,16 @@ public class ChatActivity extends AppCompatActivity {
         toolbar_avatar = (ImageView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_avatar) : null);
         toolbar_user_container = (LinearLayout) (toolbar != null ? toolbar.findViewById(R.id.toolbar_user_container) : null);
 
+        /* Views werden erfasst */
         lvMessages = (ListView) findViewById(R.id.lvMessages);
         inputMessage = (EditText) findViewById(R.id.inputMessage);
         bSubmit = (ImageButton) findViewById(R.id.bSubmit);
         cvRatingsContainer = (CardView) findViewById(R.id.cvRatingContainer);
         ratingsContainerText = (TextView) findViewById(R.id.ratingContainerText);
 
+        /* SharedPrefsManager wird erzeugt und base_url, userId sowie userName werden bezogen */
         SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(ChatActivity.this);
+        base_url = sharedPrefsManager.getBaseUrl();
         userId = sharedPrefsManager.getUserIdSharedPrefs();
         userName = sharedPrefsManager.getUserNameSharedPrefs();
 
@@ -132,6 +139,7 @@ public class ChatActivity extends AppCompatActivity {
         mAdapter = new MessagesAdapter(ChatActivity.this, messages, userId);
         lvMessages.setAdapter(mAdapter);
 
+        /* Custom Toolbar wird gesetzt */
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -142,6 +150,8 @@ public class ChatActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
+        /* Kommt der Benutzer von der mainActivity kann der Key zum ent- und verschlüsseln von Nachrichten
+         * direkt mitgenommen werden */
         if(getIntent().getBooleanExtra("comesFromMain", false)){
             Intent chatsIntent = getIntent();
             partnerName = chatsIntent.getStringExtra("name");
@@ -153,6 +163,7 @@ public class ChatActivity extends AppCompatActivity {
         if(getIntent().getBooleanExtra("comesFromNotification", false)){
             Intent chatsIntent = getIntent();
             chatId = chatsIntent.getStringExtra("chatId");
+            userId = sharedPrefsManager.getUserIdSharedPrefs();
             requestChatKey(userId, chatId);
         }
 
@@ -559,7 +570,17 @@ public class ChatActivity extends AppCompatActivity {
                     if(partnerUserId == null && !authorId.equals(userId))
                         partnerUserId = authorId;
 
-                    toznyHelper.decryptString(message);
+                    if(toznyHelper == null) {
+                        key = getKey();
+                        if (key == null){
+                            requestChatKey(userId, chatId);
+                        } else {
+                            toznyHelper = new ToznyHelper(key);
+                        }
+                        toznyHelper.decryptString(message);
+                    } else {
+                        toznyHelper.decryptString(message);
+                    }
 
                     messages.add(new MessagesEntry(authorId, name, time, date, toznyHelper.getDecryptedString(), sequence));
                 }

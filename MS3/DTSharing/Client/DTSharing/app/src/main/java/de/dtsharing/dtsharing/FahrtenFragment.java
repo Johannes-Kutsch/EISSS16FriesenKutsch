@@ -156,6 +156,17 @@ public class FahrtenFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
+
+                        int statuscode = 0;
+                        if(error.networkResponse != null){
+                            statuscode = error.networkResponse.statusCode;
+                        }
+
+                        if(statuscode == 404){
+
+                            noTripsContainer.setVisibility(View.VISIBLE);
+
+                        }
                     }
 
                 });
