@@ -24,7 +24,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 7. Um die MongoDB zu starten in den Ordner ```DTSharing/Server``` wechseln und ```mongod --dbpath mongo/db``` ausführen.
  * Um die MongoDB mit den GTFS Daten zu füllen:
  * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
- * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` die Daten einlesen (Achtung! - Dauert ca 30 Sekunden).
+ * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` einlesen (Achtung! - Dauert ca 30 Sekunden).
 8. Um den NodeJS Server zu starten mit dem erstem Terminal in den Ordner ```DTSharing/Server``` wechseln und ```node server.js```ausführen.
 
 
