@@ -1,15 +1,34 @@
-must have:
-Chat //Done
-Suchagenten //Done
-Bewerten
-Umkreissuche //Done
-Verlauf //Done
+Freitag:
+Architektur
+wenn Zeit Code kommentieren
+im Wiki verlinken
 
+
+Montag:
+Präsi?
 Prozessassesment
+=> Fahrtenfindungsalgo verbessert
+=> Matching klappte wie in der Doku beschrieben
+=> etwas von Ressourcen abgewichen, machte dadurch mehr Sinn
+=> einige Uris noch nicht gebraucht
+=> Chats/Server parallel löschen, erstellen
+=> kein Pub/Sub sondern ansprechen des Clients über ein Tokens, Chat wird nur ein Gerät alamiert, Suchagenten hat zu viele Parameter für subben einer Topic
+=> 
 Fazit
+=> Gruppenfahrten
+=> Regelmäßig Fahrten einstellen
+=>
 Code kommentieren
+Installationsdoku
+
+errorhandling bei parallelen Zugriffen/races Serverseitig
 
 nice to have:
 Chats auch offline ansehen
-Chat-Verschlüsselung //Done
 https/sessions
+
+nächste Woche Freitag:
+Plakat
+Server aufsetzen?
+
+nächste Woche Montag:
