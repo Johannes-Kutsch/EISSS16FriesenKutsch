@@ -8,9 +8,9 @@ node_modules/
 .idea/
 
 # MongoDB
-DTSharing/Server/mongo/db/*
-DTSharing_final/Server/mongo/db/*
-!DTSharing_final/Server/mongo/db/*.txt
+MS1/DTSharing/Server/mongo/db/*
+MS3/DTSharing/Server/mongo/db/*
+!MS3/DTSharing/Server/mongo/db/*.txt
 
 # Built application files
 *.apk
