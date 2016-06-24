@@ -65,27 +65,32 @@ public class SignupFragment extends Fragment {
         /*Lade fragment_database Layout*/
         v = (ScrollView) inflater.inflate(R.layout.fragment_signup, container, false);
 
+        /* base_url wird aus den SharedPrefs bezogen */
         base_url = new SharedPrefsManager(v.getContext()).getBaseUrl();
 
+        /* Views werden erfasst */
         _mail = (EditText) v.findViewById(R.id.etMail);
         _password1 = (EditText) v.findViewById(R.id.etPassword);
         _password2 = (EditText) v.findViewById(R.id.etPasswordRepeat);
         _firstName = (EditText) v.findViewById(R.id.etFirstName);
         _lastName = (EditText) v.findViewById(R.id.etLastName);
         _birthYear = (AutoCompleteTextView) v.findViewById(R.id.etBirthYear);
-
         _gender = (RadioGroup) v.findViewById(R.id.rgGender);
-
         _signup = (Button) v.findViewById(R.id.bSignup);
 
+        /* Falls die List<String> keine Einträge enthält, wird diese gefüllt */
         if(birthYears.isEmpty()){
             addBirthYears();
         }
 
+        /* Der Adapter für das AutoComplete EditText birthYear wird erzeugt. Ein Standard Layout wird zugewiesen. Ebenso die Datenquelle (List<String> birthYears)
+         * Abschließend wird das AutoComplete EditText mit dem Adapter verbunden */
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, birthYears);
         _birthYear.setThreshold(1);
         _birthYear.setAdapter(adapter);
 
+        /* Bei Auswahl eines Items aus dem AutoComplete wird diese in das Input Feld eingetragen.
+         * Software Tastatur wird versteckt für eine freie Sicht auf das Formular */
         _birthYear.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View convertView, int position, long l) {
@@ -94,12 +99,14 @@ public class SignupFragment extends Fragment {
             }
         });
 
+        /* onClick für den Registrieren Button */
         _signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 final JSONObject data = new JSONObject();
 
+                /* Ein JSONObject wird mit den Daten des Formulars vorbereitet */
                 try {
                     data.put("mail", _mail.getText().toString().trim());
                     data.put("password1", _password1.getText().toString());
@@ -111,6 +118,8 @@ public class SignupFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace(); //sollte nicht eintreten
                 }
+
+                /* Das data object wird verifiziert und abschließend an den Server gesandt */
                 if(data.length() > 0)
                     if(verifyInput(data)){
                         submitData(data);
@@ -121,6 +130,7 @@ public class SignupFragment extends Fragment {
         return v;
     }
 
+    /* Simple Methode zum füllen der birthYear Liste. Das aktuelle Datum - 100 Jahre wird durchlaufen */
     private void addBirthYears(){
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         for(int i = currentYear; i >= currentYear - 100; i--){
@@ -128,6 +138,9 @@ public class SignupFragment extends Fragment {
         }
     }
 
+    /* Methode zum verifizieren alle eingegebenen Daten
+     * Entspricht eine Eingabe nicht den Richtlinien wird diese entsprechend markiert und der Benutzer wird auf die Art
+     * des Fehlers hingewiesen */
     private boolean verifyInput(JSONObject data){
         boolean valid = true;
 
@@ -173,15 +186,23 @@ public class SignupFragment extends Fragment {
                 }
             }
 
+            /* Es wird überprüft ob beide Kennwörter angegeben wurden */
             if((!data.getString("password1").equals("")) && !data.getString("password2").equals("")) {
+
+                /* Lediglich das Kennwort 1 wird verifiziert, da das Kennwort 2 diesem ja entsprechen muss */
                 if (!LoginFragment.isValidPassword(data.getString("password1"))) {
                     valid = false;
                     _password1.setError("Das Kennwort muss aus mindestens 6 Zeichen bestehen");
                 } else {
+
+                    /* Es wird überprüft ob beide Kennwörter übereinstimmen */
                     if (!data.getString("password1").equals(data.getString("password2"))) {
                         valid = false;
                         _password2.setError("Kennwörter stimmen nicht überein");
                     }else{
+
+                        /* Kennwort erfüllt alle Voraussetzungen. Kennwort 1 wird MD5 gehashed. Anschließend werden Kennwort 1 und 2 entfernt und durch
+                         * dieses ersetzt  */
                         String md5Password = HashString.md5(data.getString("password1"));
                         data.put("password", md5Password);
                         data.remove("password1");
@@ -194,15 +215,21 @@ public class SignupFragment extends Fragment {
             e.printStackTrace(); //sollte nicht eintreten
         }
 
+        /* Wenn valid == true werden die Daten an den Server gesandt */
         return valid;
     }
 
+    /* Daten wurden verifiziert und werden an den Server gesandt */
     private void submitData(final JSONObject data){
 
-        String url = base_url+"/users";
+        String URI = base_url+"/users";
 
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+        /* Ein POST-Request mit den Verifizierten Formulardaten wird an den Server gesandt */
+        StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
                 new Response.Listener<String>() {
+
+                    /* Bei einer erfolgreichen Response wird eine positive Snackbar mit entsprechender Meldung angezeigt
+                     * Anschleßend wird wieder auf Seite 1 (Login) navigiert */
                     @Override
                     public void onResponse(String response) {
                         Snackbar snackbar = Snackbar.make(v, "Account wurde erfolgreich erstellt", Snackbar.LENGTH_LONG)
@@ -222,12 +249,21 @@ public class SignupFragment extends Fragment {
 
                 error.printStackTrace();
 
-                int  statusCode = error.networkResponse.statusCode;
+                int statusCode = 0;
 
+                if(error.networkResponse != null) {
+                    statusCode = error.networkResponse.statusCode;
+                }
+
+                /* Bei einem Fehler wird je nach Statuscode weiter verfahren */
                 switch (statusCode) {
+
+                    /* E-Mail Adresse ist bereits vergeben und wird dem Benutzer als Error im Feld "E-Mail" angezeigt */
                     case 409:
                         _mail.setError("Diese E-Mail Adresse ist bereits vergeben");
                         break;
+
+                    /* Serverseitiger Fehler. Negative Snackbar mit entsprechendem Hinweis wird angezeigt */
                     case 500:
                         Snackbar snackbar = Snackbar.make(v, "Fehler im System. Versuche es später erneut", Snackbar.LENGTH_INDEFINITE)
                                 .setAction("Action", null);
@@ -265,6 +301,7 @@ public class SignupFragment extends Fragment {
 
         };
 
+        /* Request wird der Volley Queue hinzugefügt und abgearbeitet */
         Volley.newRequestQueue(getActivity()).add(postRequest);
 
     }

@@ -14,20 +14,24 @@ public class TripsAdapter extends BaseAdapter{
     private ArrayList<TripsEntry> trips;
     private Context context_1;
 
+    /* ViewHolder wird spezifiziert */
     public class ViewHolder {
         public TextView departureTime, departureDate, departureName, targetTime, targetName, transitDuration, lineName, badgeCount;
 
     }
 
+    /* Konstruktor. Die ArrayList trips enthält die jeweiligen Daten der Response des Servers */
     public TripsAdapter(Context context, ArrayList<TripsEntry> trips) {
         this.context_1 = context;
         this.trips = trips;
     }
 
+    /* Gibt die größe der ArrayList aus */
     @Override
     public int getCount() {
         return trips.size();
     }
+
 
     @Override
     public Object getItem(int position) {
@@ -39,6 +43,8 @@ public class TripsAdapter extends BaseAdapter{
         return 0;
     }
 
+    /* in getView werden die Views erfasst, dem viewHolder zugewiesen und abschließend mit den Daten der ArrayListe trips
+     * angereichert. Die Operationen eines Adapters gelten für jedes Item welches diesem über die ArrayListe hinzugefügt wurde */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;

@@ -39,17 +39,30 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         sendNotification(remoteMessage);
     }
 
-    //This method is only generating push notification
-    //It is same as we did in earlier posts
     private void sendNotification(RemoteMessage remoteMessage) {
         Intent intent = null;
+        /* onClick Intent der Push Notification wird festgelegt. Dies geschieht anhand des im Data() enthaltenen Key/Value Pairs "type".
+         * Dem Intent werden jeweils benötigte und in der remoteMessage beigefügte Daten als Extra mitgegeben. Durch das Anfügen eines
+         * Extra Booleans "comesFrom..." weiß die Aktivität ob sie normal oder über einen Klick auf die Notification gestartet wurde. Somit
+         * kann Beispielsweise beim anzeiges des potentiellen Matches der "Als Suchend Eintragen" Button entfernt werden, wenn der Benutzer
+         * die Matching Aktivität über die Notification erreicht. Da dieser die Notification ja nur erhält, wenn er sich bereits als Suchend/Anbietend
+         * eingetragen hat entfällt dieser Button also */
+
+        /* Erhält der Benutzer eine neue Chat Nachricht ODER ein Partner schreibt sich für seine Fahrt ein erhält dieser einen Hinweis
+         * onClick auf die Notification bringt den Benutzer direkt in den betroffenen Chat. Die remoteMessage dieses Types enthält also alle für die
+         * Darstellung des richtiges Chats benötigten Informationen */
         if(remoteMessage.getData().get("type").equals("chat_message") || remoteMessage.getData().get("type").equals("new_partner")) {
             intent = new Intent(getApplicationContext(), ChatActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("comesFromNotification", true);
             intent.putExtra("chatId", remoteMessage.getData().get("chat_id"));
         }
-        if(remoteMessage.getData().get("type").equals("search_agent")) {
+
+        /* Der Suchagent triggert, wenn ein Benutzer sich als Anbietend/Suchend für eine Fahrt eingetragen hat und während er auf einen Partner wartet
+         * ein anderer Nutzer dasselbe getan hat, statt sich mit diesem zu matchen. Daraufhin wird dieser Informiert. Die remoteMessage enthält alle für die
+         * Darstellung der korrekten Matchdetails benötigten Informationen und führt den Benutzer in die MatchingActivity. Der Button um sich als Suchend/Anbietend
+         * einzutragen wird entfernt*/
+        else if(remoteMessage.getData().get("type").equals("search_agent")) {
             intent = new Intent(getApplicationContext(), MatchingActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("comesFromNotification", true);
@@ -63,13 +76,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             intent.putExtra("sequenceIdTargetStation", remoteMessage.getData().get("sequence_id_target_station"));
             intent.putExtra("hasSeasonTicket", remoteMessage.getData().get("has_season_ticket"));
         }
-        if(remoteMessage.getData().get("type").equals("delete")) {
+
+        /* Trägt ein Partner sich aus einer Fahrt aus wird der verblieben Benutzer darüber Informiert. */
+        else if(remoteMessage.getData().get("type").equals("delete")) {
             intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
+
+        /* Das PendingIntent wird mit einem der vorher eingetroffenen Typen und deren Daten gefüllt */
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
+        /* Die Notification wird definiert. Hier werden unter anderem Icon, Sound, Title und Text festgelegt */
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.dtsharing_icon)
@@ -82,6 +100,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        /* Letzendlich wird die Notification angezeigt */
         notificationManager.notify(0, notificationBuilder.build());
     }
 }

@@ -46,6 +46,7 @@ public class FahrtenAdapter extends BaseAdapter{
         this.fahrtenFragment = fahrtenFragment;
     }
 
+    /* Gibt die größe der ArrayList aus */
     @Override
     public int getCount() {
         return fahrten.size();
@@ -61,6 +62,8 @@ public class FahrtenAdapter extends BaseAdapter{
         return 0;
     }
 
+    /* in getView werden die Views erfasst, dem viewHolder zugewiesen und abschließend mit den Daten der ArrayListe trips
+     * angereichert. Die Operationen eines Adapters gelten für jedes Item welches diesem über die ArrayListe hinzugefügt wurde */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder viewHolder = null;
@@ -94,6 +97,8 @@ public class FahrtenAdapter extends BaseAdapter{
         viewHolder.lineName.setText(fahrtenEntry.getRouteName());
         viewHolder.badgeCount.setText(fahrtenEntry.getNumberPartners());
 
+        /* onClick Listener für den Delete Button. Es wird ein AlertDialog erzeugt, welcher die Bestätigung des
+         * benutzers erfordert */
         viewHolder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,6 +111,8 @@ public class FahrtenAdapter extends BaseAdapter{
 
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
+                        /* Bei einer positiven Bestätitung wird die Methode zum Löschen eines Trips aufgerufen */
                         deleteTrip(fahrtenEntry.getTripId(), userId, position);
                     }
 
@@ -119,6 +126,8 @@ public class FahrtenAdapter extends BaseAdapter{
         return convertView;
     }
 
+    /* Beim löschen eines Trips wird ein Delete Request an den Server gesandt. Dieser enthält bereits alle dafür benötigten
+     * Informatinen in der URI */
     public void deleteTrip(String dtTripId, String userId, final int position){
 
         base_url = new SharedPrefsManager(context_1).getBaseUrl();
@@ -130,10 +139,14 @@ public class FahrtenAdapter extends BaseAdapter{
 
             @Override
             public void onResponse(JSONObject response) {
+
                 Log.d("FahrtenAdapter", response.toString());
+
+                /* Bei einer Erfolgreichen response wird die Fahrt aus der ArrayList entfernt und ein update
+                 * des Adapters angefordert */
                 if(response.has("success_message")) {
                     fahrten.remove(position);
-                    updateFahrtenList(fahrten);
+                    updateFahrtenList();
                 }
             }
 
@@ -152,9 +165,8 @@ public class FahrtenAdapter extends BaseAdapter{
 
     }
 
-    public void updateFahrtenList(ArrayList<FahrtenEntry> newlist) {
-        /*fahrten.clear();
-        fahrten.addAll(newlist);*/
+    /* Hier wird nur notifyDataSetChanged() des FahrtenFragments aufgerufen, da dies aus dem Adapter selbst nicht möglich ist */
+    public void updateFahrtenList() {
         fahrtenFragment.refreshList();
     }
 

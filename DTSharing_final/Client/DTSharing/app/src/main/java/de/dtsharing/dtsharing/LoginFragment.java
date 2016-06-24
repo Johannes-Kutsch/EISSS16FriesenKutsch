@@ -60,9 +60,11 @@ public class LoginFragment extends Fragment {
         /*Lade fragment_database Layout*/
         v = (RelativeLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
+        /* Der SharedPrefs Helper wird erzeugt und die base_url deklariert */
         final SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(v.getContext());
         base_url = sharedPrefsManager.getBaseUrl();
 
+        /* Views werden erfasst */
         _signup = (TextView) v.findViewById(R.id.tvSignup);
         _forgotPassword = (TextView) v.findViewById(R.id.tvForgotPassword);
         _signin = (Button) v.findViewById(R.id.bSignin);
@@ -71,6 +73,7 @@ public class LoginFragment extends Fragment {
         _inputBaseUrl = (EditText) v.findViewById(R.id.inputBaseUrl);
         _submitBaseUrl = (Button) v.findViewById(R.id.submitBaseUrl);
 
+        /* ViewPager wird bei onClick auf Registrieren auf Seite 2 (rechts) gestellt */
         _signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,6 +81,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        /* ViewPager wird bei onClick auf Kennwort vergessen auf Seite 0 (links) gestellt */
         _forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,32 +89,45 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        /* Bei onClick auf Anmelden werden die Daten verifiziert und abschließend findet die Anmeldung statt */
         _signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                /* Software Tastatur wird eingefahren */
                 hideSoftKeyboard(getActivity(), view);
 
+                /* Auslesen von E-Mail und Kennwort */
                 final String mail = _mail.getText().toString().trim(),
                         password = _password.getText().toString();
 
+                /* E-Mail und Kennwort werden auf formale Korrektheit überprüft */
                 if(verifyInput(mail, password)){
+
+                    /* E-Mail und md5 gehashtes Kennwort werden an den Server gesendet */
                     submitData(mail, HashString.md5(password));
                 }
             }
         });
 
+        /* Aktuelle base_ip wird aus den SharedPrefs ausgelesen und in das zugehörige Feld eingetragen */
         _inputBaseUrl.setText(sharedPrefsManager.getBaseIP());
 
+        /* Bei onClick auf submitBaseUrl wird die base_url in den SharedPrefs aktualisiert */
         _submitBaseUrl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /* Es wird überprüft ob das Eingabefeld leer ist */
                 if(!_inputBaseUrl.getText().toString().trim().equals("")){
 
+                    /* SharedPrefs Helper übernimmt die Aktualisierung der base_url */
                     sharedPrefsManager.setBaseUrl(_inputBaseUrl.getText().toString().trim());
 
+                    /* Software Tastatur wird eingefahren */
                     hideSoftKeyboard(getActivity(), view);
 
+                    /* Snackbar mit Erfolgsnachricht und bitte zum neustart wird angezeigt */
                     Snackbar snackbar = Snackbar.make(v, "IP-Adresse geändert\nBitte Applikation neustarten", Snackbar.LENGTH_SHORT)
                             .setAction("Action", null);
                     View snackBarView = snackbar.getView();
@@ -123,6 +140,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        /* Der Broadcast receiver wird registriert und durch den Filter für den Empfang des FCM Tokens festgelegt */
         IntentFilter filter = new IntentFilter("OnTokenRefresh");
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new MyTokenReceiver();
@@ -132,14 +150,17 @@ public class LoginFragment extends Fragment {
 
     }
 
+    /* E-Mail und Kennwort werden verifiziert */
     private boolean verifyInput(String mail, String password){
         boolean valid = true;
 
+        /* E-Mail wird auf Merkmale einer typischen E-Mail überprüft */
         if(!isValidEmail(mail)){
             valid = false;
             _mail.setError("Keine gültige E-Mail Adresse");
         }
 
+        /* Kennwort wird auf die mindestlänge von 6 Zeichen überprüft */
         if(!isValidPassword(password)){
             valid = false;
             _password.setError("Ungültiges Kennwort");
@@ -148,10 +169,13 @@ public class LoginFragment extends Fragment {
         return valid;
     }
 
+    /* E-Mail und md5 gehashtes Kennwort werden an den Server gesendet */
     private void submitData(final String mail, final String password){
 
-        final String url = base_url+"/sessions";
+        /* URI wird spezifiziert */
+        final String URI = base_url+"/sessions";
 
+        /* ProgressDialog wird vorbereitet und dargestellt */
         progressDialog = new ProgressDialog(v.getContext(),
                 R.style.AppTheme_Dialog);
         progressDialog.setIndeterminate(true);
@@ -160,10 +184,14 @@ public class LoginFragment extends Fragment {
         progressDialog.setMessage("Es wird ein Preis für deine Daten ermittelt...");
         progressDialog.show();
 
+        /* Das FCM Token wird aus den SharedPrefs ausgelesen */
         token = new SharedPrefsManager(v.getContext()).getFCMToken();
 
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+        /* Ein POST-Request an die URI mit dem Body E-Mail, Kennwort und FCM Token */
+        StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
                 new Response.Listener<String>() {
+
+                    /* Bei erfolgreichem Login werden dem Benutzer zugehörige Daten aus der Datenbank zurückgegeben */
                     @Override
                     public void onResponse(String response) {
                         try {
@@ -175,7 +203,10 @@ public class LoginFragment extends Fragment {
                                     more = jsonObject.getString("more"),
                                     interests = jsonObject.getString("interests");
 
+                            /* Ein neues Intent wird erzeugt. Ziel: MainActivity */
                             Intent mainIntent = new Intent(v.getContext(), MainActivity.class);
+
+                            /* Intent wird mit Daten aus der Response angereichert */
                             mainIntent.putExtra("cameFromLogin", true);
                             mainIntent.putExtra("user_id", user_id);
                             mainIntent.putExtra("picture", picture);
@@ -184,8 +215,12 @@ public class LoginFragment extends Fragment {
                             mainIntent.putExtra("more", more);
                             mainIntent.putExtra("interests", interests);
                             startActivity(mainIntent);
+
+                            /* Login Aktivität wird durch finish() terminiert um zu vermeiden, dass der Benutzer durch drücken
+                             * auf Zurück zu dieser zurück gelangt */
                             getActivity().finish();
 
+                            /* ProgressDialog wird beendet */
                             progressDialog.dismiss();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -202,13 +237,19 @@ public class LoginFragment extends Fragment {
                 if(error.networkResponse != null)
                     statusCode = error.networkResponse.statusCode;
 
+                /* Bei einem Fehler wird der ProgressDialog, falls noch offen, beendet */
                 if(progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
 
+                /* Anschließend wird anhand des StatusCodes auf die Art des Fehler hingewiesen */
                 switch (statusCode) {
+
+                    /* E-Mail Kennwort Kombination ist nicht korrekt */
                     case 403:
                         _password.setError("Die E-Mail und Kennwort Kombination ist nicht im System vorhanden");
                         break;
+
+                    /* Serverseitiger Fehler. Es wird nur eine Snackbar mit dem Hinweis erzeugt */
                     case 500:
                         Snackbar snackbar = Snackbar.make(v, "Fehler im System. Versuche es später erneut", Snackbar.LENGTH_INDEFINITE)
                                 .setAction("Action", null);
@@ -240,29 +281,36 @@ public class LoginFragment extends Fragment {
 
         };
 
+        /* Request wird in die Queue von Volley eingeführt */
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
+    /* Methode zum verstecken der Software Tastatur */
     public static void hideSoftKeyboard (Activity activity, View view)
     {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
+    /* http://stackoverflow.com/a/7882950
+    * Methode zur einfachen Überprüfung einer validen E-Mail */
     public final static boolean isValidEmail(CharSequence target) {
         return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
 
+    /* Kennwort wird lediglich auf Vorhandenheit und mindestlänge überprüft */
     public final static boolean isValidPassword(CharSequence target) {
         return !TextUtils.isEmpty(target) && target.length() >= 6;
     }
 
+    /* Wenn die Aktivität durch finish() abgeschlossen wird muss der Broadcast Receiver abgemeldet werden */
     @Override
     public void onDestroy() {
         super.onDestroy();
         receiver.unregister(v.getContext());
     }
 
+    /* CustomReceiver zum empfangen des FCM Tokens */
     public class MyTokenReceiver extends BroadcastReceiver {
         public boolean isRegistered;
 
@@ -283,6 +331,8 @@ public class LoginFragment extends Fragment {
             return false;
         }
 
+        /* Entspricht die Aktion des Broadcasts der hier spezifizierten wird der erhaltene FCM Token in die
+        * SharedPrefs gespeichert */
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("OnTokenRefresh")) {

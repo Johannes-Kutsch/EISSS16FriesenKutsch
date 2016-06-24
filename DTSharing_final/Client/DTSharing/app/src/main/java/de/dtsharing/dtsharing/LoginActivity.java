@@ -62,8 +62,6 @@ public class LoginActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     Snackbar snackbar;
 
-    SharedPreferences prefs;
-
     private MyStationStatusReceiver receiver;
 
     @Override
@@ -71,39 +69,48 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
-
+        /* Die Benutzerspezifischen SharedPrefs werden zurückgesetzt */
         new SharedPrefsManager(getApplicationContext()).setLoggedOutSharedPrefs();
 
+        /* Toolbar views werden erfasst */
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar_title = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
+        /* Die Custom Toolbar wird als Toolbar gesetzt */
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
 
         if (actionBar != null) {
-            /*Deaktiviere Titel da Custom Titel*/
+            /* Deaktiviere Titel da Custom Titel */
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        // Setting ViewPager for each Tabs
+        /* ViewPager wird mit Fragmenten gefüllt.*/
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
+
+        /* Aktuelle Seite wird auf 1 (mitte) gesetzt. Animation deaktiviert */
         viewPager.setCurrentItem(1, false);
 
+        /* OnPageChangeListener für den ViewPager, da sich die Toolbar Eigenschaften ändern wenn
+         * auf Registrieren oder Kennwort vergessen gewechselt wird */
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
+            /* Wird nicht benötigt, muss jedoch überschrieben werden */
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             @Override
             public void onPageSelected(int position) {
+
+                /* Wenn Registrieren oder Kennwort vergessen: Title Linksbündig, hinzufügen von Zurück Button */
                 if (position != 1) {
                     actionBar.setDisplayHomeAsUpEnabled(true);
                     actionBar.setHomeButtonEnabled(true);
                     toolbar_title.setText(adapter.getPageTitle(position).toString());
                     toolbar_title.setGravity(Gravity.LEFT);
+
+                /* Wenn Login: Titel zentriert und Zurück Button deaktivieren */
                 } else {
                     actionBar.setDisplayHomeAsUpEnabled(false);
                     actionBar.setHomeButtonEnabled(false);
@@ -112,19 +119,23 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
+            /* Wird nicht benötigt, muss jedoch überschrieben werden */
             @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
+            public void onPageScrollStateChanged(int state) {}
         });
 
 
+        /* Worker Thread, welcher den Broadcast Receiver registriert und den Service zum füllen der Stops Datenbank initiiert*/
         Thread myThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
+                /* Message Body des ProgressDialogs, welcher darstellt ob DTSharing für die erste Verwendung vorbereitet wird oder
+                 * aktualisiert wird */
                 final String message = new SharedPrefsManager(getApplicationContext()).getStopsVersion() == 0 ? "DTSharing wird für die erste Verwendung vorbereitet" : "Fahrplandaten werden aktualisiert";
 
+
+                /* Im Worker Thread wird ein UI Thread gestartet, welcher sich um die Darstellung des ProgressDialogs kümmert */
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -138,11 +149,14 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
+                /* Der Broadcast Receiver wird mit entsprechenden Filtern registriert und empfängt nun den Status des Database Service */
                 IntentFilter filter = new IntentFilter(MyStationStatusReceiver.STATUS_RESPONSE);
                 filter.addCategory(Intent.CATEGORY_DEFAULT);
                 receiver = new MyStationStatusReceiver();
                 registerReceiver(receiver, filter);
 
+                /* Der Database Service wird gestartet. Es wird überprüft ob die Lokalen Stops aktuell sind. Falls nicht werden diese
+                * aktualisiert bzw die erste befüllung vorgenommen*/
                 Intent databaseServiceIntent = new Intent(LoginActivity.this, DatabaseStationService.class);
                 startService(databaseServiceIntent);
             }
@@ -156,6 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         MultiDex.install(this);
     }
 
+    /* Wenn der Hardware Zurück Button gedrückt wurde */
     @Override
     public void onBackPressed() {
         if (viewPager.getCurrentItem() == 1) {
@@ -167,11 +182,12 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /* Public Methode um die aktuelle viewPager Seite zu wechseln. Wird benötigt um auf onClicks in den Fragmenten zu reagieren */
     public void setCurrentPage(int page) {
         viewPager.setCurrentItem(page, true);
     }
 
-    // Add Fragments to Tabs
+    /* Der Adapter wird mit den Fragmenten samt Titel gefüllt und anschließend mit dem viewPager verbunden */
     private void setupViewPager(ViewPager viewPager) {
         adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(new ForgotPasswordFragment(), "Kennwort vergessen");
@@ -180,6 +196,7 @@ public class LoginActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
     }
 
+    /* Custom Adapter für den ViewPager */
     static class Adapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
@@ -188,21 +205,25 @@ public class LoginActivity extends AppCompatActivity {
             super(manager);
         }
 
+        /* Gibt Fragment an der Position aus */
         @Override
         public Fragment getItem(int position) {
             return mFragmentList.get(position);
         }
 
+        /* Gibt die Größe der Fragment Liste aus */
         @Override
         public int getCount() {
             return mFragmentList.size();
         }
 
+        /* Füge Fragment zu List<Fragment> und Titel zu List<String> hinzu */
         public void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
 
+        /* Gib Titel an der Position in der Liste aus */
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
@@ -212,10 +233,13 @@ public class LoginActivity extends AppCompatActivity {
     //<--           OnOptionsItemSelected Start         -->
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
+
             /*Zurück Button geklickt*/
             case android.R.id.home:
-                /*Schließe Aktivität ab und kehre zurück*/
+
+                /* Kehre zum Login zurück */
                 viewPager.setCurrentItem(1, true);
                 return true;
         }
@@ -225,6 +249,7 @@ public class LoginActivity extends AppCompatActivity {
     //<--           OnOptionsItemSelected End         -->
 
 
+    /* CustomReceiver für den Broadcast vom DatabaseService */
     public class MyStationStatusReceiver extends BroadcastReceiver {
 
         public static final String STATUS_RESPONSE = "de.dtsharing.dtsharing.intent.action.STATUS_RESPONSE";
@@ -248,6 +273,7 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         }
 
+        /* Bei Fehler oder Erfolg wird der ProgressDialog beendet  */
         @Override
         public void onReceive(Context context, Intent intent) {
             boolean statusBoolean = intent.getBooleanExtra("finished", false),
@@ -255,6 +281,8 @@ public class LoginActivity extends AppCompatActivity {
             if (statusBoolean || errorBoolean) {
                 progressDialog.dismiss();
                 unregisterReceiver(receiver);
+
+                /* Bei einem Fehler wird eine Snackbar Meldung ausgegeben, welche den Nutzer darüber informiert */
                 if (errorBoolean){
                     snackbar = Snackbar.make(findViewById(R.id.viewpager), "Keine Verbindung zum Server möglich", Snackbar.LENGTH_INDEFINITE)
                             .setAction("Action", null);

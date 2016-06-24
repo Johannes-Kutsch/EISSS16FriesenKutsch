@@ -75,6 +75,7 @@ public class FahrtenFragment extends Fragment {
         /*Fülle Array mit Beispieldaten*/
         getDtTrips();
 
+        /* onItemClickListener für die ListView Fahrten. Dieser bringt einen in die Detailed Fahrten Ansicht */
         lvFahrten.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -93,9 +94,12 @@ public class FahrtenFragment extends Fragment {
         return v;
     }
 
+    /* GET Request zur Ermittlung der vom Benutzer eingetragenen Fahrten */
     private void getDtTrips(){
 
         final String URI = base_url+"/users/"+userId+"/dt_trips";
+
+        /* ArrayList wird geleert */
         fahrten.clear();
 
         Log.d("FahrtenFragment", "URI: "+URI);
@@ -107,6 +111,9 @@ public class FahrtenFragment extends Fragment {
             public void onResponse(JSONArray response) {
 
                 Log.d("FahrtenFragment", "response: "+response.toString());
+
+                /* Bei einer Erfolgreichen response wird das JSON Array durchlaufen und jeder Eintrag
+                 * der ArrayList fahrten<FahrtenEntry> hinzugefügt */
                 if(response.length() > 0) {
 
                     for (int i = 0; i < response.length(); i++) {
@@ -129,10 +136,14 @@ public class FahrtenFragment extends Fragment {
                             e.printStackTrace();
                         }
                     }
+
+                /* Sind keine Daten vorhanden wird der Container "noTripsFound" angezeigt, welcher den Benutzer
+                * darauf hinweist, dass dieser derzeit für keine Trips eingetragen ist */
                 }else{
                     noTripsContainer.setVisibility(View.VISIBLE);
                 }
 
+                /* Abschließend wird der Adapter über Änderungen benachrichtigt und die ListView sichtbar gemacht */
                 mAdapter.notifyDataSetChanged();
                 lvFahrten.setVisibility(View.VISIBLE);
 
@@ -153,6 +164,8 @@ public class FahrtenFragment extends Fragment {
 
     }
 
+    /* Die public Methode wird benötigt da im FahrtenAdapter Fahrten aus der ArrayList gelöscht werden können
+     * und diese somit über Änderungen informiert und ein update des UIs vorgenommen werden kann */
     public void refreshList(){
 
         mAdapter.notifyDataSetChanged();

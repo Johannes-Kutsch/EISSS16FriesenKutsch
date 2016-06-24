@@ -39,11 +39,13 @@ public class ChatsAdapter extends BaseAdapter{
 
     }
 
+    /* chats enthält alle aktiven Chats des Benutzers */
     public ChatsAdapter(Context context, ArrayList<ChatsEntry> chats) {
         this.context_1 = context;
         this.chats = chats;
     }
 
+    /* Gibt die größe der ArrayList aus */
     @Override
     public int getCount() {
         return chats.size();
@@ -59,6 +61,8 @@ public class ChatsAdapter extends BaseAdapter{
         return 0;
     }
 
+    /* in getView werden die Views erfasst, dem viewHolder zugewiesen und abschließend mit den Daten der ArrayListe trips
+     * angereichert. Die Operationen eines Adapters gelten für jedes Item welches diesem über die ArrayListe hinzugefügt wurde */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
@@ -87,9 +91,11 @@ public class ChatsAdapter extends BaseAdapter{
         viewHolder.target.setText(chatsEntry.getTargetStationName());
 
 
+        /* Wenn eine letzte Nachricht existiert */
         if(!chatsEntry.getMessage().equals("null")) {
             String message = null;
 
+            /* Suche in der Lokalen Datenbank den zur ChatID zugehörigen Key zum entschlüsseln der Nachricht */
             SQLiteDatabase db;
             db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
             Cursor cursor = db.rawQuery("SELECT key FROM chats WHERE chat_id=?", new String[]{chatsEntry.getChatId()});

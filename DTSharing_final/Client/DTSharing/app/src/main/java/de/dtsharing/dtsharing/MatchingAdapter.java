@@ -62,6 +62,7 @@ public class MatchingAdapter extends BaseAdapter{
         this.enteredTripDetails = enteredTripDetails;
     }
 
+    /* Gibt die größe der ArrayList aus */
     @Override
     public int getCount() {
         return matches.size();
@@ -77,6 +78,8 @@ public class MatchingAdapter extends BaseAdapter{
         return 0;
     }
 
+    /* in getView werden die Views erfasst, dem viewHolder zugewiesen und abschließend mit den Daten der ArrayListe trips
+     * angereichert. Die Operationen eines Adapters gelten für jedes Item welches diesem über die ArrayListe hinzugefügt wurde */
     @Override
     public View getView(int position, View convertView, final ViewGroup parent) {
         ViewHolder viewHolder = null;

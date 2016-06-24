@@ -61,11 +61,12 @@ public class MatchingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_matching);
 
+        /* Der SharedPrefsManager wird erzeugt und anschließend werden base_url und userId ausgelesen */
         SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(MatchingActivity.this);
         base_url = sharedPrefsManager.getBaseUrl();
         userId = sharedPrefsManager.getUserIdSharedPrefs();
 
-        /*Adding Toolbar to Main screen*/
+        /* Toolbar und Title werden erfasst */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
@@ -75,6 +76,7 @@ public class MatchingActivity extends AppCompatActivity {
         cvContainer = (CardView) findViewById(R.id.cvContainer);
         tvNoMatch = (TextView) findViewById(R.id.tvNoMatch);
 
+        /* Custom Toolbar wird gesetzt */
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -85,8 +87,10 @@ public class MatchingActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-        /*Sichere die Empfangenen Daten in Variablen*/
-
+        /* Fallunterscheidung beim beziehen der Daten des Intents. Diese Unterscheiden sich in sofern, dass
+         * beim erreichen der MatchActivity über die Notification der submit Button ausgeblendet wird und bereits
+         * eine dt_trip_id vorhanden ist, welche der des Benutzers entspricht, da dieser Trip gelöscht werden muss,
+         * wenn der Benutzer sich entschließen sollte sich mit dem potentiellen Partner zu matchen */
         if(getIntent().getBooleanExtra("comesFromTrips", false)) {
             Intent tripsIntent = getIntent();
             tripData.put("hasTicket", tripsIntent.getBooleanExtra("hasTicket", false));
@@ -116,14 +120,16 @@ public class MatchingActivity extends AppCompatActivity {
         }
 
 
+        /* Der Toolbar Title wird entsprechend des booleans "hasTicket" gesetzt */
         if (mTitle != null) {
             mTitle.setText(tripData.getAsBoolean("hasTicket") ? "Mitfahrgelegenheit Suchende" : "Mitfahrgelegenheiten");
         }
 
+        /* Auch die Beschriftung des Buttons wird entsprechend des booleans "hasTicket" vorgenmmmen. Ebenso der Text, wenn kein
+         * Match gefunden wurde */
         role = tripData.getAsBoolean("hasTicket") ? "Anbietend" : "Suchend";
         bSubmit.setText("ALS "+role.toUpperCase()+" EINTRAGEN");
         String noMatchFound = getResources().getString(R.string.noMatch, role);
-        System.out.println(noMatchFound);
         tvNoMatch.setText(noMatchFound);
 
         /*Erzeuge und verbinde Adapter mit der History ListView*/
@@ -134,6 +140,7 @@ public class MatchingActivity extends AppCompatActivity {
         getMatchingData(tripData);
         //prepareMatchingData();
 
+        /* Es wird ein onItemClick Listener für die ListView Matches erzeugt, welcher den Benutzer zum UserProfile des Matches bringt */
         lvMatches.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -145,14 +152,18 @@ public class MatchingActivity extends AppCompatActivity {
             }
         });
 
+        /* Es wird ein onClickListener für den submit Button erstellt */
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                /* Es wird ein Dialog erzeugt, welcher eine Bestätigung des Benutzers anfordert */
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(view.getContext(), R.style.AppTheme_Dialog_Alert);
 
                 builder.setMessage("Möchtest du dich wirklich als "+role+" eintragen?");
+
+                /* Wird der Dialog positiv bestötigt, werden die Daten an den Server gesandt um einen Trip zu erzeugen */
                 builder.setPositiveButton("Eintragen", new DialogInterface.OnClickListener() {
 
                     @Override
@@ -172,10 +183,15 @@ public class MatchingActivity extends AppCompatActivity {
 
     private void addDtTrip(final ContentValues tripData){
 
+        /* Festlegung der URI */
         final String URI = base_url+"/users/"+userId+"/dt_trips";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, URI,
                 new Response.Listener<String>() {
+
+                    /* Bei einer positiven response wird der Benutzer zurück zur MainActivity (Suchmaske) und durch den
+                     * Boolean "trip_created" auf Seite 2 (Fahrten) geführt. Anschließend erhält er dort eine positive
+                     * Snackbar, dass der Trip erfolgreich erstellt wurde */
                     @Override
                     public void onResponse(String response) {
                         Log.d(LOG_TAG, "SERVER RESPONSE: "+response);
@@ -189,18 +205,7 @@ public class MatchingActivity extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-
                 error.printStackTrace();
-
-                int  statusCode = error.networkResponse.statusCode;
-
-                switch (statusCode) {
-                    case 409:
-                        break;
-                    case 500:
-                        break;
-                }
-
             }
         })
         {
@@ -231,8 +236,11 @@ public class MatchingActivity extends AppCompatActivity {
 
     }
 
+    /* Ein GET Request an den Server, welcher über Query Paramter mit Daten angereichert wird und als Response
+     * potentielle Matches enthält, oder die TextView "tvNoMatch" einblendet */
     private void getMatchingData(ContentValues tripData){
 
+        /* Die URI wird erstellt und durch Query Parameter angereichert */
         final String uri = Uri.parse(base_url+"/matches")
                 .buildUpon()
                 .appendQueryParameter("unique_trip_id", tripData.getAsString("uniqueTripId"))
@@ -248,6 +256,9 @@ public class MatchingActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(JSONArray response) {
+
+                /* Wenn die response Daten enthält, werden diese der ArrayList hinzugefügt und abschließend
+                 * der Container angezeigt */
                 if(response.length() > 0) {
                     addMatchingData(response);
                     cvContainer.setVisibility(View.VISIBLE);
@@ -259,6 +270,9 @@ public class MatchingActivity extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                /* Gibt es keine potentiellen Matches wird der StatusCode 404 geworfen, welcher dafür sorgt
+                 * dass die entsprechende TextView für eine Erfolglose Suche angezeigt wird */
                 error.printStackTrace();
                 NetworkResponse response = error.networkResponse;
                 if(response.statusCode == 404){
@@ -275,8 +289,10 @@ public class MatchingActivity extends AppCompatActivity {
     //<--           prepareVerlaufData Start          -->
     private void addMatchingData(final JSONArray data){
 
+        /* ArrayList wird geleert */
         matches.clear();
 
+        /* ArrayList wird in einem Worker Thread mit Daten gefüllt */
         Thread myThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -306,6 +322,8 @@ public class MatchingActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+
+                /* Im UI Thread wird der Adapter über Änderungen informiert */
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -11,7 +11,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-/* http://www.androidhive.info/2012/07/android-gps-location-manager-tutorial/ */
+/* http://www.androidhive.info/2012/07/android-gps-location-manager-tutorial/
+* Für die Ermittlung der Standortdaten wird eine nicht selbst erstellte Klasse verwendet, da diese bereits
+* alles liefert was bei DTSharing an Standortdaten benötigt wird.
+*
+* Bei der Ermittlung der Standortdaten wird das Android Location Framework genutzt. */
 public class GPSTracker extends Service implements LocationListener {
 
     private final Context context;

@@ -31,12 +31,16 @@ public class ForgotPasswordFragment extends Fragment {
         /*Lade fragment_database Layout*/
         v = (RelativeLayout) inflater.inflate(R.layout.fragment_forgot_password, container, false);
 
+        /* Views werden erfasst */
         _mail = (EditText) v.findViewById(R.id.etMail);
         _submit = (Button) v.findViewById(R.id.bSubmit);
 
+        /* onClick für den submitButton */
         _submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /* E-Mail wird auf formale Korrektheit überprüft */
                 final String mail = _mail.getText().toString().trim();
                 if (!LoginFragment.isValidEmail(mail)){
                     _mail.setError("Keine gültige E-Mail Adresse");
@@ -49,6 +53,7 @@ public class ForgotPasswordFragment extends Fragment {
         return v;
     }
 
+    /* Bei korrekten Daten wird derzeit lediglich eine positive Snackbar angezeigt, da die richtige Implementation nicht elementar für den Prototypen ist */
     private void submitData(String mail){
         LoginFragment.hideSoftKeyboard(getActivity(), v);
         snackbar = Snackbar.make(v, "Eine E-Mail mit weiteren Instruktionen zum zurücksetzen deines Kennwortes wird in kürze bei dir eintreffen", Snackbar.LENGTH_INDEFINITE)

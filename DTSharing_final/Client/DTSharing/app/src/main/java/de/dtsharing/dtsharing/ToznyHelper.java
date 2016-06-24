@@ -8,6 +8,11 @@ import java.security.InvalidKeyException;
 
 import de.dtsharing.dtsharing.AesCbcWithIntegrity.CipherTextIvMac;
 
+
+/* Eine Helper Klasse zur Nutzung der AesCbcWithIntegrity Klasse.
+*  Diese wird genutzt um die Verschlüsselten Nachrichten des Chats zu entschlüsseln bzw neue Nachrichten zu verschlüsseln.
+*  Ebenso wird bei der Erstellung der StringKey mitgegeben. Somit muss der StringKey nur 1x umgewandelt werden. Ebenso werden
+*  die Try/Catches hierher ausgelagert, was in den Chat Parts für saubereren Code sorgt. */
 public class ToznyHelper {
 
     AesCbcWithIntegrity.SecretKeys keys;

@@ -22,6 +22,8 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         //Displaying token on logcat
         Log.d(TAG, "Refreshed token: " + refreshedToken);
 
+        /* Wurde ein neues FCM Token generiert, wird der TokenReceiver über einen Broadcast benachrichtigt
+         * und sichert dieses in den SharedPrefs */
         if (refreshedToken != null) {
             Intent broadcastIntent = new Intent();
             broadcastIntent.setAction("OnTokenRefresh");

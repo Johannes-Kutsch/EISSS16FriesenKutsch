@@ -24,13 +24,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+/* Bei dem DatabaseStationService handelt es sich um einen IntentService, welcher beim Login gestartet wird und anhand einer stops_version
+ * als Query Parameter beim GET auf die Ressource /stops die eigene Version mitteilt. Unterscheiden sich die Versionen wird die Lokale
+ * Datenbank gedroppt und mit den Daten der Response erneut aufgefüllt. Desweiteren wird die Versionsnummer angehoben. Sind die stops_versionen
+ * identisch werden keine stops Daten in der Response mitgeschickt
+ *
+ * Der Clientseitige Zugriff auf die stops verringert die Zugriffszeit und gewährt die Nutzung des AutoCompletes bei der Eingabe der Reisedaten sowie
+ * die Nutzung der Umkreissuche auch ohne eine intakte Internetverbindung. Desweiteren wird dadurch traffic gespart, da die stops sich nicht allzu häufig
+ * ändern sollten */
+
 public class DatabaseStationService extends IntentService {
 
     private static final String LOG_TAG = DatabaseStationService.class.getSimpleName();
@@ -49,8 +51,10 @@ public class DatabaseStationService extends IntentService {
     public boolean setupStopsDatabase(){
 
 
+        /* Die base_url wird aus den SharedPrefs bezogen */
         String base_url = new SharedPrefsManager(DatabaseStationService.this).getBaseUrl();
 
+        /* Es wird eine URI mithilfe des URI Parsers erzeugt, welche mit dem Query Parameter "stops_version" angereichert wird */
         String uri = Uri.parse(base_url+"/stops")
                 .buildUpon()
                 .appendQueryParameter("stops_version", Integer.toString(getStopsVersion()))
@@ -62,6 +66,9 @@ public class DatabaseStationService extends IntentService {
             @Override
             public void onResponse(JSONObject response) {
 
+                /* Enthält die Response keine Daten sind die Stops bereits up-to-date und müssen nicht aktualisiert / bezogen werden
+                 * Über einen Broadcast wird der aufrufenden Aktivität mitgeteilt, dass das GET auf stops abgeschlossen wurde und somit
+                 * der ProgressDialog abgeschlossen werden kann */
                 if(response.length() == 0) {
                     Log.d(LOG_TAG, "Stations sind bereits up-to-date");
                     Intent broadcastIntent = new Intent();
@@ -69,6 +76,9 @@ public class DatabaseStationService extends IntentService {
                     broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
                     broadcastIntent.putExtra("finished", true);
                     sendBroadcast(broadcastIntent);
+
+                /* Andernfalls werden die Daten in die lokale Datenbank übertragen. Abschließend wird der aufrufenden Aktivität durch
+                 * einen Broadcast mitgeteilt, dass das GET auf stops abgeschlossen wurde und somit der ProgressDialog abgeschlossen werden kann */
                 } else {
                     insertStationData(response);
 
@@ -87,6 +97,9 @@ public class DatabaseStationService extends IntentService {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
+
+                        /* Bei einem Fehler wird die aufrufende Aktivität ebenfalls über einen Broadcast darauf aufmerksam gemacht, sodass der blockierende
+                         * ProgressDialog abgeschlossen und auf den Fehler aufmerksam gemacht werden kann */
                         error.printStackTrace();
                         Intent broadcastIntent = new Intent();
                         broadcastIntent.setAction(MyStationStatusReceiver.STATUS_RESPONSE);
@@ -97,23 +110,27 @@ public class DatabaseStationService extends IntentService {
 
                 });
 
+        /* Request wird in die Volley Queue eingereiht und ausgeführt */
         Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
         return true;
 
     }
 
+    /* Die stops_version wird aus den SharedPrefs bezogen */
     public int getStopsVersion(){
         //Lese aktuelle stops_version aus, falls keine vorhanden 0
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getInt("stops_version", 0);
     }
 
+    /* Die stops_version wird aktualisiert / gesetzt */
     public void setStopsVersion(int stops_version){
         SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
         editor.putInt("stops_version", stops_version);
         editor.apply();
     }
 
+    /* Falls stops eingefügt / aktualisiert werden müssen wird die Methode inserStationData ausgeführt */
     private void insertStationData(JSONObject response){
         try {
 
@@ -121,6 +138,9 @@ public class DatabaseStationService extends IntentService {
 
             Log.d(LOG_TAG, stops.length()+" Stationen müssen in die Datenbank eingefügt werden");
 
+            /* es wird ein Worker Thread gestartet, da das einfügen von ~7 Tausend stops eine sehr intensive
+             * Aufgabe ist und somit das UI für ungefähr 30 Sekunden blockiert würde. Diesem wird somit entgegen
+             * gewirkt und das Einfügen der stops dauert nur noch maximal 2 Sekunden */
             Thread myThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -148,7 +168,6 @@ public class DatabaseStationService extends IntentService {
 
                         db.insert("vrs", null, values);
 
-                        //db.execSQL("INSERT INTO vrs VALUES('"+stop_name+"','"+stop_lat+"','"+stop_lon+"');");
                     }
 
                     db.close();
@@ -158,6 +177,8 @@ public class DatabaseStationService extends IntentService {
 
             Log.d(LOG_TAG, "Stationen wurden in die Datenbank eingetragen");
             Log.d(LOG_TAG, "Die Stops Version wird aktualisiert. Alt: "+getStopsVersion()+" Neu: "+response.getInt("stops_version"));
+
+            /* Die stops_version wird auf die des Servers gesetzt */
             setStopsVersion(response.getInt("stops_version"));
 
         } catch (JSONException e) {

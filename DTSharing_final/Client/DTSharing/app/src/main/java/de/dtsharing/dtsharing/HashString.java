@@ -3,7 +3,9 @@ package de.dtsharing.dtsharing;
 import java.security.MessageDigest;
 
 /*http://stackoverflow.com/a/17490344 (13.06.2016)*/
-
+/* Ein String wird md5 gehashed und das Ergebnis returned.
+ * Diese Funktion wird momentan nur beim Login und Registrieren verwendet um das Kennwort nicht im
+ * Klartext zu speichern */
 public class HashString {
 
     public static final String md5(final String toEncrypt) {

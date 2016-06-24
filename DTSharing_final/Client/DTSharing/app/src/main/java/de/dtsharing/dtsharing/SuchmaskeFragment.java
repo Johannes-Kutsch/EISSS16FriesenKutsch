@@ -125,9 +125,13 @@ public class SuchmaskeFragment extends Fragment {
         etTarget.setAdapter(adapterAutoComplete);
         etTarget.setThreshold(1);
 
+        /* Stop_names werden aus der Lokalen Datenbank abgerufen */
         getStationData();
+
+        /* Verlauf wird aus der Loaklen Datenbank abgerufen */
         getHistoryData();
 
+        /* onItemClickListener für Start und Ziel AutoCompleteItems damit die Software Tastatur versteckt wird */
         etDeparture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -143,25 +147,35 @@ public class SuchmaskeFragment extends Fragment {
             }
         });
 
+        /* onClick swapStations. Start und Zielhaltestelle werden getauscht */
         swapStations.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String tmpHolder;
-                tmpHolder = etDeparture.getText().toString();
+
+                /* Zwischensichern eines Feldes und anschließendes tauschen*/
+                String tmpHolder = etDeparture.getText().toString();
                 etDeparture.setText(etTarget.getText().toString());
                 etTarget.setText(tmpHolder);
             }
         });
 
+        /* onClick für radiusSearch */
         radiusSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /* Aktuelle Position wird ermittelt */
                 GPSTracker mGPS = new GPSTracker(v.getContext());
                 if(mGPS.canGetLocation()){
-                    stopsInRadius = new RadiusSearch(v.getContext()).startRadiusSearch(mGPS.getLatitude(), mGPS.getLongitude());
-                    mGPS.stopUsingGPS();
-                    Log.d(LOG_TAG, stopsInRadius.toString());
 
+                    /* die RadiusSearch wird mit aktuellen Positionsdaten erzeugt. Diese ermittelt alle stops in einem Umkreis von 2 km
+                     * und gibt diese als String[] Array zurück. Dieses Array dient als Datenquelle für den AlertDialog */
+                    stopsInRadius = new RadiusSearch(v.getContext()).startRadiusSearch(mGPS.getLatitude(), mGPS.getLongitude());
+
+                    /* Die Nutzung von GPS wird nach abgeschlossener Ermittlung gestoppt um den Akku zu schonen */
+                    mGPS.stopUsingGPS();
+
+                    /* AlertDialog mit allen Haltestellen in einem Umkreis von 2 km wird erzeugt und angezeigt */
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog_Alert);
                     builder.setTitle("Haltestellen in einem Umkreis von 2 km");
                     builder.setIcon(R.drawable.ic_my_location_24dp);
@@ -175,18 +189,36 @@ public class SuchmaskeFragment extends Fragment {
 
                 } else {
 
+                    /* Kann keine Position ermittelt werden wird eine negative Snackbar ausgegeben */
+                    Snackbar snackbar = Snackbar.make(v, "Ermittlung der aktuellen Position nicht möglich\nÜberprüfe deine Einstellungen", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null);
+                    View snackBarView = snackbar.getView();
+                    snackBarView.setBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorPrimaryDark));
+                    TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(ContextCompat.getColor(v.getContext(), R.color.white));
+                    snackbar.show();
                 }
             }
         });
 
+        /* onClick für die Auswahl des Tickets */
         etTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /* Es wird ein AlertDialog mit den Auswahlmöglichkeiten erzeugt */
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog_Alert);
                 builder.setTitle("Ich besitze...");
+
+                /* onClick für die einzelnen Auswahlmöglichkeiten */
                 builder.setSingleChoiceItems(ticketDialogArray, currentTicketIndex, new DialogInterface.OnClickListener() {
+
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position) {
+
+                        /* Der Text der Ticketauswahl wird auf die aktuelle Auswahl gesetzt
+                         * Der Index wird aktualisiert, sollte der Benutzer erneut den Dialog öffnen ist die aktuelle Auswahl gewählt
+                         * Ein Boolean für hasTicket wird basierend auf der Auswahl gebildet und der Dialog wird geschlossen */
                         etTicket.setText(ticketDialogArray[position]);
                         etTicket.setError(null);
                         currentTicketIndex = position;
@@ -197,6 +229,8 @@ public class SuchmaskeFragment extends Fragment {
                 builder.show();
             }
         });
+
+        /* onClick Listener für Date- und Time- Dialoge. Diese werden somit initiiert und auch auf Geräten die mit Kitkat laufen dem Material Design nachempfunden  */
         etDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -209,6 +243,9 @@ public class SuchmaskeFragment extends Fragment {
                 showTimeDialog();
             }
         });
+
+        /* onClick für den Submit Button
+         * Reisedaten werden validiert und bei erfolgreicher Validierung wird die TripsActivity erzeugt und die Daten an diese gegeben  */
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -219,7 +256,7 @@ public class SuchmaskeFragment extends Fragment {
 
                 boolean valid = true;
 
-                /*Prüfe ob Start oder Ziel leer sind*/
+                /*Prüfe ob Start, Ziel oder Ticket leer sind*/
 
                 if (departureName.equals("")) {
                     valid = false;
@@ -229,12 +266,12 @@ public class SuchmaskeFragment extends Fragment {
                     valid = false;
                     etTarget.setError("Darf nicht leer sein!");
                 }
-
                 if(etTicket.getText().toString().equals("")){
                     valid = false;
                     etTicket.setError("Bitte ein Ticket wählen!");
                 }
 
+                /* Wenn die Validierung Erfolgreich war wird die TripsActivity gestartet und die Reisedaten werden als Extra angefügt */
                 if(valid){
                     HistoryService.startActionAddToHistory(v.getContext(), departureName, targetName);
                     /*Erzeuge die Matching Activity und füge Daten hinzu*/
@@ -244,21 +281,26 @@ public class SuchmaskeFragment extends Fragment {
                     tripsIntent.putExtra("hasTicket", hasTicket);
                     tripsIntent.putExtra("date", date);
                     tripsIntent.putExtra("time", time);
-                    /*Starte Matching Activity*/
+                    /* Starte Trips Activity
+                    *  Werden keine Trips gefunden oder anderweitige Fehler treten auf wird in onActivityResult darauf reagiert*/
                     startActivityForResult(tripsIntent, REQUEST_CODE_TRIPS);
                 }
             }
         });
 
-        /*History item selected listener*/
+        /* History item selected listener */
         historyOnClickListener();
 
         return v;
     }
 
+    /* Die TripsActivity wird mit dem Zusatz ...ForResult gestartet. Dies bedeutet, dass die Suchmaske bei wiederkehr ein Feedbach anhand eines StatusCodes erwartet */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        /* Die Suche nach Trips wurde mit einem Fehler beendet und wirft den Benutzer auf die Suchmaske zurück
+         * Anschließend wird eine negative Snackbar mit entsprechender Fehlermeldung vom Server erzeugt */
         if(requestCode == REQUEST_CODE_TRIPS && resultCode == Activity.RESULT_CANCELED) {
             String message = data.getStringExtra("message");
             snackbar = Snackbar.make(v, message, Snackbar.LENGTH_INDEFINITE)
@@ -268,6 +310,8 @@ public class SuchmaskeFragment extends Fragment {
             TextView textView = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
             textView.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
             snackbar.show();
+
+        /* Kehrt der Benutzer manuell, ohne Fehler, zur Suchmaske zurück wird der Verlauf erneut aktualisiert, da dieser durch die Tripssuche verändert wurde */
         }else if (requestCode == REQUEST_CODE_TRIPS && resultCode == Activity.RESULT_OK) {
             getHistoryData();
         }
@@ -278,21 +322,29 @@ public class SuchmaskeFragment extends Fragment {
     private void getHistoryData(){
         transit.clear();
 
+        /* Es wird ein Worker Thread gestartet, welcher den Verlauf aus der Lokalen Datenbank ausliest und der ArrayList<HistoryEntry> 5 nach Rating Sortierten
+         * Ergebnisse hinzufügt  */
         Thread myThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
+                /* SQLite Datenbank wird geöffnet und ein entsprechender Query wird eingeleitet */
                 SQLiteDatabase db;
                 db = v.getContext().openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
                 Cursor cursor = db.query("history", new String[] {"departure_station_name", "target_station_name"}, null, null, null, null, "rating DESC", "5");
 
+                /* Entspricht das Ergebnis mehr als 0 Einträgen werden diese der ArrayList hinzugefügt */
                 if(cursor.getCount() > 0){
                     while (cursor.moveToNext()){
                         transit.add(new HistoryEntry(cursor.getString(0), cursor.getString(1)));
                     }
                 }
+
+                /* Abschließend werden cursor und db geschlossen um Datenlecks zu vermeiden */
                 cursor.close();
                 db.close();
+
+                /* Im UI Thread wird der Adapter benachrichtigt und der noHistoryContainer wird angezeigt oder versteckt */
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -326,7 +378,7 @@ public class SuchmaskeFragment extends Fragment {
                         mMonth = monthOfYear;
                         mDay = dayOfMonth;
 
-                        /*Trage Wert in das EditText ein (String.format um die )*/
+                        /*Trage Wert in das EditText ein*/
                         etDate.setText(String.format(Locale.US, "%02d.%02d.%04d", dayOfMonth, (monthOfYear+1), year));
                     }
                 },mYear, mMonth, mDay);
@@ -369,16 +421,21 @@ public class SuchmaskeFragment extends Fragment {
             public void onItemClick(android.widget.AdapterView<?> parent,
                                     View view, int position, long id) {
 
+                /* der Pointer wird auf ein Item der position in der ArrayList gesetzt */
                 HistoryEntry historyEntry = transit.get(position);
 
+                /* Start und Zielname werden in die Eingabefelder übernommen */
                 etDeparture.setText(historyEntry.getDeparture());
                 etTarget.setText(historyEntry.getTarget());
 
+                /* Errormeldungen werden entfernt, sofern vorhanden */
                 etDeparture.setError(null);
                 etTarget.setError(null);
 
+                /* Es wird smooth nach oben gescrollt */
                 svContainer.smoothScrollTo(0,0);
 
+                /* Eine Snackbar wird dem Benutzer angezeigt damit dieser Feedbach bekommt */
                 Snackbar.make(view, "Eintrag gewählt", Snackbar.LENGTH_SHORT)
                         .setAction("Action", null).show();
             }
@@ -388,6 +445,7 @@ public class SuchmaskeFragment extends Fragment {
 
     private void getStationData(){
 
+        /* Ein Worker Thread wird gestartet welcher die Station_names aus der Lokalen Datenbank auslesen und dem Adapter hinzufügen soll */
         Thread myThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -406,6 +464,7 @@ public class SuchmaskeFragment extends Fragment {
                 cursor.close();
                 db.close();
 
+                /* Im UI Thread wird der adapter über Veränderungen benachrichtigt */
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -419,6 +478,7 @@ public class SuchmaskeFragment extends Fragment {
 
     }
 
+    /* Methode um die Software Tastatur zu verstecken */
     public static void hideSoftKeyboard (Activity activity, View view)
     {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);

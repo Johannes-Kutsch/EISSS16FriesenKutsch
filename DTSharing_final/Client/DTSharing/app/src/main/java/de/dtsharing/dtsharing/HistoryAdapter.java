@@ -29,6 +29,7 @@ public class HistoryAdapter extends BaseAdapter{
         this.transit = transit;
     }
 
+    /* Gibt die größe der ArrayList aus */
     @Override
     public int getCount() {
         return transit.size();
@@ -44,6 +45,8 @@ public class HistoryAdapter extends BaseAdapter{
         return 0;
     }
 
+    /* in getView werden die Views erfasst, dem viewHolder zugewiesen und abschließend mit den Daten der ArrayListe trips
+     * angereichert. Die Operationen eines Adapters gelten für jedes Item welches diesem über die ArrayListe hinzugefügt wurde */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
@@ -60,6 +63,7 @@ public class HistoryAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        /* Daten der Zeile "position" werden aus der ArrayList genommen und den Views zugewiesen */
         HistoryEntry historyEntry = transit.get(position);
 
         viewHolder.departure.setText(historyEntry.getDeparture());

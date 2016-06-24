@@ -43,6 +43,7 @@ public class MessagesAdapter extends BaseAdapter{
         this.userID = userID;
     }
 
+    /* Gibt die größe der ArrayList aus */
     @Override
     public int getCount() {
         return messages.size();
@@ -58,6 +59,8 @@ public class MessagesAdapter extends BaseAdapter{
         return 0;
     }
 
+    /* in getView werden die Views erfasst, dem viewHolder zugewiesen und abschließend mit den Daten der ArrayListe trips
+     * angereichert. Die Operationen eines Adapters gelten für jedes Item welches diesem über die ArrayListe hinzugefügt wurde */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
@@ -81,6 +84,9 @@ public class MessagesAdapter extends BaseAdapter{
 
         MessagesEntry messagesEntry = messages.get(position);
 
+        /* Entspricht die AuthorID der des Benutzers handelt es sich um seine Nachricht. Daraufhin werden
+         * die Parameter für main_content und CardView angepasst, sodass diese rechts steht und einen anderen
+         * Farbton aufweist. Ebenso werden Name und Datum gespiegelt */
         if(messagesEntry.getAuthorID().equals(userID)) {
             viewHolder.mainContentParams.setMargins(200, 0, 0, 0);
             viewHolder.main_content.setLayoutParams(viewHolder.mainContentParams);
@@ -88,6 +94,10 @@ public class MessagesAdapter extends BaseAdapter{
 
             viewHolder.date.setText(messagesEntry.getName());
             viewHolder.name.setText(messagesEntry.getDate());
+
+        /* Andernfalls handelt es sich um eine Nachricht des Partners, woraufhin diese links angezeigt werden muss.
+         * Auch hier wird der Farbton entsprechend angepasst. Ebenso werden Name und Datum gegenüber der eigenen
+         * Nachrichten gespiegelt dargestellt */
         } else {
             viewHolder.mainContentParams.setMargins(0, 0, 200, 0);
             viewHolder.main_content.setLayoutParams(viewHolder.mainContentParams);
@@ -97,6 +107,7 @@ public class MessagesAdapter extends BaseAdapter{
             viewHolder.date.setText(messagesEntry.getDate());
         }
 
+        /* Uhrzeit und Nachricht werden für beide Author Gruppen gleich behandelt und einfach zugewiesen */
         viewHolder.time.setText(messagesEntry.getTime());
         viewHolder.message.setText(messagesEntry.getMessage());
 

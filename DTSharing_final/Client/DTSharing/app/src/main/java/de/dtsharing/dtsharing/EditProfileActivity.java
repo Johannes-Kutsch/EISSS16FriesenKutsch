@@ -62,12 +62,17 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        base_url = new SharedPrefsManager(EditProfileActivity.this).getBaseUrl();
+        /* Die base_url wird sowie die EditProfileDaten werden aus den SharedPrefs bezogen */
+        SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(EditProfileActivity.this);
+        base_url = sharedPrefsManager.getBaseUrl();
+        profileData = sharedPrefsManager.getEditProfileSharedPrefs();
+        newPicture = profileData.getAsString("picture");
 
-        /*Adding Toolbar to Main screen*/
+        /* Erfassen der Toolbar und title Views */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         TextView mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
+        /* Setzen der Custom Toolbar */
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -78,9 +83,6 @@ public class EditProfileActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-        profileData = new SharedPrefsManager(getApplicationContext()).getEditProfileSharedPrefs();
-        newPicture = profileData.getAsString("picture");
-
         /*Erfassen der Views mit denen interagiert werden soll*/
         _interests = (EditText) findViewById(R.id.etInterests);
         _more = (EditText) findViewById(R.id.etMore);
@@ -89,26 +91,35 @@ public class EditProfileActivity extends AppCompatActivity {
         _profilePicture = (ImageView) findViewById(R.id.ivProfilePicture);
         _mainContent = (CoordinatorLayout) findViewById(R.id.main_content);
 
+        /* EditTexts werden mit den derzeitigen Daten gefüllt */
         _interests.setText(profileData.getAsString("interests"));
         _more.setText(profileData.getAsString("more"));
 
+        /* Besitzt der Benutzer kein Bild ist dieses "null" und somit wird ein default picture gewählt */
         if(profileData.getAsString("picture").equals("null")) {
             int placeholder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_96dp", null, null);
             _profilePicture.setImageResource(placeholder);
+
+        /* Besitzt der Benutzer ein Bild wird dieses in eine rundes Drawable umgewandelt. Als Bildquelle wird die decodeBase64 Methode angegeben, welche als Parameter den String
+         * des Bildes enthält und somit eine Bitmap darstellt. Anschließend wird das Bild gesetzt */
         }else {
             RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), EncodeDecodeBase64.decodeBase64(profileData.getAsString("picture")));
             roundDrawable.setCircular(true);
             _profilePicture.setImageDrawable(roundDrawable);
         }
 
+        /* onClick für den editPicture Button */
         _editPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /* Es wird ein Picker Intent gestartet, welches Medien von der SD Karte auswählen lassen soll */
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
             }
         });
 
+        /* onClick für den submit Button. Es wird überprüft ob Informationen verändert wurden und nur bei Änderungen das Profil aktualisiert */
         _submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,8 +128,10 @@ public class EditProfileActivity extends AppCompatActivity {
                                 moreChanged      = !profileData.getAsString("more").equals(_more.getText().toString()),
                                 pictureChanged   = !profileData.getAsString("picture").equals(newPicture);
 
+                /* Falls mind. eine Information verändert wurde */
                 if(interestsChanged || moreChanged || pictureChanged) {
 
+                    /* Zeige einen AlertDialog um eine Bestätigung des Benutzers zu erhalten */
                     AlertDialog.Builder builder =
                             new AlertDialog.Builder(EditProfileActivity.this, R.style.AppTheme_Dialog_Alert);
 
@@ -128,6 +141,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
+                            /* Wird der Dialog positiv beantwortet starte den PUT-Request an den Server */
                             updateProfile(interestsChanged, moreChanged, pictureChanged);
 
                         }
@@ -136,8 +150,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
                     builder.setNegativeButton("Abbruch", null);
                     builder.show();
+
+                /* Wurde keine Information geändert */
                 }else{
 
+                    /* Weise den Benutzer darauf hin, dass keine Änderungen vorgenommen wurden */
                     Snackbar snackbar = Snackbar.make(_mainContent, "Es wurden keine Änderungen vorgenommen", Snackbar.LENGTH_LONG)
                             .setAction("Action", null);
                     View snackBarView = snackbar.getView();
@@ -153,6 +170,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     }
 
+    /* PUT-Request an den Server um die Benutzerdaten zu aktualisieren */
     private void updateProfile(final boolean interestsChanged, final boolean moreChanged, final boolean pictureChanged){
 
         String url = base_url+"/users/"+profileData.getAsString("user_id");
@@ -163,9 +181,13 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
 
+                        /* Bei Erfolgreicher Response des Servers */
                         if(response.contains("success_message")) {
+
+                            /* Daten in den SharedPrefs aktualisieren */
                             new SharedPrefsManager(getApplicationContext()).setEditProfileSharedPrefs(newPicture, _interests.getText().toString(), _more.getText().toString());
 
+                            /* Den Benutzer durch eine positive Snackbar darauf hinweisen, dass sein Profil aktualisiert wurde */
                             Snackbar snackbar = Snackbar.make(_mainContent, "Profil wurde aktualisiert", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null);
                             View snackBarView = snackbar.getView();
@@ -185,7 +207,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         })
         {
-            /*Daten welche der Post-Request mitgegeben werden*/
+            /*Daten welche der PUT-Request mitgegeben werden*/
             @Override
             protected Map<String, String> getParams()
             {
@@ -200,10 +222,14 @@ public class EditProfileActivity extends AppCompatActivity {
 
         };
 
+        /* Request wird der Volley Queue angehangen und ausgeführt */
         Volley.newRequestQueue(getApplicationContext()).add(postRequest);
 
     }
 
+    /* Bild wird skaliert, sodass es in einen Rahmen von 512x512 passt und anschließend gecropped, sodass es quadratisch ist. Der mittlere Bildausschnitt steht dabei
+     * im Fokus. Die Größe von 512x512 wurde gewählt, da man somit bei der Umwandlung einen kürzeren String erhält. Ein weiterer Punkt ist, dass die Bilder momentan nicht
+     * im Vollbild dargestellt werden können und eine kleine Auflösung für die Profilbilder somit ausreichend ist*/
     public Bitmap centerCropImage(Bitmap bitmap){
 
         /*http://stackoverflow.com/a/30609107   Hat als Inspiration gedient, jedoch Nullpointerexception mit unterschiedlichen Galerie Apps
@@ -243,31 +269,40 @@ public class EditProfileActivity extends AppCompatActivity {
         return bitmap;
     }
 
+    /* onActivityResult wird benötigt, da beim onClick auf editPicture ein MediaPicker gestartet wird, dessen result
+     * hier erhält und welches weiterverarbeitet wird */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         // http://stackoverflow.com/a/30004714
+        /* Entspricht der requestCode dem des MediaPickers, ist der resultCode positiv und data ungleich null
+         * wurde ein Bild gewählt welches nun weiter behandelt werden kann */
         if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && data != null) {
 
+            /* Der Pfad des Bildes wird extrahiert */
             Uri pickedImage = data.getData();
 
+            /* Es wird ein InputStream erstellt, aus welchem das Bild bezogen werden kann */
             InputStream imageStream = null;
-
             try {
                 imageStream = getContentResolver().openInputStream(pickedImage);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
 
+            /* Es wird eine Bitmap aus dem InputStream decodiert und erstmals in einer Variable festgehalten */
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap bitmap = BitmapFactory.decodeStream(imageStream, null, options);
 
-            Bitmap croppedImage = centerCropImage(bitmap);
-            newPicture = EncodeDecodeBase64.encodeToBase64(croppedImage, Bitmap.CompressFormat.JPEG, 80);
+            /* Das Bild wird anschließend auf eine maximale Größe von 512x512 gebracht und center cropped */
+            bitmap = centerCropImage(bitmap);
+            /* Zusätzlich wird das Bild bereits in Base64 encodiert und der Variable newPicture zugewiesen, welche zuvor das alte Bild beinhaltet hat */
+            newPicture = EncodeDecodeBase64.encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 80);
 
-            RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), croppedImage);
+            /* Das neue Bild wird anschließend abgerundet und der ImageView zugewiesen */
+            RoundedBitmapDrawable roundDrawable = RoundedBitmapDrawableFactory.create(getResources(), bitmap);
             roundDrawable.setCircular(true);
             _profilePicture.setImageDrawable(roundDrawable);
         }
