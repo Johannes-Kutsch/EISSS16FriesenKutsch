@@ -22,17 +22,17 @@ app.use(bodyParser.urlencoded({
 
 
 
-//Alle Stops Abrufen 
+//stops 
 //Querry: stops_version
 app.get('/stops', stops_Controller.findStops);
 
 
-//Login
+//login
 //Querry: email, pass, token
 app.post('/sessions', sessions_Controller.login);
 
 
-//Benutzer
+//users
 //Boddy: birth_year,first_name,last_name,gender,interests,more,email,pass,
 app.post('/users', users_Controller.register);
 
@@ -44,7 +44,7 @@ app.get('/users/:user_id', users_Controller.findUser);
 app.put('/users/:user_id', users_Controller.updateUser);
 
 
-//Ratings
+//ratings:
 //URI: User ID des Nutzers der bewertet wird
 //Boddy: author_id, stars, comment, chat_id
 app.post('/users/:user_id/ratings', ratings_Controller.rate);
@@ -72,7 +72,7 @@ app.put('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.match);
 app.delete('/users/:user_id/dt_trips/:dt_trip_id', dt_trips_Controller.removeDtTrip);
 
 
-//Chat
+//chat
 //URI: User ID des Nutzers der den Chatraum erstellt
 //Body: partner_user_id, key, dt_trip_id
 app.post('/users/:user_id/chats', chats_Controller.createChat);
@@ -85,7 +85,7 @@ app.get('/users/:user_id/chats', chats_Controller.findChats);
 app.post('/users/:user_id/chats/:chat_id/messages', chats_Controller.createMessage);
 
 //Uri: User ID des Nutzers, Chat ID des Chats
-app.get('/users/:user_id/chats/:chat_id', chats_Controller.findChat);
+app.get('/users/:user_id/chats/:chat_id/partner', chats_Controller.findPartner);
 
 //Uri: User ID des Nutzers, Chat ID des Chats
 //Query: sequence der letzten bekannten Nachricht (optional)
@@ -99,16 +99,17 @@ app.get('/users/:user_id/chats/:chat_id/key', chats_Controller.findKey);
 
 
 
-
+//trips:
 //trips ermitteln
 app.get('/trips', trips_Controller.findTrips);
 
+//matches:
 //matches
 app.get('/matches', matches_Controller.findMatches);
 
 
 
-//Not Found
+//Default response, falls die Uri nicht gefunden wurde
 app.use(function(req, res, next) {
     res.status(404);
     res.send({ errorMessage: 'URI not found' });
