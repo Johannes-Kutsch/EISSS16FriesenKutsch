@@ -41,7 +41,13 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 #####Client
 1. DTSharing.apk auf dem Smartphone installieren
  * [DTSharing.apk herunterladen](https://github.com/netrox91/EISSS16FriesenKutsch/raw/master/MS3/DTSharing.apk) und installieren
- * oder die DTSharing.apk aus dem Ordner ```MS3/DTSharing.apk```auf das Handy ziehen und manuell installieren
+ * oder die DTSharing.apk aus dem Ordner ```MS3/DTSharing.apk``` auf das Handy ziehen und manuell installieren
+2. DTSharing starten
+ * Lokale IP-Adresse des Servers ermitteln und im Client ändern
+ * DTSharing neustarten damit die Stops mit der korrekten Adresse vom Server geholt werden können
+3. Über die Schaltfläche ```Registrieren``` ein Benutzerkonto anlegen
+4. Nach Erfolgreicher Registration mit den Daten anmelden
+
 ####Erste Schritte
 
 
