@@ -100,8 +100,7 @@
                 android:layout_height="wrap_content"
                 android:hint="IP-Adresse und Port des Servers"
                 android:theme="@style/AppTheme.Base"
-                android:inputType="phone"
-                android:digits=".:0123456789"/>
+                android:inputType="phone"/>
         </android.support.design.widget.TextInputLayout>
         <Button
             android:id="@+id/submitBaseUrl"
