@@ -1,11 +1,7 @@
-Freitag:
-Architektur
-wenn Zeit Code kommentieren
-im Wiki verlinken
-
-
 Montag:
-Präsi?
+
+Präsi
+
 Prozessassesment
 => Fahrtenfindungsalgo verbessert => node-gtfs nicht performant genug
 => Matching klappte wie in der Doku beschrieben
@@ -27,9 +23,17 @@ Fazit
 => Sessions
 => Wba nocht so gut geplant/viele Änderungen => wenig erfahrung
 => MCI => Personen fragen ob matching ok ist
-Code kommentieren
+
+Installationsdoku:
+=> APK die ip des Servers eintragen
+=> wie man das ganze im Emulator zum laufen kriegt
+=> mindestanforderungen von node/mongodb
+=> sagen auf welchen Geräten getestet wurde
+
+
+
 Projektplan
-Installationsdoku
+
 Verschlüsselungsvideo reinziehen
 
 errorhandling bei parallelen Zugriffen/races Serverseitig

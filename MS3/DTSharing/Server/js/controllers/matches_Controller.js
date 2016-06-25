@@ -61,8 +61,8 @@ module.exports.findMatches = function (req, res) {
                         ratings.forEach(function(rating) {
                             average_rating += rating.stars;
                         });
-                        if(average_rating.length) {
-                            average_rating/=average_rating.length;
+                        if(ratings.length) {
+                            average_rating/=ratings.length;
                         }
                         callback(null, average_rating);
                     });
