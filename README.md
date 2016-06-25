@@ -14,6 +14,16 @@ teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits
 vorhandenen Dauertickets ermöglicht. Außerdem soll es durch das System
 vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 
+####Anforderungen
+#####Smartphone
+Mindestens Android 4.4
+10 MB Speicherplatz
+Internetzugang (FCM)
+
+#####Server
+Mindestens 500 MB Speicherplatz
+Internetzugang (FCM)
+
 ####Installation
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
 2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
@@ -21,7 +31,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 4. Terminal öffnen und in den Ordner ```DTSharing/Server``` wechseln.
 5. Die benötigten Module durch ```npm install``` installieren.
 6. Ein 2. Terminal öffnen, da MongoDB und NodeJS ausgeführt werden müssen.
-7. Um die MongoDB zu starten in den Ordner ```DTSharing/Server``` wechseln und ```mongod --dbpath mongo/db``` ausführen.
+7. Um die MongoDB zu starten in den Ordner ```MS3/DTSharing/Server``` wechseln und ```mongod --dbpath mongo/db``` ausführen.
  * Um die MongoDB mit den GTFS Daten zu füllen:
  * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
  * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` einlesen (Achtung! - Dauert ca 30 Sekunden).
