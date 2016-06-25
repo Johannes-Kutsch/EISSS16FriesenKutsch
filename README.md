@@ -18,7 +18,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 #####Smartphone
 * Mindestens Android 4.4
 * 10 MB Speicherplatz
-* Internetzugang1 1wird für Firebase Messaging benötigt
+* Internetzugang (FCM)
 
 #####Server
 * Mindestens 500 MB Speicherplatz
