@@ -37,7 +37,7 @@ public class SharedPrefsManager {
      * compiled werden muss */
     public void setBaseUrl(String baseIP){
         SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
-        editor.putString("baseUrl", "http://"+baseIP+":3000");
+        editor.putString("baseUrl", "http://"+baseIP);
         editor.putString("baseIP", baseIP);
         editor.apply();
     }
@@ -45,7 +45,7 @@ public class SharedPrefsManager {
     /* Wird im LoginFragment aufgerufen und ins EditText eingetragen */
     public String getBaseIP(){
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getString("baseIP", "192.168.0.15");
+        return prefs.getString("baseIP", "192.168.0.15:3000");
     }
 
     /* Wird bei jeder Aktivität die eine Request an den Server sendet aufgerufen und stellt die Basis URL dar */
