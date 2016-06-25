@@ -75,7 +75,7 @@ module.exports.findMatches = function (req, res) {
                 
                 //Rating des Anbieters ermitteln
                 }, function(callback) {
-                    Ratings.find({user_id : result.owner_user_id}, 'stars', function(err, ratings) {
+                    Ratings.find({user_id : result.owner_user_id}, 'stars', function(err, results) {
                         if(err) {
                             //Fehler bei der Datenbankabfrage
                             callback(err)
