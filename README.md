@@ -17,11 +17,14 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 ####Anforderungen
 #####Smartphone
 Mindestens Android 4.4
+
 10 MB Speicherplatz
+
 Internetzugang (FCM)
 
 #####Server
 Mindestens 500 MB Speicherplatz
+
 Internetzugang (FCM)
 
 ####Installation
