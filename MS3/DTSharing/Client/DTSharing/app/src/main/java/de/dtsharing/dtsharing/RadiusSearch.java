@@ -19,19 +19,29 @@ public class RadiusSearch {
         this.mContext = context;
     }
 
+    /* Anhand der gegebenen Latitude und Longitude Parameter werden die stops gefiltert und abschließend
+     * alle stops nach nach Distanz sortiert und in einem Umkreis 2 km befindend ausgegeben */
     public String[] startRadiusSearch(double lat, double lon){
 
+        /* Alle stops werden aus der Lokalen Datenbank ausgelesen. Diese enthalten stop_name, latitude und longitude */
         SQLiteDatabase db;
         db = mContext.openOrCreateDatabase("Stops", Context.MODE_PRIVATE, null);
         Cursor cursor = db.rawQuery("SELECT * FROM vrs", null);
 
+        /* Es wird eine ArrayListe erzeugt, welche im weiteren Verlauf mit Daten von stops im Umkreis gefüllt werden. Zugehörig
+         * zum Namen enthalten die Einträge die Distanz */
         ArrayList<StopsEntry> stopsInRadius = new ArrayList<>();
+
+        /* Abschließend wird die erste Liste aufsteigend sortiert und die Namen der stops in die finale Liste gepusht */
         List<String> stopNamesOnly = new ArrayList<>();
 
+        /* Wenn stops gefunden wurden */
         if(cursor.getCount() > 0){
 
             cursor.moveToFirst();
 
+            /* Solange Einträge vorhanden sind vergleiche position der stops mit der position des Benutzers und pushe nur
+             * Einträge in die erste Liste, welche in einem Umkreis von 2 km liegen */
             while (cursor.moveToNext()){
 
                 String stopName = cursor.getString(0);
@@ -52,9 +62,14 @@ public class RadiusSearch {
                     stopsInRadius.add(new StopsEntry(stopName, distance));
                 }
             }
+
+            /* Abschließend schließe die Verbindungen um Datenlecks zu vermeiden */
             cursor.close();
             db.close();
 
+            /* Da die Liste sowohl aus einem String als auch einem int besteht wird diese über einen
+             * Comparator sortiert. Als Key wird die Distanz gewählt und die Einträge werden der Distanz
+             * aufsteigend sortiert*/
             Collections.sort(stopsInRadius, new Comparator<StopsEntry>() {
                 @Override
                 public int compare(StopsEntry stop1, StopsEntry stop2) {
@@ -64,15 +79,19 @@ public class RadiusSearch {
                 }
             });
 
+            /* Abschließend pushe nur die Namen in die dafür vorgesehene Liste */
             for (StopsEntry stop : stopsInRadius){
                 stopNamesOnly.add(stop.getStopName());
             }
         }
+
+        /* Der ProgressDialog fordert als Datenquelle ein Array. Somit wird die Liste in ein Array umgewandelt */
         String[] array = new String[stopNamesOnly.size()];
         stopNamesOnly.toArray(array);
         return array;
     }
 
+    /* CustomEntry für die ArrayListe um String (stop_name) und Int (Distanz) zu speichern */
     public class StopsEntry {
         public String stopName;
         public int distance;

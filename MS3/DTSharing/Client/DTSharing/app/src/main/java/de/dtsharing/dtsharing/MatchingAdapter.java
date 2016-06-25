@@ -110,19 +110,25 @@ public class MatchingAdapter extends BaseAdapter{
 
         final MatchingEntry matchesEntry = matches.get(position);
 
+        /* Daten werden den dafür zuständigen Views zugewiesen */
         viewHolder.userName.setText(matchesEntry.getUserName());
         viewHolder.departureTime.setText(matchesEntry.getDepartureTime());
         viewHolder.departureName.setText(matchesEntry.getDepartureName());
         viewHolder.targetTime.setText(matchesEntry.getTargetTime());
         viewHolder.targetName.setText(matchesEntry.getTargetName());
 
+        /* Hat der Benutzer noch keine Bewertung erhalten werden die Sterne durch "Keine Bewertung" ersetzt */
         if(matchesEntry.getAverageRating() == 0){
             viewHolder.noRatingContainer.setVisibility(View.VISIBLE);
+
+        /* Andernfalls sind die Sterne sichtbar und die Methode zum bestimmen der Image Ressource wird initiiert */
         }else{
             viewHolder.starsContainer.setVisibility(View.VISIBLE);
             setRating(matchesEntry.getAverageRating(), viewHolder);
         }
 
+        /* Hat der Benutzer kein Profilbild wird das default Bild angezeigt, ansonsten wird das Profilbild des Benutzers
+         * dekodiert und angezeigt */
         Log.d("MatchingAdapter", matchesEntry.getPicture());
         if(matchesEntry.getPicture().equals("null")) {
             Log.d("MatchingAdapter", "PICTURE IS NULL");
@@ -135,10 +141,13 @@ public class MatchingAdapter extends BaseAdapter{
             viewHolder.picture.setImageDrawable(roundDrawable);
         }
 
+        /* onClick Listener für den Matching Button. Es wird ein AlertDialog erzeugt, welcher eine finale
+         * Entscheidung des Benutzers erwartet. */
         viewHolder.matchingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
 
+                /* Die Message der AlertView wird anhand des Ticket Status des Benutzers gewählt */
                 String message, positiveButton;
                 if(enteredTripDetails.getAsBoolean("hasTicket")) {
                     message = "Möchtest du wirklich " + matchesEntry.getUserName() + " mitnehmen?";
@@ -152,6 +161,9 @@ public class MatchingAdapter extends BaseAdapter{
                         new AlertDialog.Builder(parent.getContext(), R.style.AppTheme_Dialog_Alert);
 
                 builder.setMessage(message);
+
+                /* Beim onClick des positiven Buttons wird der Key für den Chat generiert, in einen String
+                 * umgewandelt und samt der matchEntry Daten an den Server gesandt */
                 builder.setPositiveButton(positiveButton, new DialogInterface.OnClickListener() {
 
                     @Override
@@ -176,6 +188,9 @@ public class MatchingAdapter extends BaseAdapter{
         return convertView;
     }
 
+    /* POST-Request an den Server, welches den Matching Prozess Serverseitig initiiert. Bei einer positiven
+     * Response erhält der Benutzer die chatID. Diese zuzüglich des generierten Keys werden in der Lokalen
+     * Datenbank gesichert. */
     private void commitMatch(final MatchingEntry matchData, final String key){
 
         base_url = new SharedPrefsManager(context_1).getBaseUrl();
@@ -199,8 +214,14 @@ public class MatchingAdapter extends BaseAdapter{
 
                                 String chatID = jsonObject.getString("chat_id");
 
+                                /* Enthalten die enteredTripDetails den Key dtTripId, hat der Benutzer
+                                 * die MatchingActivity durch eine Notification erreicht. Daraufhin muss
+                                 * ein löschen der eigenen Fahrt initiiert werden, da der Benutzer sich matcht
+                                 * und seine Fahrt somit aus dem System ausgetragen werden muss */
                                 if(enteredTripDetails.containsKey("dtTripId")) {
                                     deleteOwnTrip(enteredTripDetails.getAsString("dtTripId"), userID, chatID, matchData, key);
+
+                                /* Andernfalls muss kein Trip aus dem System entfernt werden */
                                 } else {
                                     SQLiteDatabase db;
                                     db = context_1.openOrCreateDatabase("DTSharing", Context.MODE_PRIVATE, null);
@@ -212,6 +233,8 @@ public class MatchingAdapter extends BaseAdapter{
                                     db.insert("chats", null, values);
                                     db.close();
 
+                                    /* Benutzer wird zur MainActivity in die Chatübersicht geleitet und erhält
+                                     * dort eine Meldung, dass das Matching Erfolgreich verlaufen ist */
                                     Intent mainIntent = new Intent(context_1, MainActivity.class);
                                     mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     mainIntent.putExtra("matching_success", true);
@@ -241,7 +264,6 @@ public class MatchingAdapter extends BaseAdapter{
             {
                 Map<String, String> params = new HashMap<>();
                 // the POST parameters:
-                //params.put("interests", _interests.getText().toString());
                 params.put("user_id", userID);
                 params.put("departure_time", enteredTripDetails.getAsString("departureTime"));
                 params.put("arrival_time", enteredTripDetails.getAsString("arrivalTime"));
@@ -260,6 +282,8 @@ public class MatchingAdapter extends BaseAdapter{
 
     }
 
+    /* Ein DELETE-Request an den Server, welches die eigene Fahrt des Benutzers aus dem System entfernen soll, da dieser sich
+     * bei einer anderen Fahrt einträgt */
     private void deleteOwnTrip(String dtTripId, String userId, final String chatId, final MatchingEntry matchData, final String key){
 
         String URI = base_url+"/users/"+userId+"/dt_trips/"+dtTripId;
@@ -273,6 +297,8 @@ public class MatchingAdapter extends BaseAdapter{
 
                         Log.d("MatchingActivity", "deleteOwnTrip RESPONSE: "+response);
 
+                        /* Bei einer Erfolgreichen Response wird der Benutzer zu MainActivity zurück
+                         * geleitet und erhält dort eine Meldung, dass das Matching erfolgreich verlaufen ist */
                         if (response.contains("success_message")){
 
                             SQLiteDatabase db;
@@ -306,6 +332,8 @@ public class MatchingAdapter extends BaseAdapter{
 
     }
 
+    /* Das Rating wird in vorkomma und nachkomma aufgeteilt und daraufhin wird die Image Ressource
+     * für die Sterne ermittelt */
     private void setRating(final double rating, ViewHolder viewHolder){
 
         /*Default = starBorder => Somit muss dieser Stern nicht zugewiesen werden*/
@@ -315,6 +343,7 @@ public class MatchingAdapter extends BaseAdapter{
         int wholeRating = (int) rating;
         double fractionalRating = rating - wholeRating;
 
+        /* Ermittlung der ganzen Sterne */
         switch (wholeRating){
             case 5:
                 viewHolder.star5.setImageResource(starFull);
@@ -328,7 +357,7 @@ public class MatchingAdapter extends BaseAdapter{
                 viewHolder.star1.setImageResource(starFull);
         }
 
-
+        /* Ermittlung der halben Sterne */
         if(fractionalRating > 0.25 && fractionalRating < 0.75){
             switch (wholeRating+1){
                 case 1:
@@ -347,6 +376,9 @@ public class MatchingAdapter extends BaseAdapter{
                     viewHolder.star5.setImageResource(starHalf);
                     break;
             }
+
+        /* Beträgt die Nachkomma Stelle mehr als 0,75 wird aufgerundet
+         * und somit wird ein ganzer Stern vergeben */
         }else if(fractionalRating >= 0.75){
             switch (wholeRating+1){
                 case 1:

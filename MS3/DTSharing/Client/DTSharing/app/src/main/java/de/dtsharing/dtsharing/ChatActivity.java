@@ -69,7 +69,7 @@ public class ChatActivity extends AppCompatActivity {
     ImageView toolbar_avatar;
 
     String key;
-    ToznyHelper toznyHelper;
+    ToznyHelper toznyHelper = null;
 
     private MyMessageReceiver myReceiver;
 
@@ -94,7 +94,7 @@ public class ChatActivity extends AppCompatActivity {
             return false;
         }
 
-        /* Wird ein Broadcast mit der Action "newMessage" empfangen werde chatId und messageId aus diesem
+        /* Wird ein Broadcast mit der Action "newMessage" empfangen werden chatId und messageId aus diesem
         * gezogen. Entspricht die chatId der des aktuellen Chats handelt es sich um eine Nachricht aus diesem Chat.
         * Daraufhin wird die Methode getMessages aufgerufen. Da der dritte Parameter nicht null ist, weiß die Methode
         * dass es sich lediglich um den Empfang einer einzelnen Nachricht handelt. */
@@ -116,7 +116,7 @@ public class ChatActivity extends AppCompatActivity {
 
         context = ChatActivity.this;
 
-        /*Adding Toolbar to Main screen*/
+        /* Erfasse toolbar Views */
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
         toolbar_avatar = (ImageView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_avatar) : null);
@@ -152,36 +152,38 @@ public class ChatActivity extends AppCompatActivity {
 
         /* Kommt der Benutzer von der mainActivity kann der Key zum ent- und verschlüsseln von Nachrichten
          * direkt mitgenommen werden */
-        if(getIntent().getBooleanExtra("comesFromMain", false)){
-            Intent chatsIntent = getIntent();
-            partnerName = chatsIntent.getStringExtra("name");
-            partnerPicture = chatsIntent.getStringExtra("picture");
-            chatId = chatsIntent.getStringExtra("chatId");
-            key = getKey();
-            toznyHelper = new ToznyHelper(key);
-        }
-        if(getIntent().getBooleanExtra("comesFromNotification", false)){
+        if(getIntent() != null){
             Intent chatsIntent = getIntent();
             chatId = chatsIntent.getStringExtra("chatId");
-            userId = sharedPrefsManager.getUserIdSharedPrefs();
-            requestChatKey(userId, chatId);
         }
 
+        /* Es wird Überprüft ob der toznyHelper bereits mit einem korrekten Key erzeugt wurde und maßnahmen getroffen wenn
+         * dies nicht der Fall ist */
+        checkForTozny();
 
+        /* Rufe allgemeine Informationen zum Partner ab */
         getPartnerDetails();
+
+        /* Wird der Chat betreten sollen alle Messages abgerufen werden,daher wird der dritte Paramteter auf null
+         * gesetzt und signalisiert dadurch, dass es sich nicht um das Abrufen einer einzelnen Nachricht handelt */
         getMessages(userId, chatId, null);
 
+        /* onClick für den Nachricht Senden Button. Wurde ein Text eingegeben wird dieser mithilfe des ToznyHelpers
+         * verschlüsselt und an den Server gesendet */
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String message = inputMessage.getText().toString().trim();
                 if(!message.equals("")){
+                    checkForTozny();
                     toznyHelper.encryptString(message);
                     sendMessage(toznyHelper.getEncryptedString());
                 }
             }
         });
 
+        /* onClick für den User_Container in der Toolbar. Wird dieser angetippt gelangt der Benutzer zum Profil des
+         * Chatpartners */
         toolbar_user_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -193,6 +195,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        /* Der Broadcast Receiver wird registriert */
         IntentFilter filter = new IntentFilter("newMessage");
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         myReceiver = new MyMessageReceiver();
@@ -200,25 +203,39 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* Methode die sich um die Erzeugung des Bewerten Dialogs kümmert
+     * Wurde eine Fahrt abgeschlossen wird in der Response zum erhalten alle Nachrichten ein Boolean mit hasVoted mitgegeben
+     * Entspricht dieser true, wird lediglich ein Dank für die Bewertung ausgesprochen. Ist dieser false erhält der Nutzer eine nette
+     * Aufforderung seine Fahrt zu bewerten. Die Bewertung geschieht über einen Custom Alert Dialog */
     private void setRatingsContainer(boolean hasVoted){
 
+        /* Fahrt wurde bereits Bewertet */
         if(hasVoted){
             ratingsContainerText.setText("Vielen Dank für die Bewertung!");
             cvRatingsContainer.setVisibility(View.VISIBLE);
+
+        /* Fahrt wurde noch nicht Bewertet */
         } else {
             cvRatingsContainer.setVisibility(View.VISIBLE);
             cvRatingsContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    /* Angabe der Ressource star Drawables  */
                     final int starFull = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_full_48dp", null, null),
                             starBorder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_star_border_48dp", null, null);
+
+                    /* Final int array, da der Wert aus einer anonymen inneren Funktionn zugewiesen werden muss */
                     final int[] finalRating = new int[1];
+                    /* Rating startet bei 3 */
                     finalRating[0] = 3;
 
+                    /* Alert Dialog mit Custom Body für die Darstellung des Rating wie geplant */
                     AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this, R.style.AppTheme_Dialog_Alert);
                     LayoutInflater inflater = (ChatActivity.this).getLayoutInflater();
                     View dialogView = inflater.inflate(R.layout.fragment_rating, null);
 
+                    /* Views des Custom Bodys werden erfasst */
                     final ImageButton star1 = (ImageButton) dialogView.findViewById(R.id.ivStar1),
                             star2 = (ImageButton) dialogView.findViewById(R.id.ivStar2),
                             star3 = (ImageButton) dialogView.findViewById(R.id.ivStar3),
@@ -226,7 +243,10 @@ public class ChatActivity extends AppCompatActivity {
                             star5 = (ImageButton) dialogView.findViewById(R.id.ivStar5);
                     final EditText etComment = (EditText) dialogView.findViewById(R.id.etComment);
 
+                    /* Custom Body wird dem Dialog Builder zugewiesen.  */
                     builder.setView(dialogView)
+
+                            /* Bei onClick des positiven Buttons wird die Bewertung an den Server geschickt */
                             .setPositiveButton("Bewerten", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -236,9 +256,13 @@ public class ChatActivity extends AppCompatActivity {
                             })
                             .setNegativeButton("Abbruch", null);
 
+                    /* onClick für die Sterne. Durch die Verwendung des Switch Case und dem Fall dass dieses durchläuft, wenn kein
+                     * break gesetzt wird ist es möglich das Rating sehr effizient und in wenigen Zeilen Code zu realisieren */
                     View.OnClickListener starsOnClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+
+                            /* Wird ein Stern angetippt werden Rating und Resourcen auf die Ausgangssituation zurückgesetzt */
                             int rating = 0;
                             star5.setImageResource(starBorder);
                             star4.setImageResource(starBorder);
@@ -246,6 +270,8 @@ public class ChatActivity extends AppCompatActivity {
                             star2.setImageResource(starBorder);
                             star1.setImageResource(starBorder);
 
+                            /* Anschließend wird über ein Switch Case das Rating bestimmt als auch die ImageResource geändert und abschließend dem finalRating array
+                             * zugewiesen */
                             switch (view.getId()){
                                 case R.id.ivStar5:
                                     star5.setImageResource(starFull);
@@ -266,12 +292,14 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     };
 
+                    /* Setze den onClick Listener für jeden Star */
                     star1.setOnClickListener(starsOnClickListener);
                     star2.setOnClickListener(starsOnClickListener);
                     star3.setOnClickListener(starsOnClickListener);
                     star4.setOnClickListener(starsOnClickListener);
                     star5.setOnClickListener(starsOnClickListener);
 
+                    /* Erzeuge und zeige den Dialog */
                     builder.create();
                     builder.show();
                 }
@@ -280,6 +308,7 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* POST-Request an den Server mit den Rating Daten im Body */
     private void submitRating(final int rating, final String comment){
 
         final String URI = base_url+"/users/"+partnerUserId+"/ratings";
@@ -289,6 +318,7 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
 
+                        /* Bei Erfolgreicher Response wird der Text des Bewwerten Containers geändert */
                         if(response.contains("success_message")){
                             ratingsContainerText.setText("Vielen Dank für die Bewertung!");
                         }
@@ -324,6 +354,34 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* Es wird Überprüft ob der ToznyHelper bereits mit einem gültigen Key erzeugt wurde. Ist dies nicht der Fall
+     * wird geschaut, ob bereits ein Key existiert. Ist auch dies nicht der Fall wird in der Lokalen Datenbank nach
+     * dem Key geschaut. Ist auch diese Suche Ergebnislos wird der Key vom Server angefordert und der ToznyHelper erzeugt
+     * Durch das kurze Überprüfen des ToznyHelpers vor jeder Ver- und Entschlüsseln Aktion werden nullpointer vermieden die zu einem
+     * Absturz der App führen. Ebenso wird dadurch garantiert, dass Nachrichten korrekt Ent- und Verschlüsselt werden */
+    private void checkForTozny(){
+
+        /* Existiert der ToznyHelper bereits? */
+        if (toznyHelper == null){
+
+            /* Suche in der Lokalen Datenbank nach dem Key */
+            if (key == null)
+                key = getKey();
+
+            /* Key in der Lokalen Datenbank nicht gefunden => Vom Server anfordern und den ToznyHelper sofort erzeugen*/
+            if (key == null)
+                requestChatKey(userId, chatId);
+
+            /* Andernfalls erzeuge den ToznyHelper mit dem Key aus der Lokalen Datenbank */
+            else
+                toznyHelper = new ToznyHelper(key);
+
+        }
+
+    }
+
+    /* Es wird geschaut, ob der Verschlüsselungs Key zugehörig zu diesem Chat bereits in der Lokalen Datenbank
+     * vorhanden ist */
     private String getKey(){
 
         String keyString = null;
@@ -343,6 +401,9 @@ public class ChatActivity extends AppCompatActivity {
         return keyString;
     }
 
+    /* Hier wird durch ein GET Request an den Server mit UserID und ChatID als Query Parameter der
+     * Key für diesen Chat angefordert. Bei einer Erfolgreichen Response wird dieser in die Lokale
+     * Datenbank gesichert und der ToznyHelper sofort erzeugt um eine weitere Datenbankabfrage zu ersparen*/
     public void requestChatKey(String userId, final String chatID){
 
         final String URI = base_url+"/users/"+userId+"/chats/"+chatID+"/key";
@@ -354,6 +415,8 @@ public class ChatActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
 
                 Log.d("ChatActivity", "RESPONSE: "+response);
+
+                /* Der Key wird der JSON Response entnommen */
                 String key = null;
                 try {
                     key = response.getString("key");
@@ -361,6 +424,8 @@ public class ChatActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                /* Wenn der Key erfolgreich entnommen wurde wird er in die Lokale Datenbank gesichert und
+                 * der ToznyHelper wird sofort erzeugt */
                 if(key != null) {
 
                     SQLiteDatabase db;
@@ -393,6 +458,8 @@ public class ChatActivity extends AppCompatActivity {
         Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
     }
 
+    /* Es wird ein POST-Request an den Server gesandt, welche die verschlüsselte Nachricht im Body mitliefert. Bei einer Erfolgreichen
+     * Response wird die Nachricht sofort (nur Clientseitig) der ArrayListe hinzugefügt und der Adapter benachrichtigt */
     private void sendMessage(final String message){
 
         String URI = base_url+"/users/"+userId+"/chats/"+chatId+"/messages";
@@ -404,11 +471,13 @@ public class ChatActivity extends AppCompatActivity {
 
                         if(response.contains("success_message")){
 
+                            /* Aktuelle Uhrzeit und Datum werden ermittelt. Ebenso wird die fortlaufende sequence der Nachricht ermittelt, indem
+                             * die der letzten Nachricht um 1 aufaddiert, oder falls keine Nachrichten vorhanden einfach 0 gesetzt wird */
                             String currentTime = new SimpleDateFormat("HH:mm", Locale.GERMANY).format(new Date()),
                                     currentDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(new Date());
-                            int sequence = messages.size() > 0 ? messages.get(messages.size()-1).getSequence() : 0;
+                            int sequence = messages.size() > 0 ? messages.get(messages.size()-1).getSequence()+1 : 0;
 
-
+                            /* Nachricht wird der ArrayListe hinzugefügt. InputFeld wird geleert und der Adapter wird benachrichtigt */
                             messages.add(new MessagesEntry(userId, userName, currentTime, currentDate, inputMessage.getText().toString().trim(), sequence));
                             inputMessage.setText("");
                             mAdapter.notifyDataSetChanged();
@@ -442,6 +511,10 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* Benutzerdaten des Partners werden über ein GET-Reqeuest mit den Query Parametern userID und chatID an den Server erhalten. Diese Methode
+     * wird benötigt um Name, Profilbild und Id des Partner zu erhalten. Diese müssen abgefragt werden, da es 2 Wege gibt in den Chat zu kommen.
+     * Über die Chatübersicht könnten diese Daten bereits mitgenommen werden, kommt man hingegen durch Klick auf die Notification fehlen einem diese
+     * Daten */
     private void getPartnerDetails(){
 
         String URI = base_url+"/users/"+userId+"/chats/"+chatId+"/partner";
@@ -449,6 +522,7 @@ public class ChatActivity extends AppCompatActivity {
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(
                 Request.Method.GET, URI, null, new Response.Listener<JSONObject>() {
 
+            /* Bei einer Erfolgreichen Response werden die Variablen deklariert und die Informationen in die dafür Vorgesehenen Views eingefügt */
             @Override
             public void onResponse(JSONObject response) {
 
@@ -461,8 +535,10 @@ public class ChatActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                /* Setzen des Namens */
                 mTitle.setText(partnerName);
 
+                /* Ist das Bild null wird das default Bild gesetzt. Ansonsten wird das mitgelieferte Bild in eine Bitmap umgewandelt und der ImageView übergeben */
                 if(partnerPicture.equals("null") || partnerPicture == null){
                     int placeholder = getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
                     toolbar_avatar.setImageResource(placeholder);
@@ -489,15 +565,21 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* Die Methode getMessages ist ein GER-Request an den Server um entweder, wenn keine messageID angegeben wurde, alle Nachrichten zu erhalten, oder mit vorhandener
+     * MessageIO, welche dem Broadcast Receiver übergeben wird, einzelne Nachrichten abrufen zu können. Da es sich bei der Response aller Nachrichten um ein JSONArray und
+     * bei der Response von einzelnen Nachrichten um ein JSONObject handelt muss bei der Behandlung dieser unterschieden werden */
     private void getMessages(final String userId, final String chatId, final String messageId){
 
         String URI;
 
+        /* Ist keine MessageID vorhanden wird die URI auf /messages mit dem Query Parameter sequence erzeugt */
         if(messageId == null) {
             URI = Uri.parse(base_url + "/users/" + userId + "/chats/" + chatId + "/messages")
                     .buildUpon()
                     .appendQueryParameter("sequence", messages.size() > 0 ? Integer.toString(messages.get(messages.size() - 1).getSequence() + 1) : "0")
                     .build().toString();
+
+        /* Andernfalls wird das GET auf die URI der einzelnen Nachrichten gemacht */
         } else {
             URI = base_url+"/users/"+userId+"/chats/"+chatId+"/messages/"+messageId;
         }
@@ -510,12 +592,16 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onResponse(String stringResponse) {
 
+                /* Ist die messageID null wird ein JSONArray erwartet */
                 if(messageId == null){
                     getAllMessages(stringResponse);
+
+                /* Andernfalls wird die behandlung der einzelnen Nachricht initiiert */
                 } else {
                     getSingleMessage(stringResponse);
                 }
 
+                /* Abschließend wird der Adapter benachrichtigt */
                 mAdapter.notifyDataSetChanged();
 
             }
@@ -535,15 +621,22 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* Die stringResponse enthält partner Daten und das message array. Es kann, sofern die Fahrt abgeschlossen
+     * ist auch einen has_voted boolean enthalten. Die StringResponse wird in dieser Methode entsprechend verarbeitet
+     * und die Nachrichten werden abschließend der ArrayList hinzugefügt  */
     private void getAllMessages(String stringResponse){
 
         try {
 
             Log.d("ChatActivity", "GET_ALL_MESSAGES: "+stringResponse);
 
+            /* Bei der stringResponse handelt es sich im ein JSONObject, welches ein JSONArray beinhaltet */
             JSONObject response = new JSONObject(stringResponse);
 
+            /* Es wird geprüft ob der boolean has_voted vorhanden ist */
             if(response.has("has_voted")){
+
+                /* Ist dieser vorhanden wird die Methode setRatingsContainer initiiert */
                 boolean hasVoted = response.getBoolean("has_voted");
                 setRatingsContainer(hasVoted);
             }
@@ -554,6 +647,8 @@ public class ChatActivity extends AppCompatActivity {
             partnerName = partner.getString("first_name")+" "+partner.getString("last_name");
             partnerPicture = partner.getString("picture");
 
+            /* Das messages array wird durchlaufen und jede Nachricht der ArrayList hinzugefügt. Dabei ist zu beachten,
+             * dass der message_text verschlüsselt ist und erst entschlüsselt werden muss */
             if(messagesArray.length() > 0) {
 
                 for (int i = 0; i < messagesArray.length(); i++) {
@@ -567,20 +662,14 @@ public class ChatActivity extends AppCompatActivity {
                     int sequence = messageData.getInt("sequence");
                     String name = authorId.equals(userId) ? userName : partnerName;
 
+                    /* Falls die partnerUserID noch fehlt wird diese einmalig über die Messages bezogen. Die identifizierun dieser
+                     * geschieht durch einen Vergleich mit der eigenen, bereits bekannten, userID */
                     if(partnerUserId == null && !authorId.equals(userId))
                         partnerUserId = authorId;
 
-                    if(toznyHelper == null) {
-                        key = getKey();
-                        if (key == null){
-                            requestChatKey(userId, chatId);
-                        } else {
-                            toznyHelper = new ToznyHelper(key);
-                        }
-                        toznyHelper.decryptString(message);
-                    } else {
-                        toznyHelper.decryptString(message);
-                    }
+                    /* Um einer nullpointer vorzubeugen wird vor der entschlüsselung der Nachricht auf einen korrekten toznyHelper überprüft */
+                    checkForTozny();
+                    toznyHelper.decryptString(message);
 
                     messages.add(new MessagesEntry(authorId, name, time, date, toznyHelper.getDecryptedString(), sequence));
                 }
@@ -593,6 +682,8 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    /* Bei der stringResponse handelt es sich um ein JSONObject, welches die Informationen einer einzelnen Nachricht aufweist. Auch hier
+     * wird die Nachricht vor einfügen in die ArrayList entschlüsselt */
     private void getSingleMessage(String stringResponse){
 
         try {
@@ -607,6 +698,8 @@ public class ChatActivity extends AppCompatActivity {
             int sequence = messageData.getInt("sequence");
             String name = authorId.equals(userId) ? userName : partnerName;
 
+            /* Um einer nullpointer vorzubeugen wird vor der entschlüsselung der Nachricht auf einen korrekten toznyHelper überprüft */
+            checkForTozny();
             toznyHelper.decryptString(message);
 
             messages.add(new MessagesEntry(authorId, name, time, date, toznyHelper.getDecryptedString(), sequence));
@@ -633,6 +726,7 @@ public class ChatActivity extends AppCompatActivity {
     //<--           OnOptionsItemSelected End         -->
 
 
+    /* Wird die Aktivität zerstört muss der receiver abgemeldet werden */
     @Override
     protected void onDestroy() {
         super.onDestroy();

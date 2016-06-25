@@ -74,14 +74,26 @@ public class RatingsAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        /* Aktuelle Position in der ArrayListe wird festgelegt, sodass nun die Values den dafür vorgesehenen Views
+         * zugewiesen werden können */
         RatingsEntry ratingsEntry = ratings.get(position);
 
         viewHolder.name.setText(ratingsEntry.getName());
         viewHolder.date.setText(ratingsEntry.getDate());
-        viewHolder.message.setText(ratingsEntry.getMessage());
 
+        /* Ist keine Message angegeben worden, verstecke die MessageView um weißraum zu vermeiden */
+        if(ratingsEntry.getMessage().equals("")){
+            viewHolder.message.setVisibility(View.GONE);
+
+        } else {
+            viewHolder.message.setText(ratingsEntry.getMessage());
+            viewHolder.message.setVisibility(View.VISIBLE);
+        }
+
+        /* Bestimme anhand des Ratings die Ressourcen der ImageViews */
         setRating(ratingsEntry.getRating(), viewHolder);
 
+        /* Wenn kein Bild angegeben wird das default Bild gesetzt */
         if(ratingsEntry.getPicture().equals("null")){
             int placeholder = context_1.getResources().getIdentifier("de.dtsharing.dtsharing:drawable/ic_account_circle_48dp", null, null);
             viewHolder.picture.setImageResource(placeholder);
@@ -94,6 +106,8 @@ public class RatingsAdapter extends BaseAdapter{
         return convertView;
     }
 
+    /* Da nur ganze Sterne vergeben werden können muss keine Fallunterscheidung getroffen werden. Da
+     * die sterne per default nicht ausgefüllt sind muss auch nur der Fall des ausfüllens behandelt werden */
     private void setRating(final int rating, ViewHolder viewHolder) {
 
         /*Default = starBorder => Somit muss dieser Stern nicht zugewiesen werden*/
@@ -101,6 +115,7 @@ public class RatingsAdapter extends BaseAdapter{
 
         System.out.println("Rating: "+rating);
 
+        /* Die durchlaufende switch/case ermöglich eine effizientes setzen der ressourcen */
         switch (rating){
             case 5:
                 viewHolder.star5.setImageResource(starFull);

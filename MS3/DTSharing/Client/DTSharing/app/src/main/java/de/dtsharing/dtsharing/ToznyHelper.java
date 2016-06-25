@@ -18,11 +18,13 @@ public class ToznyHelper {
     AesCbcWithIntegrity.SecretKeys keys;
     String key, encryptedString, decryptedString;
 
+    /* Der ToznyHelper wird mit einem StringKey erzeugt und wandelt diesen sofort in einen gültigen Key um */
     public ToznyHelper(String key){
         this.key = key;
         StringToKey();
     }
 
+    /* Anschließend kann mit der erzeugen Instanz das Ver- und Entschlüsseln von Nachrichten vorgenommen werden */
     public void encryptString (String message){
 
         CipherTextIvMac cipherTextIvMac = null;
@@ -53,6 +55,7 @@ public class ToznyHelper {
 
     }
 
+    /* Der StringKey wird in einen gültigen Key umgewandelt */
     public void StringToKey (){
 
         try {
@@ -64,16 +67,13 @@ public class ToznyHelper {
 
     }
 
+    /* Die ent- bzw verschlüsselte Nachricht wird als String ausgegeben */
     public String getEncryptedString(){
         return encryptedString;
     }
 
     public String getDecryptedString(){
         return decryptedString;
-    }
-
-    public AesCbcWithIntegrity.SecretKeys getKeys(){
-        return keys;
     }
 
 }

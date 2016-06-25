@@ -36,14 +36,16 @@ public class FahrtenDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fahrten_detail);
 
-        base_url = new SharedPrefsManager(FahrtenDetailActivity.this).getBaseUrl();
+        /* base_url und userID werden aus den SharedPrefs bezogen */
+        SharedPrefsManager sharedPrefsManager = new SharedPrefsManager(FahrtenDetailActivity.this);
+        base_url = sharedPrefsManager.getBaseUrl();
+        userId = sharedPrefsManager.getUserIdSharedPrefs();
 
-        /*Adding Toolbar to Main screen*/
+        /* Toolbar Views werden gesetzt */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mTitle = (TextView) (toolbar != null ? toolbar.findViewById(R.id.toolbar_title) : null);
 
-        userId = new SharedPrefsManager(FahrtenDetailActivity.this).getUserIdSharedPrefs();
-
+        /* Custom toolbar wird gesetzt */
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -53,6 +55,8 @@ public class FahrtenDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
+        /* Views werden erfasst */
         _main_content = (CoordinatorLayout) findViewById(R.id.main_content);
         _main_content.setVisibility(View.GONE);
 
@@ -74,14 +78,18 @@ public class FahrtenDetailActivity extends AppCompatActivity {
         _targetUserName1 = (TextView) findViewById(R.id.targetUserName1);
         _targetUserName2 = (TextView) findViewById(R.id.targetUserName2);
 
+        /* Extras des Intents werden bezogen */
         Intent mainIntent = getIntent();
         if(mainIntent != null){
             dtTripId = mainIntent.getStringExtra("dtTripId");
         }
 
+        /* Die Trips Daten werden vom Server angefordert */
         getTripData(userId, dtTripId);
     }
 
+    /* GET-Request an den Server. Ein JSONObject wird als Response erwartet. Bei einer erfolgreichen Response
+     * werden die Daten den dafür vorgesehenen Views zugewiesen */
     private void getTripData(final String userId, final String dtTripId){
 
         final String URI = base_url+"/users/"+userId+"/dt_trips/"+dtTripId;
@@ -102,8 +110,17 @@ public class FahrtenDetailActivity extends AppCompatActivity {
                     Log.d("FahrtenDetailActivity", "trip: "+trip.toString()+"\nuser: "+user.toString()+"\npartner: "+partner.toString());
                     mTitle.setText(trip.getString("route_name")+" - "+trip.getString("date"));
 
+
+                    /* Das Layout wurde Tabellarisch aufgebaut, sodass nicht benötigte Spalten, da beide
+                     * Teammitglieder denselben Start- und Zielbahnhof haben, oder für diese Fahrt noch kein
+                     * Partner vorhanden ist, entfernt werden können.
+                     * Die hier dargestellt Fallunterscheidung sorgt für die korrekte Darstellung der
+                     * Detaillierten Fahrtübersicht und deckt jeden Fall ab */
+
+                    /* Ist ein Partner für die Fahrt eingetragen */
                     if(!partner.getString("sequence_id_departure_station").equals("null")){
 
+                        /* Beide Teilnehmer haben denselben Startbahnhof */
                         if(user.getInt("sequence_id_departure_station") == partner.getInt("sequence_id_departure_station")){
 
                             _tableRowDeparture2.setVisibility(View.GONE);
@@ -112,6 +129,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
                             _departureStationName1.setText(user.getString("departure_station_name"));
                             _departureTime1.setText(user.getString("departure_time"));
 
+                        /* Der Benutzer steigt während der Fahrt zu */
                         } else if(user.getInt("sequence_id_departure_station") > partner.getInt("sequence_id_departure_station")){
 
                             _departureUserName1.setText(partner.getString("first_name")+" steigt ein");
@@ -121,6 +139,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
                             _departureTime1.setText(partner.getString("departure_time"));
                             _departureTime2.setText(user.getString("departure_time"));
 
+                        /* Der Partner steigt während der Fahrt zu */
                         } else {
 
                             _departureUserName1.setText(user.getString("first_name")+" steigt ein");
@@ -132,6 +151,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
                         }
 
+                        /* Beide Teilnehmer haben denselben Zielbahnhof */
                         if(user.getInt("sequence_id_target_station") == partner.getInt("sequence_id_target_station")){
 
                             _tableRowTarget1.setVisibility(View.GONE);
@@ -140,6 +160,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
                             _targetStationName2.setText(user.getString("target_station_name"));
                             _arrivalTime2.setText(user.getString("arrival_time"));
 
+                        /* Der Partner steigt früher aus */
                         } else if(user.getInt("sequence_id_target_station") > partner.getInt("sequence_id_target_station")){
 
                             _targetUserName1.setText(partner.getString("first_name")+" steigt aus");
@@ -149,6 +170,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
                             _arrivalTime1.setText(partner.getString("arrival_time"));
                             _arrivalTime2.setText(user.getString("arrival_time"));
 
+                        /* Der Benutzer steigt früher aus */
                         } else if(user.getInt("sequence_id_target_station") < partner.getInt("sequence_id_target_station")){
 
                             _targetUserName1.setText(user.getString("first_name")+" steigt aus");
@@ -160,6 +182,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
                         }
 
+                    /* Kein Partner für die Fahrt eingetragen */
                     } else {
 
                         _tableRowDeparture2.setVisibility(View.GONE);
@@ -176,6 +199,7 @@ public class FahrtenDetailActivity extends AppCompatActivity {
 
                     }
 
+                    /* Wurden die Fallunterscheidungen abgeschlossen mache die View sichtbar */
                     _main_content.setVisibility(View.VISIBLE);
 
                 } catch (JSONException e) {

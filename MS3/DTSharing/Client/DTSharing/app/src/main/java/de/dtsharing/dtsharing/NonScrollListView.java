@@ -6,6 +6,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 //http://stackoverflow.com/a/24629341
+/* Die Custom ListView wird für eine Darstellung in einer ScrollView benötigt. Sie sorgt dafür,
+ * dass die ListView ihre komplette Höhe erhält und somit nicht mehr Scrollbar ist. Das Scrollen
+ * erfolgt über die ScrollView
+ * Diese wird nur in der Suchmaske benötigt */
 public class NonScrollListView extends ListView {
 
     public NonScrollListView(Context context) {
