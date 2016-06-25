@@ -25,6 +25,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 * Internetzugang (FCM)
 
 ####Installation
+#####Server
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
 2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
 3. Den Git Ordner [MS3/DTSharing](https://github.com/netrox91/EISSS16FriesenKutsch/tree/master/MS3/DTSharing) herunterladen und entpacken.
@@ -36,6 +37,12 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
  * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
  * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` einlesen (Achtung! - Dauert ca 30 Sekunden).
 8. Um den NodeJS Server zu starten mit dem erstem Terminal in den Ordner ```DTSharing/Server``` wechseln und ```node server.js```ausführen.
+
+#####Client
+1. DTSharing.apk auf dem Smartphone installieren
+ * [DTSharing.apk herunterladen](https://github.com/netrox91/EISSS16FriesenKutsch/raw/master/MS3/DTSharing.apk) und installieren
+ * oder die DTSharing.apk aus dem Ordner ```MS3/DTSharing.apk```auf das Handy ziehen und manuell installieren
+####Erste Schritte
 
 
 ###Rapid Prototype
