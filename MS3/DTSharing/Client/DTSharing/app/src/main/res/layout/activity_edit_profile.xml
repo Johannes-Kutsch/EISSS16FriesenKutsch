@@ -104,7 +104,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Interessen"
-                                android:text="Platzhalter"
                                 android:theme="@style/AppTheme.Base"/>
 
                         </android.support.design.widget.TextInputLayout>
@@ -118,7 +117,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Sonstiges"
-                                android:text="Platzhalter"
                                 android:theme="@style/AppTheme.Base"/>
 
                         </android.support.design.widget.TextInputLayout>
