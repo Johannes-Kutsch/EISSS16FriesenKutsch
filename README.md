@@ -16,16 +16,13 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 
 ####Anforderungen
 #####Smartphone
-Mindestens Android 4.4
-
-10 MB Speicherplatz
-
-Internetzugang (FCM)
+* Mindestens Android 4.4
+* 10 MB Speicherplatz
+* Internetzugang (FCM)
 
 #####Server
-Mindestens 500 MB Speicherplatz
-
-Internetzugang (FCM)
+* Mindestens 500 MB Speicherplatz
+* Internetzugang (FCM)
 
 ####Installation
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
