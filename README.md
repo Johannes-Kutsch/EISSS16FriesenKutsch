@@ -16,7 +16,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 
 ####Anforderungen
 #####Smartphone
-* Mindestens Android 4.4
+* Mindestens Android 4.4, API 19
 * 10 MB Speicherplatz
 * Internetzugang (FCM)
 
