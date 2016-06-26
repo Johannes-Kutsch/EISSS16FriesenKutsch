@@ -34,8 +34,8 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 6. Ein 2. Terminal öffnen, da MongoDB und NodeJS ausgeführt werden müssen.
 7. Um die MongoDB zu starten in den Ordner ```MS3/DTSharing/Server``` wechseln und ```mongod --dbpath mongo/db``` ausführen.
  * Um die MongoDB mit den GTFS Daten zu füllen:
- * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
- * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` einlesen (Achtung! - Dauert ca 30 Sekunden).
+   * Die Config Datei aus dem Ordner ```DTSharing/Server/config``` in den Ordner ```DTSharing/Server/node_modules/gtfs``` kopieren
+    * Mit dem erstem Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` einlesen (Achtung! - Dauert ca 30 Sekunden).
 8. Um den NodeJS Server zu starten mit dem erstem Terminal in den Ordner ```DTSharing/Server``` wechseln und ```node server.js```ausführen.
 
 #####Client
@@ -53,16 +53,9 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 ####Erste Schritte
 
 
-###Rapid Prototype
+###Implementation
 ####Beschreibung
-Der Rapid Prototype wurde in Android Studio entwickelt, für den Server wurde NodeJS gewählt und als Datenbank findet MongoDB verwendung. Es wurden im Prototypen für das Projekt wichtige Funktionalitäten umgesetzt.
-* Einpflegen der GTFS Fahrplandaten* in die MongoDB. *(werden monatlich von der VRS aktualisiert)
-* Eintragen der Ticket-Anbietenden und -Suchenden nach Typ in die Datenbank (Search, Offer)
-* Abrufen der eingetragenen Daten nach Typ (Search, Offer)
-* Autocomplete mit den Verfügbaren Haltestellen im Eingabeformular (Haltestellen über die GTFS Daten in der MongoDB bezogen und somit kompatible mit direktem API Zugriff)
-* Matching zwischen Ticket-Anbietend und -Suchend anhand der eingetragenen Daten (PoC 11.1)
-* Abrufen der GPS Informationen Latitude und Longitude on demand (PoC 11.4)
-* Ausgabe von Haltestellen, welche sich in einem Umkreis von 2km befinden (Radius kann variiert werden) (PoC 11.5)
+Text
 
 ####Screenshots
-![alt text](https://github.com/netrox91/EISSS16FriesenKutsch/blob/master/MS1/Rapid%20Prototype%20Screenshots/All.png "Screenshot")
+![alt text](https://github.com/netrox91/EISSS16FriesenKutsch/blob/master/MS3/Screenshots/All_4x4.png "Screenshot")
