@@ -45,7 +45,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 2. DTSharing starten
  * Lokale IP-Adresse des Servers ermitteln und im Client ändern (Default Port: 3000) 
    * Handelt es sich um einen Android Emulator, der auf demselben Rechner ausgeführt wird, auf dem der NodeJS Server läuft, lautet die IP: 10.0.2.2
-     * OSX:
+    * OSX:
        * ```ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'``` im Terminal eingeben
         * oder alt gedrückt halten und die WLAN Schaltfläche von OSX klicken
      * Windows:
