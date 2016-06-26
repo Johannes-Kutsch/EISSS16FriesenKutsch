@@ -11,8 +11,7 @@ Personen am Bahnhof ausfindig zu machen.
 Das Ziel des Projektes ist es, eine Plattform zu schaffen, welche es ermöglicht Kontakt
 zwischen einander unbekannten Benutzern herzustellen, deren Route ganz oder
 teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits
-vorhandenen Dauertickets ermöglicht. Außerdem soll es durch das System
-vereinfacht werden Personen am Bahnhof ausfindig zu machen.
+vorhandenen Dauertickets ermöglicht.
 
 ####Anforderungen
 #####Smartphone
