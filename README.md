@@ -50,12 +50,5 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
 3. Über die Schaltfläche ```Registrieren``` ein Benutzerkonto anlegen
 4. Nach Erfolgreicher Registration mit den Daten anmelden
 
-####Erste Schritte
-
-
-###Implementation
-####Beschreibung
-Text
-
 ####Screenshots
 ![alt text](https://github.com/netrox91/EISSS16FriesenKutsch/blob/master/MS3/Screenshots/All_4x4.png "Screenshot")
