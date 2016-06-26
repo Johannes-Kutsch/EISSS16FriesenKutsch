@@ -46,7 +46,7 @@ vereinfacht werden Personen am Bahnhof ausfindig zu machen.
  * Lokale IP-Adresse des Servers ermitteln und im Client ändern (Default Port: 3000)
    * OSX: ```ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'``` im Termin eingeben oder alt gedrückt halten und auf das WLAN Symbol klicken
     * Windows: ```ipconfig``` im CMD eingeben
- * DTSharing neustarten damit die Stops mit der korrekten Adresse vom Server geholt werden können
+ * DTSharing neustarten damit die Stops vom Server geholt werden können
 3. Über die Schaltfläche ```Registrieren``` ein Benutzerkonto anlegen
 4. Nach Erfolgreicher Registration mit den Daten anmelden
 
