@@ -6,26 +6,26 @@ kostenlos mit der Bahn mitzunehmen. Momentan gibt es keine einfache Möglichkeit
 sich mit fremden Personen zusammenzuschließen um das Ticket gemeinsam zu
 nutzen.
 
-####Ziel
+#### Ziel
 Das Ziel des Projektes ist es, eine Plattform zu schaffen, welche es ermöglicht Kontakt
 zwischen einander unbekannten Benutzern herzustellen, deren Route ganz oder
 teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits
 vorhandenen Dauertickets ermöglicht.
 
-####Anforderungen
+#### Anforderungen
 
-#####Smartphone
+##### Smartphone
 * Mindestens Android 4.4, API 19
 * 10 MB Speicherplatz
 * Internetzugang (FCM)
 
-#####Server
+##### Server
 * Mindestens 500 MB Speicherplatz
 * Internetzugang (FCM)
 
-####Installation
+#### Installation
 
-#####Server
+##### Server
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
 2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
 3. Den Git Ordner [MS3/DTSharing](https://github.com/netrox91/EISSS16FriesenKutsch/tree/master/MS3/DTSharing) herunterladen und entpacken.
@@ -38,7 +38,7 @@ vorhandenen Dauertickets ermöglicht.
     * Mit dem ersten Terminal in den Ordner ```DTSharing/Server/node_modules/gtfs``` wechseln und die Daten mit dem Befehl ```node ./scripts/download``` einlesen (Achtung! - Dauert ca 30 Sekunden).
 8. Um den NodeJS Server zu starten mit dem ersten Terminal in den Ordner ```DTSharing/Server``` wechseln und ```node server.js```ausführen.
 
-#####Client
+##### Client
 1. DTSharing.apk auf dem Smartphone installieren
  * [DTSharing.apk herunterladen](https://github.com/netrox91/EISSS16FriesenKutsch/raw/master/MS3/DTSharing.apk) und installieren
  * oder die DTSharing.apk aus dem Ordner ```MS3/DTSharing.apk``` auf das Handy ziehen und manuell installieren
@@ -54,5 +54,5 @@ vorhandenen Dauertickets ermöglicht.
 3. Über die Schaltfläche ```Registrieren``` ein Benutzerkonto anlegen
 4. Nach Erfolgreicher Registration mit den Daten anmelden
 
-####Screenshots
+#### Screenshots
 ![alt text](https://github.com/netrox91/EISSS16FriesenKutsch/blob/master/MS3/Screenshots/All_4x4.png "Screenshot")
