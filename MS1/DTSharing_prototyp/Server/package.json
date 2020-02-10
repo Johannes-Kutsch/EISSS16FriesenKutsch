@@ -9,7 +9,7 @@
     "geocoder": "^0.2.2",
     "geolib": "^2.0.20",
     "gtfs2mongo": "^1.1.7",
-    "mongoose": "^4.4.12"
+    "mongoose": "^5.8.11"
   },
   "devDependencies": {},
   "scripts": {},
