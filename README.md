@@ -5,6 +5,7 @@ Zu bestimmten Zeiten bietet das Dauerticket die Möglichkeit eine zusätzliche P
 kostenlos mit der Bahn mitzunehmen. Momentan gibt es keine einfache Möglichkeit
 sich mit fremden Personen zusammenzuschließen um das Ticket gemeinsam zu
 nutzen.
+
 ####Ziel
 Das Ziel des Projektes ist es, eine Plattform zu schaffen, welche es ermöglicht Kontakt
 zwischen einander unbekannten Benutzern herzustellen, deren Route ganz oder
@@ -12,6 +13,7 @@ teilweise miteinander übereinstimmt und so die gemeinsame Nutzung eines bereits
 vorhandenen Dauertickets ermöglicht.
 
 ####Anforderungen
+
 #####Smartphone
 * Mindestens Android 4.4, API 19
 * 10 MB Speicherplatz
@@ -22,6 +24,7 @@ vorhandenen Dauertickets ermöglicht.
 * Internetzugang (FCM)
 
 ####Installation
+
 #####Server
 1. [NodeJS herunterladen](https://nodejs.org/en/download/) und installieren.
 2. [MongoDB herunterladen](https://www.mongodb.org/downloads#production) und installieren.
